@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"mi1li0n.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="今年（2024年）米开的一篇，主要贡献是利用现有数据集制作了一个新数据集（源自TCGA），以及设计了一个多实例生成框架（在经典Transformer上加入了分层位置感知模块） 这篇的故事讲得比较精彩且公式化，内容其实不多（会议论文） 链接：https:&#x2F;&#x2F;papers.miccai.org&#x2F;miccai-2024&#x2F;850-Paper0761.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【论文阅读】WsiCaption">
+<meta property="og:url" content="http://mi1li0n.github.io/2024/11/05/WsiCaption/index.html">
+<meta property="og:site_name" content="Million&#39;blog">
+<meta property="og:description" content="今年（2024年）米开的一篇，主要贡献是利用现有数据集制作了一个新数据集（源自TCGA），以及设计了一个多实例生成框架（在经典Transformer上加入了分层位置感知模块） 这篇的故事讲得比较精彩且公式化，内容其实不多（会议论文） 链接：https:&#x2F;&#x2F;papers.miccai.org&#x2F;miccai-2024&#x2F;850-Paper0761.html">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-11-05T07:56:47.000Z">
+<meta property="article:modified_time" content="2024-11-05T09:32:47.701Z">
+<meta property="article:author" content="Million Mi">
+<meta property="article:tag" content="work">
+<meta property="article:tag" content="论文">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://mi1li0n.github.io/2024/11/05/WsiCaption/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://mi1li0n.github.io/2024/11/05/WsiCaption/","path":"2024/11/05/WsiCaption/","title":"【论文阅读】WsiCaption"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>【论文阅读】WsiCaption | Million'blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Million'blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">你喜欢我，我喜欢你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Multiple-Instance-Generation-Problem-Formulation"><span class="nav-number">2.</span> <span class="nav-text">Multiple Instance Generation: Problem Formulation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Method"><span class="nav-number">3.</span> <span class="nav-text">Method</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Experiments-and-Results"><span class="nav-number">4.</span> <span class="nav-text">Experiments and Results</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Million Mi"
+      src="/images/me.jpg">
+  <p class="site-author-name" itemprop="name">Million Mi</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Mi1li0n" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Mi1li0n" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://mi1li0n.github.io/2024/11/05/WsiCaption/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/me.jpg">
+      <meta itemprop="name" content="Million Mi">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Million'blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="【论文阅读】WsiCaption | Million'blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【论文阅读】WsiCaption
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-11-05 15:56:47 / 修改时间：17:32:47" itemprop="dateCreated datePublished" datetime="2024-11-05T15:56:47+08:00">2024-11-05</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>今年（2024年）米开的一篇，主要贡献是利用现有数据集制作了一个新数据集（源自TCGA），以及设计了一个多实例生成框架（在经典Transformer上加入了分层位置感知模块）</p>
+<p>这篇的故事讲得比较精彩且公式化，内容其实不多（会议论文）</p>
+<p>链接：<a target="_blank" rel="noopener" href="https://papers.miccai.org/miccai-2024/850-Paper0761.html">https://papers.miccai.org/miccai-2024/850-Paper0761.html</a></p>
+<span id="more"></span>
+
+<p>先看标题，WsiCaption: Multiple Instance Generation of Pathology Reports for Gigapixel Whole-Slide Images。标题很直白，为十亿像素级的Wsi生成病理报告，给任务起了个WsiCaption的名字</p>
+<h3 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h3><p>这一章就是公式化introduction</p>
+<p>第一段中花两句话很简洁的介绍了Wsi以及当前的局限性（需要专家），随后转到计算病理学的成功，提高了病理切片阅读的自动化程度（比如目标检测，我没看引用的方法，猜的）。</p>
+<p>第二段提到了当前计算病理学的局限性，虽然很好用但现在不够好用，虽然可以提高自动化程度但病理医生还是要写病理报告，好烦，如果可以自动化则能大大减少病理学家的工作量，还能自动诊断。</p>
+<p>（这几句简直万能，贴下原文：”In spite of the ”clinical-grade” performance of these computational pathology approaches, pathologists still need to organize the findings and write textual reports for each slide. Hundreds to thousands of WSIs need to be summarized in text in the pathology departments every day [9]. The automation of diagnostic reports can largely reduce the workload of pathologists. Furthermore, the content of pathology reports usually includes abundant diagnostic results [3]. Therefore, it motivates us to take a step forward to achieve the automatic generation of pathology reports.“）</p>
+<p>然后话锋一转提到过去几年计算病理学的进步要归功于公开数据集，不少研究人员弄出来了大量的图像-文本对，然而，他们的都是patch级别的，文本也局限于patch级别，所以收集高质量的silde级别是有意义的（为作者下文的贡献做铺垫，其实我觉得这篇文章能发米开也是因为弄了个数据集）。</p>
+<p>第三、四段转到作者自己的贡献了。</p>
+<p>作者发现TCGA是有PDF格式的病理报告扫描件，但是太长而且信息冗余，此前很少有人利用上这个扫描件。于是作者出来了，作者提出了一种提取与清理这样的病理报告扫描件的流程，可以在LLM的帮助下总结归纳信息，制作Wsi-文本对。</p>
+<p>作者研读了许多报告生成的文章，又发现当前很少有人直接处理100亿级像素的Wsi（基本都在搞CT或者普通病理切片的生成），除非牺牲很多信息（据我所知现有的方法是在Wsi中挑选图像进行多实例学习），作者又出来了，作者设计了一个多实例生成框架来做Wsi的生成，采用一个视觉提取器用滑动窗来非重叠的编码Wsi，再采用一个sequence to sequence的生成器来生成文本。而且模型取得了不错的效果。</p>
+<h3 id="Multiple-Instance-Generation-Problem-Formulation"><a href="#Multiple-Instance-Generation-Problem-Formulation" class="headerlink" title="Multiple Instance Generation: Problem Formulation"></a>Multiple Instance Generation: Problem Formulation</h3><p>这一章讲了当前任务的一些背景（为啥章节名起成这样…我还以为他要介绍多实例生成的定义）</p>
+<p>介绍了一下理论上的整个任务逻辑，有点像开题报告里面的<strong>拟采取的研究方案</strong></p>
+<p>这章没什么好看的，但我比较好奇在Introduction和Method中间插一个背景并起这么个名字是为啥，难道是米开的通用格式？</p>
+<h3 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h3><p>诶🤓👆，有意思的来了，这一章分了两个小节，对应两个贡献（数据集与模型）</p>
+<p>第一小节是数据集的制作，作者给数据集起名叫<strong>PathText</strong></p>
+<p>作者的方法很简单，采用OCR提取出病理报告PDF中的文字，再采用LLM进行过滤整理，最后手动标注了一些数据，训了个分类器来清洗数据（🤓👆这不是和我在自己数据集上干的事情一样吗）</p>
+<p>第二小节是关于作者的多实例生成框架，<strong>MI-Gen</strong>，模型由两部分组成，第一部分为Wsi的特征提取，第二部分为病理报告生成模块。</p>
+<p>先说第一部分，因为Wsi太大了，根本没法读这么大的图，作者采用常规的切分成patch的方式进行特征提取，采用了预训练的神经网络提取出一组固定的特征表示，这个预训练的网络不参与模型训练。</p>
+<p>提取出Wsi的特征后，来到作者的第二部分，<del>就是一个普通的Transformer</del>是在Transformer的Encoder后加入了一个分层位置感知模块。按照作者的方法图示，我倾向于是类似于残差的操作，将每一层的Encoder输出均放入位置感知模块，再将每一层的位置感知模块的输出合并作为KV投入Decoder中。（🤓👆抛开位置感知模块不谈，这和我干的事情也很像，<del>所以为啥不是我发的米开</del>）。</p>
+<p>那么位置感知模块是什么呢，来到第三部分，这个位置感知模块就是一个多卷积核合并的卷积层…</p>
+<p>作者花了一些笔墨讲解他是如何重塑特征映射以拟合卷积层的，即填充序列变成一个平方数后重塑为二维，再采用CNN进行处理。</p>
+<h3 id="Experiments-and-Results"><a href="#Experiments-and-Results" class="headerlink" title="Experiments and Results"></a>Experiments and Results</h3><p>这一章也比较公式化，能讲的不多，贴两个可以抄思路的原文在下面：</p>
+<p>这部分可以抄baseline的找法</p>
+<p>”To benchmark our models, two kinds of visual models are chosen as our visual extractor: ResNet [11] which is composed of convolutional layers and ViT [8] which is based on Transformer. For the pre-training of visual extractors, we explore two strategies: 1) ImageNet (out-of-domain) pre-training on extensive natural images, and 2) hierarchical self-supervised learning with a pyramid transformer (HIPT) [6] on TCGA (in-domain). We also apply several other popular backbones. There are two backbones which decode by LSTMs: CNN-RNN [27] and att-LSTM [28]. We set the hidden size of these two LSTM-based models as 512 and the number of layers is 3. We also re-implemented two state-of-the-art Transformer-based models. The first is Vanilla Transformer which can be seen as the ablated version of our method with the same structure except for the position-aware module. The other is Mem-Transformer [7] which is specially designed for medical report generation by incorporating a memory mechanism in the decoder.“</p>
+<p>这部分可以抄评判指标</p>
+<p>”As illustrated in Table 1, we adopt standard image captioning evaluation metrics to evaluate the generation performance: BLEU [22], METEOR [1], and ROUGE [17].“</p>
+<p><strong>有一说一，这一章的故事讲的尤其好，把很多内容都解释的很合理，令人信服，还是推荐看看原文的</strong></p>
+<p><span style="display:block;text-align:center;color:orangered;">----------------------------------------------------------------------------------------</span></p>
+
+<center>「~~祝大伙长命百岁~~」</center>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/work/" rel="tag"># work</a>
+              <a href="/tags/%E8%AE%BA%E6%96%87/" rel="tag"># 论文</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/11/01/20%E4%B8%AA%E5%85%B3%E4%BA%8E63%E7%9A%84%E4%BA%8B%E5%AE%9E/" rel="prev" title="20个关于63的事实">
+                  <i class="fa fa-angle-left"></i> 20个关于63的事实
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2024/12/07/%E9%BC%8E%E6%B9%96%E5%B1%B1%E6%B8%B8%E8%AE%B0/" rel="next" title="鼎湖山游记">
+                  鼎湖山游记 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2025</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Million Mi</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
