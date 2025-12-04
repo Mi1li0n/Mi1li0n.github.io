@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8"/>
-    <title>今天吃什么 · 命运转盘</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <style>
+  <meta charset="UTF-8"/>
+  <title>今天吃什么 · 命运转盘</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -14,19 +14,16 @@
       padding: 0;
       height: 100%;
     }
-
-
-
     body {
       display: flex;
       justify-content: center;
-      align-items: flex-start; /* 想完全居中就改成 center */
+      align-items: flex-start;
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
         "PingFang SC", "Microsoft YaHei", sans-serif;
       background: radial-gradient(circle at top, #ffe7ba 0, #fff7e6 40%, #fff 100%);
       color: #333;
-      min-height: 100vh;  /* 关键：至少和一屏一样高 */
+      min-height: 100vh;
     }
     .container {
       max-width: 480px;
@@ -48,7 +45,6 @@
       margin-bottom: 24px;
       color: #555;
     }
-
     .progress-container {
       position: relative;
       width: 220px;
@@ -65,7 +61,6 @@
     .progress-container:active {
       transform: scale(0.98);
     }
-
     svg {
       width: 220px;
       height: 220px;
@@ -83,7 +78,6 @@
       stroke-width: 14;
       transition: stroke-dashoffset 0.03s linear;
     }
-
     #press-hint,
     #progress-text {
       position: absolute;
@@ -111,12 +105,9 @@
       font-size: 0.85rem;
       color: #999;
     }
-
     .hidden {
       display: none !important;
     }
-
-    /* 结果区域 */
     #result-area {
       margin-top: 24px;
     }
@@ -142,7 +133,6 @@
       margin: 0 auto 16px;
       max-width: 360px;
     }
-
     #retest-button {
       padding: 10px 18px;
       border-radius: 999px;
@@ -158,7 +148,6 @@
       transform: translateY(1px);
       box-shadow: 0 2px 6px rgba(255, 122, 69, 0.3);
     }
-
     @media (prefers-reduced-motion: reduce) {
       * {
         scroll-behavior: auto !important;
@@ -166,870 +155,1000 @@
         animation: none !important;
       }
     }
-
-
-
-    </style>
+  </style>
 </head>
 <body>
 <div class="container">
-    <h1>今天吃什么？</h1>
-    <div class="subtitle">让命运帮你选一顿饭 🍽️</div>
-    <p id="instruction">将手指放到中间圆圈，长按 3 秒，让命运决定今天吃什么</p>
+  <h1>今天吃什么？</h1>
+  <div class="subtitle">让命运帮你选一顿饭 🍽️</div>
+  <p id="instruction">将手指放到中间圆圈，长按 3 秒，让命运决定今天吃什么</p>
 
-    <!-- 测试区域 -->
-    <div id="test-area">
-        <div class="progress-container">
-            <svg viewBox="0 0 200 200">
-                <circle
-                        class="bg-circle"
-                        cx="100"
-                        cy="100"
-                        r="85"
-                ></circle>
-                <circle
-                        id="progress-circle"
-                        cx="100"
-                        cy="100"
-                        r="85"
-                ></circle>
-            </svg>
+  <div id="test-area">
+    <div class="progress-container">
+      <svg viewBox="0 0 200 200">
+        <circle class="bg-circle" cx="100" cy="100" r="85"></circle>
+        <circle id="progress-circle" cx="100" cy="100" r="85"></circle>
+      </svg>
 
-            <div id="press-hint">长按开始</div>
+      <div id="press-hint">长按开始</div>
 
-            <div id="progress-text" class="hidden">
-                <div id="progress-percentage">0%</div>
-                <div class="progress-label">正在为你扫描菜单...</div>
-            </div>
-        </div>
+      <div id="progress-text" class="hidden">
+        <div id="progress-percentage">0%</div>
+        <div class="progress-label">正在为你扫描菜单...</div>
+      </div>
     </div>
+  </div>
 
-    <!-- 结果区域 -->
-    <div id="result-area" class="hidden">
-        <div id="result-emoji" class="result-emoji">🍽️</div>
-        <div id="result-title"></div>
-        <p id="result-description"></p>
-        <p id="result-analysis"></p>
-        <button id="retest-button">不行，换一个</button>
-    </div>
+  <div id="result-area" class="hidden">
+    <div id="result-emoji" class="result-emoji">🍽️</div>
+    <div id="result-title"></div>
+    <p id="result-description"></p>
+    <p id="result-analysis"></p>
+    <button id="retest-button">不行，换一个</button>
+  </div>
 </div>
 
 <script>
-    // 结果数据
-    const foodResults = [
-      {
-        id: "chinese-takeout",
-        name: "家常盖浇饭",
-        emoji: "🥢",
-        description: "两菜一汤的小炒盖浇饭，简单又下饭。",
-        analysis: "你今天想吃点熟悉的味道，家常菜最能给你安全感。没太多花里胡哨，只要白米饭配热菜就很满足。"
-      },
-      {
-        id: "pizza",
-        name: "披萨",
-        emoji: "🍕",
-        description: "一块芝士拉丝的快乐圆盘。",
-        analysis: "你今天想要一点“西式仪式感”，适合边吃边刷剧或者和朋友分享，热量和快乐一起爆表。"
-      },
-      {
-        id: "burger",
-        name: "汉堡套餐",
-        emoji: "🍔",
-        description: "肉饼、生菜、面包，一口就是一整套碳水与油脂的暴击。",
-        analysis: "你现在只想快速获得满足感，效率第一，精致第二。汉堡套餐可以让你在最短时间内把幸福值拉满。"
-      },
-      {
-        id: "dumplings",
-        name: "饺子",
-        emoji: "🥟",
-        description: "水饺、煎饺都行，蘸着醋才有灵魂。",
-        analysis: "你今天有点思乡属性，想吃点有“家的味道”的东西。慢慢包、慢慢吃，都挺治愈。"
-      },
-      {
-        id: "dimsum",
-        name: "早茶点心",
-        emoji: "🧁",
-        description: "虾饺、凤爪、肠粉，一笼接一笼。",
-        analysis: "你今天适合慢悠悠地吃一顿，边喝茶边聊天，不着急、不赶时间，生活节奏刚刚好。"
-      },
-      {
-        id: "bbq-skewer",
-        name: "烧烤串串",
-        emoji: "🍢",
-        description: "撸串配点小酒，夜宵氛围直接拉满。",
-        analysis: "你今天有点想放飞自我，适合约上三俩好友，一边吃一边吐槽生活，越吃越开心。"
-      },
-      {
-        id: "kebab",
-        name: "中东烤肉卷",
-        emoji: "🌯",
-        description: "烤肉、蔬菜和酱料卷在一起，一口异域风情。",
-        analysis: "你现在想尝点不一样的味道，对日常菜单有点厌倦了，适合来点新鲜的文化体验。"
-      },
-      {
-        id: "ramen",
-        name: "日式拉面",
-        emoji: "🍜",
-        description: "浓汤、叉烧、溏心蛋，一碗下肚超满足。",
-        analysis: "你今天需要被一碗热汤好好抱一下，盐分和油脂能快速安抚你略微疲惫的灵魂。"
-      },
-      {
-        id: "pho",
-        name: "越南河粉",
-        emoji: "🍲",
-        description: "清爽的汤底配上香草和牛肉，轻盈又带劲。",
-        analysis: "你现在想吃得清爽一点，但又不想太素，酸酸青草味很适合你今天的心情。"
-      },
-      {
-        id: "curry",
-        name: "咖喱饭",
-        emoji: "🍛",
-        description: "咖喱浇满饭面，再加几个大土豆块和肉块。",
-        analysis: "你今天需要一盘“安全又治愈”的料理，不会踩雷，又能让你吃完心情稳定下来。"
-      },
-      {
-        id: "bibimbap",
-        name: "石锅拌饭",
-        emoji: "🥘",
-        description: "热气腾腾的石锅里各种菜和饭混在一起，锅巴是灵魂。",
-        analysis: "你现在有点纠结选什么食材，那就干脆全都要，一碗里把颜色和营养都凑齐。"
-      },
-      {
-        id: "teppanyaki",
-        name: "铁板烧",
-        emoji: "🍖",
-        description: "在你面前滋滋作响的牛肉和蔬菜，现场表演加持。",
-        analysis: "你今天需要一点“被款待”的感觉，看着食物在你面前被制作，会觉得自己被认真对待。"
-      },
-      {
-        id: "pasta",
-        name: "意大利面",
-        emoji: "🍝",
-        description: "番茄、奶油还是青酱？总有一款适合你。",
-        analysis: "你现在有点文艺，想吃得不那么重口味，但又要有点格调和仪式感，意面刚刚好。"
-      },
-      {
-        id: "salad-bowl",
-        name: "大份沙拉碗",
-        emoji: "🥗",
-        description: "生菜、鸡胸、坚果和各种配料拌在一起的一大碗。",
-        analysis: "你今天对自己比较克制，想吃得清爽又健康，顺便安慰一下最近放飞自我的胃。"
-      },
-      {
-        id: "sandwich",
-        name: "三明治 / 潜艇堡",
-        emoji: "🥪",
-        description: "叠满食材，一手就能拿着走的便携正餐。",
-        analysis: "你今天行程有点忙，不想浪费太久在吃饭上，但又不想随便糊弄，三明治是理智选择。"
-      },
-      {
-        id: "brunch",
-        name: "早午餐拼盘",
-        emoji: "🍳",
-        description: "煎蛋、培根、吐司、沙拉，一盘搞定两顿的感觉。",
-        analysis: "你今天的时间感有点混乱，也许起得有点晚，就干脆用一顿丰盛的早午餐重启今天。"
-      },
-      {
-        id: "congee",
-        name: "粥配小菜",
-        emoji: "🥣",
-        description: "一碗热粥，加几碟小菜，简单却很安心。",
-        analysis: "你今天想让肠胃休息一下，或者人有点累，适合吃点暖和但不刺激的东西。"
-      },
-      {
-        id: "steak",
-        name: "牛排正餐",
-        emoji: "🥩",
-        description: "选择一个熟度，配上土豆和蔬菜，好好犒劳自己。",
-        analysis: "你今天有点想“庆祝一下”，不管有没有理由，都适合来一顿稍微豪华一点的。"
-      },
-      {
-        id: "baked-rice",
-        name: "芝士焗饭",
-        emoji: "🧀",
-        description: "一层厚厚的芝士盖在饭上，拉丝程度决定幸福等级。",
-        analysis: "你今天需要浓郁的碳水安慰，奶香和芝士可以迅速把你的心情从 60 分拉到 90 分。"
-      },
-      {
-        id: "bento",
-        name: "便当盒饭",
-        emoji: "🍱",
-        description: "隔层装好的主食与配菜，看着整整齐齐就很舒服。",
-        analysis: "你现在需要一点秩序感和掌控感，一盒分区清晰的便当刚好符合你今天的状态。"
-      },
-      {
-        id: "dessert",
-        name: "干脆只吃甜点",
-        emoji: "🍰",
-        description: "蛋糕、冰淇淋、奶茶……今天就让糖分说了算。",
-        analysis: "你今天的灵魂在喊：先甜后说。也许正餐不重要，情绪才最重要。吃完记得喝点水。"
-      },
-      {
-        id: "milk-tea",
-        name: "奶茶 + 小零食",
-        emoji: "🧋",
-        description: "一杯奶茶配点小吃，当成半顿饭。",
-        analysis: "你今天有点“不太正经吃饭”的心情，只想用奶茶续命。虽然营养不均衡，但快乐很真实。"
-      },
-      {
-        id: "hot-dry-noodles",
-        name: "热干面 / 拌面",
-        emoji: "🍜",
-        description: "芝麻酱、辣椒和面条搅拌在一起，香味扑鼻。",
-        analysis: "你今天想要的是那种一搅就很香的满足感，吃完会觉得“啊，这才叫吃饭”。"
-      },
-      {
-        id: "liangpi",
-        name: "凉皮 / 凉拌粉",
-        emoji: "🥡",
-        description: "酸辣劲爽，一口下去整个人都清醒了。",
-        analysis: "你有点热、有点困，适合来点冰冰凉凉的东西唤醒味蕾和大脑。"
-      },
-      {
-        id: "sushi-rolls",
-        name: "寿司卷外带",
-        emoji: "🍣",
-        description: "切好的一卷卷寿司，拿着就走，非常方便。",
-        analysis: "你今天偏向轻量级和方便携带的食物，适合边走边吃或者边工作边慢慢消灭。"
-      },
+  // ================== 菜单数据（含时段分类） ==================
+  const foodResults = [
+    {
+      id: "chinese-takeout",
+      name: "家常盖浇饭",
+      emoji: "🥢",
+      description: "两菜一汤的小炒盖浇饭，简单又下饭。",
+      analysis: "你今天想吃点熟悉的味道，家常菜最能给你安全感。没太多花里胡哨，只要白米饭配热菜就很满足。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "pizza",
+      name: "披萨",
+      emoji: "🍕",
+      description: "一块芝士拉丝的快乐圆盘。",
+      analysis: "你今天想要一点“西式仪式感”，适合边吃边刷剧或者和朋友分享，热量和快乐一起爆表。",
+      slots: ["lunch","dinner","lateNight"]
+    },
+    {
+      id: "burger",
+      name: "汉堡套餐",
+      emoji: "🍔",
+      description: "肉饼、生菜、面包，一口就是一整套碳水与油脂的暴击。",
+      analysis: "你现在只想快速获得满足感，效率第一，精致第二。汉堡套餐可以让你在最短时间内把幸福值拉满。",
+      slots: ["lunch","dinner","lateNight"]
+    },
+    {
+      id: "dumplings",
+      name: "饺子",
+      emoji: "🥟",
+      description: "水饺、煎饺都行，蘸着醋才有灵魂。",
+      analysis: "你今天有点思乡属性，想吃点有“家的味道”的东西。慢慢包、慢慢吃，都挺治愈。",
+      always: true
+    },
+    {
+      id: "dimsum",
+      name: "早茶点心",
+      emoji: "🧁",
+      description: "虾饺、凤爪、肠粉，一笼接一笼。",
+      analysis: "你今天适合慢悠悠地吃一顿，边喝茶边聊天，不着急、不赶时间，生活节奏刚刚好。",
+      slots: ["breakfast","lunch"]
+    },
+    {
+      id: "bbq-skewer",
+      name: "烧烤串串",
+      emoji: "🍢",
+      description: "撸串配点小酒，夜宵氛围直接拉满。",
+      analysis: "你今天有点想放飞自我，适合约上三俩好友，一边吃一边吐槽生活，越吃越开心。",
+      slots: ["dinner","lateNight"]
+    },
+    {
+      id: "kebab",
+      name: "中东烤肉卷",
+      emoji: "🌯",
+      description: "烤肉、蔬菜和酱料卷在一起，一口异域风情。",
+      analysis: "你现在想尝点不一样的味道，对日常菜单有点厌倦了，适合来点新鲜的文化体验。",
+      slots: ["lunch","dinner","lateNight"]
+    },
+    {
+      id: "ramen",
+      name: "日式拉面",
+      emoji: "🍜",
+      description: "浓汤、叉烧、溏心蛋，一碗下肚超满足。",
+      analysis: "你今天需要被一碗热汤好好抱一下，盐分和油脂能快速安抚你略微疲惫的灵魂。",
+      slots: ["dinner","lunch"]
+    },
+    {
+      id: "pho",
+      name: "越南河粉",
+      emoji: "🍲",
+      description: "清爽的汤底配上香草和牛肉，轻盈又带劲。",
+      analysis: "你现在想吃得清爽一点，但又不想太素，酸酸青草味很适合你今天的心情。",
+      slots: ["dinner","lunch"]
+    },
+    {
+      id: "curry",
+      name: "咖喱饭",
+      emoji: "🍛",
+      description: "咖喱浇满饭面，再加几个大土豆块和肉块。",
+      analysis: "你今天需要一盘“安全又治愈”的料理，不会踩雷，又能让你吃完心情稳定下来。",
+      slots: ["dinner","lunch"]
+    },
+    {
+      id: "bibimbap",
+      name: "石锅拌饭",
+      emoji: "🥘",
+      description: "热气腾腾的石锅里各种菜和饭混在一起，锅巴是灵魂。",
+      analysis: "你现在有点纠结选什么食材，那就干脆全都要，一碗里把颜色和营养都凑齐。",
+      slots: ["dinner","lunch"]
+    },
+    {
+      id: "teppanyaki",
+      name: "铁板烧",
+      emoji: "🍖",
+      description: "在你面前滋滋作响的牛肉和蔬菜，现场表演加持。",
+      analysis: "你今天需要一点“被款待”的感觉，看着食物在你面前被制作，会觉得自己被认真对待。",
+      slots: ["dinner"]
+    },
+    {
+      id: "pasta",
+      name: "意大利面",
+      emoji: "🍝",
+      description: "番茄、奶油还是青酱？总有一款适合你。",
+      analysis: "你现在有点文艺，想吃得不那么重口味，但又要有点格调和仪式感，意面刚刚好。",
+      slots: ["breakfast","lunch"]
+    },
+    {
+      id: "salad-bowl",
+      name: "大份沙拉碗",
+      emoji: "🥗",
+      description: "生菜、鸡胸、坚果和各种配料拌在一起的一大碗。",
+      analysis: "你今天对自己比较克制，想吃得清爽又健康，顺便安慰一下最近放飞自我的胃。",
+      slots: ["lunch"]
+    },
+    {
+      id: "sandwich",
+      name: "三明治 / 潜艇堡",
+      emoji: "🥪",
+      description: "叠满食材，一手就能拿着走的便携正餐。",
+      analysis: "你今天行程有点忙，不想浪费太久在吃饭上，但又不想随便糊弄，三明治是理智选择。",
+      slots: ["breakfast","lunch"]
+    },
+    {
+      id: "brunch",
+      name: "早午餐拼盘",
+      emoji: "🍳",
+      description: "煎蛋、培根、吐司、沙拉，一盘搞定两顿的感觉。",
+      analysis: "你今天的时间感有点混乱，也许起得有点晚，就干脆用一顿丰盛的早午餐重启今天。",
+      slots: ["breakfast","lunch"]
+    },
+    {
+      id: "congee",
+      name: "粥配小菜",
+      emoji: "🥣",
+      description: "一碗热粥，加几碟小菜，简单却很安心。",
+      analysis: "你今天想让肠胃休息一下，或者人有点累，适合吃点暖和但不刺激的东西。",
+      slots: ["breakfast","lateNight"]
+    },
+    {
+      id: "steak",
+      name: "牛排正餐",
+      emoji: "🥩",
+      description: "选择一个熟度，配上土豆和蔬菜，好好犒劳自己。",
+      analysis: "你今天有点想“庆祝一下”，不管有没有理由，都适合来一顿稍微豪华一点的。",
+      slots: ["dinner"]
+    },
+    {
+      id: "baked-rice",
+      name: "芝士焗饭",
+      emoji: "🧀",
+      description: "一层厚厚的芝士盖在饭上，拉丝程度决定幸福等级。",
+      analysis: "你今天需要浓郁的碳水安慰，奶香和芝士可以迅速把你的心情从 60 分拉到 90 分。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "bento",
+      name: "便当盒饭",
+      emoji: "🍱",
+      description: "隔层装好的主食与配菜，看着整整齐齐就很舒服。",
+      analysis: "你现在需要一点秩序感和掌控感，一盒分区清晰的便当刚好符合你今天的状态。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "dessert",
+      name: "干脆只吃甜点",
+      emoji: "🍰",
+      description: "蛋糕、冰淇淋、奶茶……今天就让糖分说了算。",
+      analysis: "你今天的灵魂在喊：先甜后说。也许正餐不重要，情绪才最重要。吃完记得喝点水。",
+      slots: ["lunch","dinner","lateNight"]
+    },
+    {
+      id: "milk-tea",
+      name: "奶茶 + 小零食",
+      emoji: "🧋",
+      description: "一杯奶茶配点小吃，当成半顿饭。",
+      analysis: "你今天有点“不太正经吃饭”的心情，只想用奶茶续命。虽然营养不均衡，但快乐很真实。",
+      always: true
+    },
+    {
+      id: "hot-dry-noodles",
+      name: "热干面 / 拌面",
+      emoji: "🍜",
+      description: "芝麻酱、辣椒和面条搅拌在一起，香味扑鼻。",
+      analysis: "你今天想要的是那种一搅就很香的满足感，吃完会觉得“啊，这才叫吃饭”。",
+      slots: ["breakfast","lunch","dinner"]
+    },
+    {
+      id: "liangpi",
+      name: "凉皮 / 凉拌粉",
+      emoji: "🥡",
+      description: "酸辣劲爽，一口下去整个人都清醒了。",
+      analysis: "你有点热、有点困，适合来点冰冰凉凉的东西唤醒味蕾和大脑。",
+      slots: ["lunch","dinner","lateNight"]
+    },
+    {
+      id: "sushi-rolls",
+      name: "寿司卷外带",
+      emoji: "🍣",
+      description: "切好的一卷卷寿司，拿着就走，非常方便。",
+      analysis: "你今天偏向轻量级和方便携带的食物，适合边走边吃或者边工作边慢慢消灭。",
+      slots: ["breakfast","lunch"]
+    },
+    {
+      id: "hotpot",
+      name: "火锅",
+      emoji: "🍲",
+      description: "热辣沸腾的锅底配上满满一桌菜，吃到脸红心跳。",
+      analysis: "你今天需要一点热闹和满足感，火锅既能治愈胃，又能治愈你的心情。记得多点点蔬菜，别全是肉哦。",
+      slots: ["lunch","dinner","lateNight"]
+    },
+    {
+      id: "malatang",
+      name: "麻辣烫",
+      emoji: "🌶️",
+      description: "想吃什么自己串，麻麻辣辣才算过瘾。",
+      analysis: "你今天有点想放纵一下，不想算卡路里，只想痛痛快快吃一顿重口味。",
+      always: true
+    },
+    {
+      id: "rice-noodle",
+      name: "螺蛳粉 / 米线",
+      emoji: "🍜",
+      description: "一碗热乎乎的粉，灵魂来自汤底。",
+      analysis: "你现在有点需要“灵魂汤”，想找点熟悉的味道安慰自己。适合一个人安静地吃完再慢慢发会儿呆。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "fried-chicken",
+      name: "炸鸡配可乐",
+      emoji: "🍗",
+      description: "咔咔脆的外皮配上冰可乐，快乐加倍。",
+      analysis: "你今天的情绪条需要直接拉满，油炸快乐水懂你。吃之前答应自己，明天再减肥。",
+      slots: ["lunch","dinner","lateNight"]
+    },
+    {
+      id: "sushi",
+      name: "寿司 / 日料",
+      emoji: "🍣",
+      description: "小小一口，精致又满足。",
+      analysis: "你今天比较细腻，想吃得清爽一点，又有一点仪式感，适合慢慢品、慢慢聊。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "claypot-rice",
+      name: "煲仔饭",
+      emoji: "🍚",
+      description: "锅巴是灵魂，酱汁是精髓。",
+      analysis: "你今天想要“简单但刚刚好”的满足，一锅热腾腾的米饭最踏实。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "kbbq",
+      name: "烤肉",
+      emoji: "🥓",
+      description: "烤到滋滋冒油，再包在菜叶里一口闷。",
+      analysis: "你今天很适合和朋友聚一聚，边烤边聊八卦，顺便把最近的压力烤没一点。",
+      slots: ["dinner","lateNight"]
+    },
+    {
+      id: "spicy",
+      name: "湘菜 / 川菜",
+      emoji: "🔥",
+      description: "没有辣就没有灵魂的一餐。",
+      analysis: "你今天需要一点刺激，可能最近有点累，想靠辣味唤醒一下自己。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "light-meal",
+      name: "轻食沙拉",
+      emoji: "🥗",
+      description: "蔬菜、鸡胸、蛋白质，一切都刚刚好。",
+      analysis: "你今天有点想对自己好一点，吃得清爽点，让身体轻松一点，心里也少一点负担。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "finger",
+      name: "啃啃手指",
+      emoji: "☝️",
+      description: "想太多，想太多，实在不行不吃了。",
+      analysis: "犹豫这么久，干脆啃啃手。",
+      always: true
+    },
+    {
+      id: "wings",
+      name: "西北风",
+      emoji: "🍃",
+      description: "想太多，想太多，实在不行不吃了。",
+      analysis: "犹豫这么久，喝点西北风。",
+      always: true
+    },
+    {
+      id: "noodles",
+      name: "简简单单一碗面",
+      emoji: "🍜",
+      description: "清汤、红烧、拌面，总有一款适合你。",
+      analysis: "你今天不太想费脑子纠结，快速解决温饱最重要。泡个面，刚刚好。",
+      always: true
+    },
+    {
+      id: "takeout",
+      name: "随便点个外卖",
+      emoji: "📱",
+      description: "打开外卖 App，看顺眼的就点。",
+      analysis: "你现在的状态是：不要问，问就是懒得选。那就把选择权交给首页推荐吧。",
+      always: true
+    },
+    {
+      id: "home-cook",
+      name: "自己下厨",
+      emoji: "👩‍🍳",
+      description: "翻翻冰箱，搞一顿“灵感料理”。",
+      analysis: "你今天适合在家静静待着，做饭的过程也许比吃更治愈。哪怕只是炒个蛋炒饭，都会有一点成就感。",
+      always: true
+    },
+    {
+      id: "fried-rice",
+      name: "炒饭 / 扬州炒饭",
+      emoji: "🥘",
+      description: "锅气十足的蛋炒饭，加点火腿粒和青豆刚刚好。",
+      analysis: "你今天适合来点简单粗暴的炒饭，什么菜都能往里扔，一盘端上桌就很有安全感。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "mapo-tofu",
+      name: "麻婆豆腐盖饭",
+      emoji: "🍚",
+      description: "麻麻辣辣、入口嫩滑，一勺浇在米饭上超下饭。",
+      analysis: "你今天想吃点有冲击力但又不太油腻的东西，辣味和豆香可以把你的味蕾叫醒。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "wonton-soup",
+      name: "馄饨 / 云吞",
+      emoji: "🥟",
+      description: "薄皮大馅，配上一碗清汤或红油，暖胃又暖心。",
+      analysis: "你现在需要一点被温柔对待的感觉，一碗热乎乎的馄饨能给你刚好的温度。",
+      slots: ["breakfast","lunch","dinner"]
+    },
+    {
+      id: "chuan-chuan",
+      name: "串串香",
+      emoji: "🍢",
+      description: "一串一串涮进锅里，再蘸上香菜蒜泥蘸碟。",
+      analysis: "你今天有点社交欲望，适合和朋友围着一口锅聊天，吃到签子堆成一座山。",
+      slots: ["dinner","lateNight"]
+    },
+    {
+      id: "mala-xiangguo",
+      name: "麻辣香锅",
+      emoji: "🍲",
+      description: "菜、肉、豆制品全都丢进锅里，干香带劲。",
+      analysis: "你现在不想一个个点菜，只想“全都给我炒一锅”，味道要浓、体验要痛快。",
+      slots: ["lunch","dinner","lateNight"]
+    },
+    {
+      id: "roujiamo",
+      name: "肉夹馍",
+      emoji: "🥙",
+      description: "外皮酥脆，里面是入味的肉和汤汁。",
+      analysis: "你今天偏向高性价比的满足感，一只肉夹馍解决温饱问题，还能让心情变好。",
+      slots: ["breakfast","lunch","dinner"]
+    },
+    {
+      id: "guokui",
+      name: "锅盔 / 烧饼夹菜",
+      emoji: "🥯",
+      description: "脆脆的饼里夹满菜，路边摊的灵魂美食。",
+      analysis: "你今天适合来点街头风味，不用太正式，只要好吃、随手买得到就行。",
+      slots: ["breakfast","lateNight"]
+    },
+    {
+      id: "beef-noodle-soup",
+      name: "牛肉面",
+      emoji: "🍜",
+      description: "红烧汤底配上几块牛肉，再撒一把香菜。",
+      analysis: "你现在需要一点“认真对待碳水”的正餐，一碗牛肉面能让你觉得今天没亏待自己。",
+      slots: ["breakfast","lunch","dinner"]
+    },
+    {
+      id: "cold-noodles",
+      name: "韩式冷面 / 冷面",
+      emoji: "🥢",
+      description: "冰冰凉凉的汤里泡着筋道的面条和小菜。",
+      analysis: "你今天可能有点浮躁或上火，适合吃点清凉解暑的面，让脑子也降温一下。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "fish-fragrant-pork",
+      name: "鱼香肉丝盖饭",
+      emoji: "🍛",
+      description: "酸甜微辣的鱼香肉丝，配上白米饭停不下来。",
+      analysis: "你今天想吃点有层次的重口味，酸甜咸辣全都要，是适合“干饭人”的选择。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "lanzhou-noodles",
+      name: "兰州拉面",
+      emoji: "🍜",
+      description: "一清二白三红四绿五黄，经典牛肉拉面组合。",
+      analysis: "你现在想吃得朴素一点，传统味道最能让你觉得扎实可靠，吃完很有精神。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "grilled-fish",
+      name: "烤鱼",
+      emoji: "🐟",
+      description: "整条鱼铺满辣椒、蔬菜，在铁盘里咕嘟咕嘟。",
+      analysis: "你今天适合来一顿“仪式感晚餐”，味道要重、分量要足，还要有点小豪华。",
+      slots: ["dinner"]
+    },
+    {
+      id: "takoyaki",
+      name: "章鱼小丸子",
+      emoji: "🐙",
+      description: "外脆里嫩，再浇上酱料和木鱼花。",
+      analysis: "你今天不一定很饿，但嘴很馋，适合用一份小吃来满足“想吃点啥”的心情。",
+      slots: ["lunch","dinner","lateNight"]
+    },
+    {
+      id: "yakitori",
+      name: "日式烤串 / 鸡肉串",
+      emoji: "🍡",
+      description: "一串一串的烤鸡肉、蔬菜，蘸点酱就很香。",
+      analysis: "你今天适合小酌小吃的节奏，不必吃到很撑，只要慢慢品、慢慢聊就很幸福。",
+      slots: ["dinner","lateNight"]
+    },
+    {
+      id: "cheese-burger-rice",
+      name: "汉堡排饭 / 日式洋食",
+      emoji: "🍱",
+      description: "煎好的肉排配上咖喱或肉汁酱，再加一勺米饭。",
+      analysis: "你现在在中餐和西餐之间摇摆，那就来份折中一点的日式洋食，两边的快乐都要。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "japanese-curry-udon",
+      name: "咖喱乌冬面",
+      emoji: "🍜",
+      description: "浓浓的咖喱裹在粗粗的乌冬面上，非常满足。",
+      analysis: "你今天想吃得软乎一点，不太咬得动太硬的东西，顺滑的乌冬面非常适合你。",
+      slots: ["breakfast","lunch","dinner"]
+    },
+    {
+      id: "fruit-bowl",
+      name: "大份水果拼盘",
+      emoji: "🍉",
+      description: "各种新鲜水果切一大盘，当成一顿轻盈正餐。",
+      analysis: "你今天有点想给身体做个小小“排毒”，多吃水果让自己心里也觉得更健康一点。",
+      slots: ["breakfast","lunch","dinner"]
+    },
+    {
+      id: "yogurt-cereal",
+      name: "酸奶麦片碗",
+      emoji: "🥣",
+      description: "酸奶配上麦片、水果和坚果，早午晚都能吃。",
+      analysis: "你现在追求的是“轻食但有饱腹感”，这碗东西既不会太罪恶，又能撑一会儿。",
+      slots: ["breakfast","lunch"]
+    },
+    {
+      id: "spicy-snacks",
+      name: "辣条 / 小零食大集合",
+      emoji: "🧃",
+      description: "辣条、薯片、膨化食品，一整包罪恶小组。",
+      analysis: "你今天的状态是：正餐可以简单点，嘴巴必须很忙。偶尔一次“垃圾快乐餐”也无妨。",
+      slots: ["lunch","dinner","lateNight"]
+    },
+    {
+      id: "street-noodle-stall",
+      name: "路边小面馆",
+      emoji: "🏮",
+      description: "找一家看着顺眼的小店，随便点一碗招牌面。",
+      analysis: "你今天适合把选择权交给缘分，随便走进一家小店，说不定会遇到惊喜味道。",
+      slots: ["lunch","dinner","lateNight"]
+    },
+    {
+      id: "random-canteen",
+      name: "食堂随缘套餐",
+      emoji: "🍽️",
+      description: "今天就听从打饭阿姨的安排吧。",
+      analysis: "你现在不想做决策了，谁给你什么你就吃什么，把大脑从“选择困难”里解放出来。",
+      always: true
+    },
+    {
+      id: "home-hotpot-simple",
+      name: "在家简易小火锅",
+      emoji: "🍲",
+      description: "买点底料和食材，在家也能涮起来。",
+      analysis: "你今天既想吃火锅，又不想出门社交，那就自己在家开一桌，一个人的火锅也很爽。",
+      slots: ["dinner","lateNight"]
+    },
+    {
+      id: "pancake-fruit",
+      name: "煎饼果子 / 鸡蛋饼",
+      emoji: "🥞",
+      description: "饼里加蛋、里脊、油条，卷起来边走边吃。",
+      analysis: "你今天适合来点接地气的主食，价格友好、味道熟悉，吃完会觉得“这就叫生活”。",
+      slots: ["breakfast","lateNight"]
+    },
+    {
+      id: "hainan-chicken",
+      name: "海南鸡饭",
+      emoji: "🍗",
+      description: "嫩嫩的鸡肉配上香米饭和蘸酱，清爽又有味道。",
+      analysis: "你今天想吃得干净一点、不太油腻，但又不想只啃生菜，鸡饭刚好在清爽和满足之间。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "zhajiang-noodles",
+      name: "炸酱面",
+      emoji: "🍜",
+      description: "黄瓜丝、豆芽和香喷喷的炸酱拌在一起，很家常的味道。",
+      analysis: "你现在有点想念“老北京那口面”，简单、直接、下头又下饭，是很踏实的一顿。",
+      slots: ["breakfast","lunch","dinner"]
+    },
+    {
+      id: "tomato-egg-rice",
+      name: "番茄炒蛋盖饭",
+      emoji: "🍅",
+      description: "酸酸甜甜的番茄炒蛋，浇在白饭上就是绝配。",
+      analysis: "你今天需要一点童年级别的温柔治愈，番茄炒蛋这种经典组合最适合安抚你的心情。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "seafood-rice",
+      name: "海鲜炒饭 / 海鲜饭",
+      emoji: "🦐",
+      description: "海鲜和米饭一起翻炒或焗烤，满嘴都是鲜味。",
+      analysis: "你今天想吃点“有点讲究”的饭，又不想太正式，有海鲜加持就会觉得这顿值了。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "stirfry-3-dishes",
+      name: "三个小炒配米饭",
+      emoji: "🥢",
+      description: "素的、荤的、半素半荤，拼成一桌迷你小宴席。",
+      analysis: "你现在很需要选择权，但又不想纠结太久，那就点三个喜欢的小菜，什么都来一点。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "fish-soup-noodle",
+      name: "鲜鱼汤米线 / 面",
+      emoji: "🐟",
+      description: "奶白色的鱼汤配上米线或面条，鲜而不腻。",
+      analysis: "你今天适合喝点有营养的汤水，让胃和心情一起被好好安抚一下。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "dry-pot",
+      name: "香辣干锅",
+      emoji: "🍲",
+      description: "各种食材一起炒香，上桌时还在咕嘟咕嘟冒泡。",
+      analysis: "你现在需要一点“重锤式快乐”，香辣干锅可以让你的味蕾24小时不忘记这顿饭。",
+      slots: ["lunch","dinner","lateNight"]
+    },
+    {
+      id: "thai-curry",
+      name: "泰式咖喱 / 冬阴功",
+      emoji: "🍤",
+      description: "椰奶、香茅、辣椒混在一起，酸辣中带着热带风情。",
+      analysis: "你今天有点想去旅行的心情，先用一顿泰式料理骗骗自己，假装在海边。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "pad-thai",
+      name: "泰式炒河粉",
+      emoji: "🍝",
+      description: "甜咸微辣的炒粉，配花生碎和柠檬。",
+      analysis: "你现在想吃点带甜味的主食，不那么油重，但味道要够有层次，泰式炒粉很适合。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "tacos",
+      name: "塔可 / 墨西哥卷",
+      emoji: "🌮",
+      description: "脆皮或软饼里塞满肉和蔬菜，一口一个很过瘾。",
+      analysis: "你今天想体验点异国街头摊的感觉，一手一个小卷，边吃边聊最开心。",
+      slots: ["breakfast","lunch","dinner"]
+    },
+    {
+      id: "burrito",
+      name: "卷饼大卷 / Burrito",
+      emoji: "🌯",
+      description: "饭、肉、豆子和各种配料裹成一个大卷，握着就能吃。",
+      analysis: "你现在可能挺饿的，又不太想分步骤吃，就想一卷在手、天下我有。",
+      slots: ["breakfast"]
+    },
+    {
+      id: "hotdog",
+      name: "热狗 + 小吃",
+      emoji: "🌭",
+      description: "面包夹香肠，再配点薯条或小吃，简单又满足。",
+      analysis: "你今天适合来点轻松、不复杂的餐车风格，边走边吃、边玩边吃都没问题。",
+      slots: ["lunch","dinner","lateNight"]
+    },
+    {
+      id: "cheese-potato",
+      name: "芝士土豆泥 / 烤土豆",
+      emoji: "🥔",
+      description: "软乎乎的土豆配上芝士和黄油，热量爆棚也很幸福。",
+      analysis: "你现在的状态是：卡路里以后再算，今天先把心情喂饱，土豆是很靠谱的选择。",
+      slots: ["dinner","lateNight"]
+    },
+    {
+      id: "korean-stew",
+      name: "韩式部队锅",
+      emoji: "🍲",
+      description: "火腿、泡菜、年糕和方便面一起煮，重口味代表。",
+      analysis: "你今天需要一锅“乱炖式快乐”，什么食材往里扔都能变成好吃的，适合和朋友一起share。",
+      slots: ["dinner","lateNight"]
+    },
+    {
+      id: "rice-burger",
+      name: "饭团 / 饭团汉堡",
+      emoji: "🍙",
+      description: "米饭捏成团或做成夹心，一手就能拿着吃。",
+      analysis: "你现在想要轻便又有饱腹感的东西，吃完就走、不耽误行程，非常适合作为移动中的一餐。",
+      slots: ["breakfast","lunch","dinner"]
+    },
+    {
+      id: "vegan-bowl",
+      name: "素食能量碗",
+      emoji: "🥦",
+      description: "全是蔬菜、豆制品和粗粮，颜色很好看。",
+      analysis: "你今天想给身体放个假，控制一下油脂和肉类，让自己感觉更“清爽一点”。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "japanese-bento",
+      name: "日式便当",
+      emoji: "🍱",
+      description: "小格子里装满饭、鱼、菜、玉子烧，视觉和味觉都被照顾到。",
+      analysis: "你现在需要一点精致的秩序感，每个小格子都像今天生活里的一个小目标，被安顿好就很安心。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "spare-ribs-rice",
+      name: "排骨饭",
+      emoji: "🍖",
+      description: "卤排骨或炸排骨配上米饭和几样小菜，很有“主角感”的一餐。",
+      analysis: "你今天适合吃点“有肉的正餐”，让自己意识到：不管多忙，这顿饭不能敷衍。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "lotus-root-soup",
+      name: "莲藕排骨汤 + 小菜",
+      emoji: "🍲",
+      description: "一碗慢火炖出来的汤，再配点小菜和米饭。",
+      analysis: "你现在需要从里到外被温暖一下，喝汤的节奏能让你慢下来，好好感受这顿饭。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "zongzi",
+      name: "粽子 / 糯米点心",
+      emoji: "🌯",
+      description: "咸蛋黄肉粽、豆沙粽都行，糯叽叽的很治愈。",
+      analysis: "你今天想吃点黏糯又扎实的主食，小小一个粽子就能让你感觉到节日感和仪式感。",
+      slots: ["breakfast","lunch","dinner"]
+    },
+    {
+      id: "shaxian-set",
+      name: "沙县小吃套餐",
+      emoji: "🥟",
+      description: "拌面、蒸饺、拌菜来一整套，便宜又顶饱。",
+      analysis: "你今天追求的是性价比，一整套小吃解决战斗，还能收获熟悉的街边味道。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "mcd-set",
+      name: "麦门快乐套餐",
+      emoji: "🍟",
+      description: "薯条、鸡块、汉堡和汽水，一次性集齐所有快乐。",
+      analysis: "你今天想体验一下“连锁快餐式的安慰”，不用思考，点个经典套餐就好。",
+      slots: ["lunch","dinner","lateNight"]
+    },
+    {
+      id: "roast-duck-rice",
+      name: "烧腊双拼饭",
+      emoji: "🥡",
+      description: "叉烧、烧鸭、油鸡随便拼，配上淋汁米饭很满足。",
+      analysis: "你今天适合吃点港式风味，多种肉类都想要，那就用一盒烧腊双拼一次解决。",
+      slots: ["lunch","dinner"]
+    },
+    {
+      id: "lamb-soup",
+      name: "羊肉汤 + 烧饼",
+      emoji: "🍲",
+      description: "一碗热乎乎的羊肉汤配上酥脆烧饼，越喝越暖。",
+      analysis: "你现在需要从胃开始的安全感，一碗汤下去，整个人都慢慢暖和起来。",
+      slots: ["breakfast","lunch","dinner"]
+    },
+    {
+      id: "soup-dumpling",
+      name: "小笼包",
+      emoji: "🥟",
+      description: "轻轻一咬汤汁流出，配上醋和姜丝刚刚好。",
+      analysis: "你今天适合细细品味的早餐或午餐，一笼小笼包能给你满满的幸福感。",
+      slots: ["breakfast","lunch"]
+    }
+  ];
 
-      {
-        id: "hotpot",
-        name: "火锅",
-        emoji: "🍲",
-        description: "热辣沸腾的锅底配上满满一桌菜，吃到脸红心跳。",
-        analysis:
-          "你今天需要一点热闹和满足感，火锅既能治愈胃，又能治愈你的心情。记得多点点蔬菜，别全是肉哦。"
-      },
-      {
-        id: "malatang",
-        name: "麻辣烫",
-        emoji: "🌶️",
-        description: "想吃什么自己串，麻麻辣辣才算过瘾。",
-        analysis:
-          "你今天有点想放纵一下，不想算卡路里，只想痛痛快快吃一顿重口味。"
-      },
-      {
-        id: "rice-noodle",
-        name: "螺蛳粉 / 米线",
-        emoji: "🍜",
-        description: "一碗热乎乎的粉，灵魂来自汤底。",
-        analysis:
-          "你现在有点需要“灵魂汤”，想找点熟悉的味道安慰自己。适合一个人安静地吃完再慢慢发会儿呆。"
-      },
-      {
-        id: "fried-chicken",
-        name: "炸鸡配可乐",
-        emoji: "🍗",
-        description: "咔咔脆的外皮配上冰可乐，快乐加倍。",
-        analysis:
-          "你今天的情绪条需要直接拉满，油炸快乐水懂你。吃之前答应自己，明天再减肥。"
-      },
-      {
-        id: "sushi",
-        name: "寿司 / 日料",
-        emoji: "🍣",
-        description: "小小一口，精致又满足。",
-        analysis:
-          "你今天比较细腻，想吃得清爽一点，又有一点仪式感，适合慢慢品、慢慢聊。"
-      },
-      {
-        id: "claypot-rice",
-        name: "煲仔饭",
-        emoji: "🍚",
-        description: "锅巴是灵魂，酱汁是精髓。",
-        analysis:
-          "你今天想要“简单但刚刚好”的满足，一锅热腾腾的米饭最踏实。"
-      },
-      {
-        id: "kbbq",
-        name: "烤肉",
-        emoji: "🥓",
-        description: "烤到滋滋冒油，再包在菜叶里一口闷。",
-        analysis:
-          "你今天很适合和朋友聚一聚，边烤边聊八卦，顺便把最近的压力烤没一点。"
-      },
-      {
-        id: "spicy",
-        name: "湘菜 / 川菜",
-        emoji: "🔥",
-        description: "没有辣就没有灵魂的一餐。",
-        analysis:
-          "你今天需要一点刺激，可能最近有点累，想靠辣味唤醒一下自己。"
-      },
-      {
-        id: "light-meal",
-        name: "轻食沙拉",
-        emoji: "🥗",
-        description: "蔬菜、鸡胸、蛋白质，一切都刚刚好。",
-        analysis:
-          "你今天有点想对自己好一点，吃得清爽点，让身体轻松一点，心里也少一点负担。"
-      },
-      {
-        id: "noodles",
-        name: "简简单单一碗面",
-        emoji: "🍜",
-        description: "清汤、红烧、拌面，总有一款适合你。",
-        analysis:
-          "你今天不太想费脑子纠结，快速解决温饱最重要。一碗面，刚刚好。"
-      },
-      {
-        id: "takeout",
-        name: "随便点个外卖",
-        emoji: "📱",
-        description: "打开外卖 App，看顺眼的就点。",
-        analysis:
-          "你现在的状态是：不要问，问就是懒得选。那就把选择权交给首页推荐吧。"
-      },
-      {
-        id: "home-cook",
-        name: "自己下厨",
-        emoji: "👩‍🍳",
-        description: "翻翻冰箱，搞一顿“灵感料理”。",
-        analysis:
-          "你今天适合在家静静待着，做饭的过程也许比吃更治愈。哪怕只是炒个蛋炒饭，都会有一点成就感。"
-      },
-            {
-        id: "fried-rice",
-        name: "炒饭 / 扬州炒饭",
-        emoji: "🥘",
-        description: "锅气十足的蛋炒饭，加点火腿粒和青豆刚刚好。",
-        analysis: "你今天适合来点简单粗暴的炒饭，什么菜都能往里扔，一盘端上桌就很有安全感。"
-      },
-      {
-        id: "mapo-tofu",
-        name: "麻婆豆腐盖饭",
-        emoji: "🍚",
-        description: "麻麻辣辣、入口嫩滑，一勺浇在米饭上超下饭。",
-        analysis: "你今天想吃点有冲击力但又不太油腻的东西，辣味和豆香可以把你的味蕾叫醒。"
-      },
-      {
-        id: "wonton-soup",
-        name: "馄饨 / 云吞",
-        emoji: "🥟",
-        description: "薄皮大馅，配上一碗清汤或红油，暖胃又暖心。",
-        analysis: "你现在需要一点被温柔对待的感觉，一碗热乎乎的馄饨能给你刚好的温度。"
-      },
-      {
-        id: "chuan-chuan",
-        name: "串串香",
-        emoji: "🍢",
-        description: "一串一串涮进锅里，再蘸上香菜蒜泥蘸碟。",
-        analysis: "你今天有点社交欲望，适合和朋友围着一口锅聊天，吃到签子堆成一座山。"
-      },
-      {
-        id: "mala-xiangguo",
-        name: "麻辣香锅",
-        emoji: "🍲",
-        description: "菜、肉、豆制品全都丢进锅里，干香带劲。",
-        analysis: "你现在不想一个个点菜，只想“全都给我炒一锅”，味道要浓、体验要痛快。"
-      },
-      {
-        id: "roujiamo",
-        name: "肉夹馍",
-        emoji: "🥙",
-        description: "外皮酥脆，里面是入味的肉和汤汁。",
-        analysis: "你今天偏向高性价比的满足感，一只肉夹馍解决温饱问题，还能让心情变好。"
-      },
-      {
-        id: "guokui",
-        name: "锅盔 / 烧饼夹菜",
-        emoji: "🥯",
-        description: "脆脆的饼里夹满菜，路边摊的灵魂美食。",
-        analysis: "你今天适合来点街头风味，不用太正式，只要好吃、随手买得到就行。"
-      },
-      {
-        id: "beef-noodle-soup",
-        name: "牛肉面",
-        emoji: "🍜",
-        description: "红烧汤底配上几块牛肉，再撒一把香菜。",
-        analysis: "你现在需要一点“认真对待碳水”的正餐，一碗牛肉面能让你觉得今天没亏待自己。"
-      },
-      {
-        id: "cold-noodles",
-        name: "韩式冷面 / 冷面",
-        emoji: "🥢",
-        description: "冰冰凉凉的汤里泡着筋道的面条和小菜。",
-        analysis: "你今天可能有点浮躁或上火，适合吃点清凉解暑的面，让脑子也降温一下。"
-      },
-      {
-        id: "fish-fragrant-pork",
-        name: "鱼香肉丝盖饭",
-        emoji: "🍛",
-        description: "酸甜微辣的鱼香肉丝，配上白米饭停不下来。",
-        analysis: "你今天想吃点有层次的重口味，酸甜咸辣全都要，是适合“干饭人”的选择。"
-      },
-      {
-        id: "lanzhou-noodles",
-        name: "兰州拉面",
-        emoji: "🍜",
-        description: "一清二白三红四绿五黄，经典牛肉拉面组合。",
-        analysis: "你现在想吃得朴素一点，传统味道最能让你觉得扎实可靠，吃完很有精神。"
-      },
-      {
-        id: "grilled-fish",
-        name: "烤鱼",
-        emoji: "🐟",
-        description: "整条鱼铺满辣椒、蔬菜，在铁盘里咕嘟咕嘟。",
-        analysis: "你今天适合来一顿“仪式感晚餐”，味道要重、分量要足，还要有点小豪华。"
-      },
-      {
-        id: "takoyaki",
-        name: "章鱼小丸子",
-        emoji: "🐙",
-        description: "外脆里嫩，再浇上酱料和木鱼花。",
-        analysis: "你今天不一定很饿，但嘴很馋，适合用一份小吃来满足“想吃点啥”的心情。"
-      },
-      {
-        id: "yakitori",
-        name: "日式烤串 / 鸡肉串",
-        emoji: "🍡",
-        description: "一串一串的烤鸡肉、蔬菜，蘸点酱就很香。",
-        analysis: "你今天适合小酌小吃的节奏，不必吃到很撑，只要慢慢品、慢慢聊就很幸福。"
-      },
-      {
-        id: "cheese-burger-rice",
-        name: "汉堡排饭 / 日式洋食",
-        emoji: "🍱",
-        description: "煎好的肉排配上咖喱或肉汁酱，再加一勺米饭。",
-        analysis: "你现在在中餐和西餐之间摇摆，那就来份折中一点的日式洋食，两边的快乐都要。"
-      },
-      {
-        id: "japanese-curry-udon",
-        name: "咖喱乌冬面",
-        emoji: "🍜",
-        description: "浓浓的咖喱裹在粗粗的乌冬面上，非常满足。",
-        analysis: "你今天想吃得软乎一点，不太咬得动太硬的东西，顺滑的乌冬面非常适合你。"
-      },
-      {
-        id: "fruit-bowl",
-        name: "大份水果拼盘",
-        emoji: "🍉",
-        description: "各种新鲜水果切一大盘，当成一顿轻盈正餐。",
-        analysis: "你今天有点想给身体做个小小“排毒”，多吃水果让自己心里也觉得更健康一点。"
-      },
-      {
-        id: "yogurt-cereal",
-        name: "酸奶麦片碗",
-        emoji: "🥣",
-        description: "酸奶配上麦片、水果和坚果，早午晚都能吃。",
-        analysis: "你现在追求的是“轻食但有饱腹感”，这碗东西既不会太罪恶，又能撑一会儿。"
-      },
-      {
-        id: "spicy-snacks",
-        name: "辣条 / 小零食大集合",
-        emoji: "🧃",
-        description: "辣条、薯片、膨化食品，一整包罪恶小组。",
-        analysis: "你今天的状态是：正餐可以简单点，嘴巴必须很忙。偶尔一次“垃圾快乐餐”也无妨。"
-      },
-      {
-        id: "street-noodle-stall",
-        name: "路边小面馆",
-        emoji: "🏮",
-        description: "找一家看着顺眼的小店，随便点一碗招牌面。",
-        analysis: "你今天适合把选择权交给缘分，随便走进一家小店，说不定会遇到惊喜味道。"
-      },
-      {
-        id: "random-canteen",
-        name: "食堂随缘套餐",
-        emoji: "🍽️",
-        description: "今天就听从打饭阿姨的安排吧。",
-        analysis: "你现在不想做决策了，谁给你什么你就吃什么，把大脑从“选择困难”里解放出来。"
-      },
-      {
-        id: "home-hotpot-simple",
-        name: "在家简易小火锅",
-        emoji: "🍲",
-        description: "买点底料和食材，在家也能涮起来。",
-        analysis: "你今天既想吃火锅，又不想出门社交，那就自己在家开一桌，一个人的火锅也很爽。"
-      },
-      {
-        id: "pancake-fruit",
-        name: "煎饼果子 / 鸡蛋饼",
-        emoji: "🥞",
-        description: "饼里加蛋、里脊、油条，卷起来边走边吃。",
-        analysis: "你今天适合来点接地气的主食，价格友好、味道熟悉，吃完会觉得“这就叫生活”。"
-      },
-            {
-        id: "hainan-chicken",
-        name: "海南鸡饭",
-        emoji: "🍗",
-        description: "嫩嫩的鸡肉配上香米饭和蘸酱，清爽又有味道。",
-        analysis: "你今天想吃得干净一点、不太油腻，但又不想只啃生菜，鸡饭刚好在清爽和满足之间。"
-      },
-      {
-        id: "zhajiang-noodles",
-        name: "炸酱面",
-        emoji: "🍜",
-        description: "黄瓜丝、豆芽和香喷喷的炸酱拌在一起，很家常的味道。",
-        analysis: "你现在有点想念“老北京那口面”，简单、直接、下头又下饭，是很踏实的一顿。"
-      },
-      {
-        id: "tomato-egg-rice",
-        name: "番茄炒蛋盖饭",
-        emoji: "🍅",
-        description: "酸酸甜甜的番茄炒蛋，浇在白饭上就是绝配。",
-        analysis: "你今天需要一点童年级别的温柔治愈，番茄炒蛋这种经典组合最适合安抚你的心情。"
-      },
-      {
-        id: "seafood-rice",
-        name: "海鲜炒饭 / 海鲜饭",
-        emoji: "🦐",
-        description: "海鲜和米饭一起翻炒或焗烤，满嘴都是鲜味。",
-        analysis: "你今天想吃点“有点讲究”的饭，又不想太正式，有海鲜加持就会觉得这顿值了。"
-      },
-      {
-        id: "stirfry-3-dishes",
-        name: "三个小炒配米饭",
-        emoji: "🥢",
-        description: "素的、荤的、半素半荤，拼成一桌迷你小宴席。",
-        analysis: "你现在很需要选择权，但又不想纠结太久，那就点三个喜欢的小菜，什么都来一点。"
-      },
-      {
-        id: "fish-soup-noodle",
-        name: "鲜鱼汤米线 / 面",
-        emoji: "🐟",
-        description: "奶白色的鱼汤配上米线或面条，鲜而不腻。",
-        analysis: "你今天适合喝点有营养的汤水，让胃和心情一起被好好安抚一下。"
-      },
-      {
-        id: "dry-pot",
-        name: "香辣干锅",
-        emoji: "🍲",
-        description: "各种食材一起炒香，上桌时还在咕嘟咕嘟冒泡。",
-        analysis: "你现在需要一点“重锤式快乐”，香辣干锅可以让你的味蕾24小时不忘记这顿饭。"
-      },
-      {
-        id: "thai-curry",
-        name: "泰式咖喱 / 冬阴功",
-        emoji: "🍤",
-        description: "椰奶、香茅、辣椒混在一起，酸辣中带着热带风情。",
-        analysis: "你今天有点想去旅行的心情，先用一顿泰式料理骗骗自己，假装在海边。"
-      },
-      {
-        id: "pad-thai",
-        name: "泰式炒河粉",
-        emoji: "🍝",
-        description: "甜咸微辣的炒粉，配花生碎和柠檬。",
-        analysis: "你现在想吃点带甜味的主食，不那么油重，但味道要够有层次，泰式炒粉很适合。"
-      },
-      {
-        id: "tacos",
-        name: "塔可 / 墨西哥卷",
-        emoji: "🌮",
-        description: "脆皮或软饼里塞满肉和蔬菜，一口一个很过瘾。",
-        analysis: "你今天想体验点异国街头摊的感觉，一手一个小卷，边吃边聊最开心。"
-      },
-      {
-        id: "burrito",
-        name: "卷饼大卷 / Burrito",
-        emoji: "🌯",
-        description: "饭、肉、豆子和各种配料裹成一个大卷，握着就能吃。",
-        analysis: "你现在可能挺饿的，又不太想分步骤吃，就想一卷在手、天下我有。"
-      },
-      {
-        id: "hotdog",
-        name: "热狗 + 小吃",
-        emoji: "🌭",
-        description: "面包夹香肠，再配点薯条或小吃，简单又满足。",
-        analysis: "你今天适合来点轻松、不复杂的餐车风格，边走边吃、边玩边吃都没问题。"
-      },
-      {
-        id: "cheese-potato",
-        name: "芝士土豆泥 / 烤土豆",
-        emoji: "🥔",
-        description: "软乎乎的土豆配上芝士和黄油，热量爆棚也很幸福。",
-        analysis: "你现在的状态是：卡路里以后再算，今天先把心情喂饱，土豆是很靠谱的选择。"
-      },
-      {
-        id: "korean-stew",
-        name: "韩式部队锅",
-        emoji: "🍲",
-        description: "火腿、泡菜、年糕和方便面一起煮，重口味代表。",
-        analysis: "你今天需要一锅“乱炖式快乐”，什么食材往里扔都能变成好吃的，适合和朋友一起share。"
-      },
-      {
-        id: "rice-burger",
-        name: "饭团 / 饭团汉堡",
-        emoji: "🍙",
-        description: "米饭捏成团或做成夹心，一手就能拿着吃。",
-        analysis: "你现在想要轻便又有饱腹感的东西，吃完就走、不耽误行程，非常适合作为移动中的一餐。"
-      },
-      {
-        id: "vegan-bowl",
-        name: "素食能量碗",
-        emoji: "🥦",
-        description: "全是蔬菜、豆制品和粗粮，颜色很好看。",
-        analysis: "你今天想给身体放个假，控制一下油脂和肉类，让自己感觉更“清爽一点”。"
-      },
-      {
-        id: "japanese-bento",
-        name: "日式便当",
-        emoji: "🍱",
-        description: "小格子里装满饭、鱼、菜、玉子烧，视觉和味觉都被照顾到。",
-        analysis: "你现在需要一点精致的秩序感，每个小格子都像今天生活里的一个小目标，被安顿好就很安心。"
-      },
-      {
-        id: "spare-ribs-rice",
-        name: "排骨饭",
-        emoji: "🍖",
-        description: "卤排骨或炸排骨配上米饭和几样小菜，很有“主角感”的一餐。",
-        analysis: "你今天适合吃点“有肉的正餐”，让自己意识到：不管多忙，这顿饭不能敷衍。"
-      },
-      {
-        id: "lotus-root-soup",
-        name: "莲藕排骨汤 + 小菜",
-        emoji: "🍲",
-        description: "一碗慢火炖出来的汤，再配点小菜和米饭。",
-        analysis: "你现在需要从里到外被温暖一下，喝汤的节奏能让你慢下来，好好感受这顿饭。"
-      },
-      {
-        id: "zongzi",
-        name: "粽子 / 糯米点心",
-        emoji: "🌯",
-        description: "咸蛋黄肉粽、豆沙粽都行，糯叽叽的很治愈。",
-        analysis: "你今天想吃点黏糯又扎实的主食，小小一个粽子就能让你感觉到节日感和仪式感。"
+  // ================== 时段逻辑 ==================
+  function getCurrentTimeSlot() {
+    const now = new Date();
+    const hour = now.getHours();
+    if (hour >= 5 && hour < 11) return "breakfast";
+    if (hour >= 11 && hour < 16) return "lunch";
+    if (hour >= 16 && hour < 21) return "dinner";
+    return "lateNight";
+  }
+
+  const currentSlot = getCurrentTimeSlot();
+
+  const SLOT_LABEL = {
+    breakfast: "早餐",
+    lunch: "午餐",
+    dinner: "晚餐",
+    lateNight: "夜宵"
+  };
+
+  function getActiveFoodList() {
+    return foodResults.filter(item => {
+      if (item.always) return true;
+      if (!item.slots || item.slots.length === 0) {
+        return currentSlot === "lunch" || currentSlot === "dinner";
       }
-    ];
+      return item.slots.includes(currentSlot);
+    });
+  }
 
-    // DOM 元素
-    const testArea = document.getElementById("test-area");
-    const resultArea = document.getElementById("result-area");
-    const progressCircle = document.getElementById("progress-circle");
-    const progressText = document.getElementById("progress-text");
-    const progressPercentage = document.getElementById("progress-percentage");
-    const pressHint = document.getElementById("press-hint");
-    const instruction = document.getElementById("instruction");
-    const resultEmoji = document.getElementById("result-emoji");
-    const resultTitle = document.getElementById("result-title");
-    const resultDescription = document.getElementById("result-description");
-    const resultAnalysis = document.getElementById("result-analysis");
-    const retestButton = document.getElementById("retest-button");
+  const STORAGE_KEY = `todayEatResult_${currentSlot}`;
 
-    // 进度条参数
-    const circumference = 2 * Math.PI * 85; // r = 85
-    const requiredHoldTime = 2000; // 长按时长（毫秒）
-    let startTime = 0;
-    let isHolding = false;
-    let progressInterval = null;
+  // ================== DOM 元素 ==================
+  const testArea = document.getElementById("test-area");
+  const resultArea = document.getElementById("result-area");
+  const progressCircle = document.getElementById("progress-circle");
+  const progressText = document.getElementById("progress-text");
+  const progressPercentage = document.getElementById("progress-percentage");
+  const pressHint = document.getElementById("press-hint");
+  const instruction = document.getElementById("instruction");
+  const resultEmoji = document.getElementById("result-emoji");
+  const resultTitle = document.getElementById("result-title");
+  const resultDescription = document.getElementById("result-description");
+  const resultAnalysis = document.getElementById("result-analysis");
+  const retestButton = document.getElementById("retest-button");
+  const subtitleEl = document.querySelector(".subtitle");
 
-    // 初始化进度条
-    progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+  if (subtitleEl) {
+    subtitleEl.textContent = `让命运帮你选一顿${SLOT_LABEL[currentSlot]} 🍽️`;
+  }
+  if (instruction) {
+    instruction.textContent = `将手指放到中间圆圈，长按 3 秒，让命运决定今天${SLOT_LABEL[currentSlot]}吃什么`;
+  }
+
+  // ================== 进度条相关 ==================
+  const circumference = 2 * Math.PI * 85;
+  const requiredHoldTime = 2000;
+  let startTime = 0;
+  let isHolding = false;
+  let progressInterval = null;
+
+  progressCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+  progressCircle.style.strokeDashoffset = circumference;
+
+  // ================== 初始化：检查是否已有结果 ==================
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      showResult(JSON.parse(saved));
+    }
+  } catch (err) {
+    console.error("读取本地存储失败:", err);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (_) {}
+  }
+
+  // ================== 长按开始 ==================
+  function handleHoldStart(e) {
+    e.preventDefault();
+
+    try {
+      if (localStorage.getItem(STORAGE_KEY)) return;
+    } catch (_) {}
+
+    isHolding = true;
+    startTime = Date.now();
+
+    if (progressInterval) clearInterval(progressInterval);
+    progressInterval = setInterval(updateProgress, 30);
+
+    progressText.classList.remove("hidden");
+    pressHint.classList.add("hidden");
+    instruction.textContent = `正在为你查找今天的${SLOT_LABEL[currentSlot]}命定美食...`;
+
+    const testContainer = document.querySelector(".progress-container");
+    if (testContainer) {
+      testContainer.style.transition = "transform 0.2s";
+      testContainer.classList.add("scale-105");
+    }
+  }
+
+  // ================== 长按结束 ==================
+  function handleHoldEnd() {
+    try {
+      if (localStorage.getItem(STORAGE_KEY)) return;
+    } catch (_) {}
+
+    isHolding = false;
+    clearInterval(progressInterval);
+    resetProgress();
+
+    const testContainer = document.querySelector(".progress-container");
+    if (testContainer) {
+      testContainer.classList.remove("scale-105");
+    }
+
+    instruction.textContent = `将手指放到中间圆圈，长按 3 秒，让命运决定今天${SLOT_LABEL[currentSlot]}吃什么`;
+  }
+
+  // ================== 更新进度条 ==================
+  function updateProgress() {
+    if (!isHolding) return;
+
+    const elapsedTime = Date.now() - startTime;
+    const progress = Math.min(elapsedTime / requiredHoldTime, 1);
+    const offset = circumference - progress * circumference;
+
+    progressCircle.style.strokeDashoffset = offset;
+    const percentage = Math.round(progress * 100);
+    progressPercentage.textContent = `${percentage}%`;
+
+    if (progress >= 1) {
+      clearInterval(progressInterval);
+      generateResult();
+    }
+  }
+
+  // ================== 重置进度条 ==================
+  function resetProgress() {
+    clearInterval(progressInterval);
     progressCircle.style.strokeDashoffset = circumference;
+    progressText.classList.add("hidden");
+    pressHint.classList.remove("hidden");
+    progressPercentage.textContent = "0%";
+  }
 
-    // localStorage key
-    const STORAGE_KEY = "todayEatResult";
-
-    // 初始化：检查是否已有结果
+  // ================== 生成随机结果 ==================
+  function generateResult() {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        showResult(JSON.parse(saved));
-      }
-    } catch (err) {
-      console.error("读取本地存储失败:", err);
+      playSound("complete");
+
+      const pool = getActiveFoodList();
+      const useList = pool.length > 0 ? pool : foodResults;
+      const index = Math.floor(Math.random() * useList.length);
+      const result = useList[index];
+
       try {
-        localStorage.removeItem(STORAGE_KEY);
-      } catch (_) {}
-    }
-
-    // 长按开始
-    function handleHoldStart(e) {
-      e.preventDefault();
-
-      // 如果已有结果，不再响应长按
-      try {
-        if (localStorage.getItem(STORAGE_KEY)) return;
-      } catch (_) {}
-
-      isHolding = true;
-      startTime = Date.now();
-
-      // 避免多次开启 interval
-      if (progressInterval) clearInterval(progressInterval);
-      progressInterval = setInterval(updateProgress, 30);
-
-      progressText.classList.remove("hidden");
-      pressHint.classList.add("hidden");
-      instruction.textContent = "正在为你查找今天的命定美食...";
-
-      const testContainer = document.querySelector(".progress-container");
-      if (testContainer) {
-        testContainer.style.transition = "transform 0.2s";
-        testContainer.classList.add("scale-105");
-      }
-    }
-
-    // 长按结束
-    function handleHoldEnd() {
-      try {
-        if (localStorage.getItem(STORAGE_KEY)) return;
-      } catch (_) {}
-
-      isHolding = false;
-      clearInterval(progressInterval);
-      resetProgress();
-
-      const testContainer = document.querySelector(".progress-container");
-      if (testContainer) {
-        testContainer.classList.remove("scale-105");
-      }
-
-      instruction.textContent = "将手指放到中间圆圈，长按 3 秒，让命运决定今天吃什么";
-    }
-
-    // 更新进度条
-    function updateProgress() {
-      if (!isHolding) return;
-
-      const elapsedTime = Date.now() - startTime;
-      const progress = Math.min(elapsedTime / requiredHoldTime, 1);
-      const offset = circumference - progress * circumference;
-
-      progressCircle.style.strokeDashoffset = offset;
-      const percentage = Math.round(progress * 100);
-      progressPercentage.textContent = `${percentage}%`;
-
-      if (progress >= 1) {
-        clearInterval(progressInterval);
-        generateResult();
-      }
-    }
-
-    // 重置进度条
-    function resetProgress() {
-      clearInterval(progressInterval);
-      progressCircle.style.strokeDashoffset = circumference;
-      progressText.classList.add("hidden");
-      pressHint.classList.remove("hidden");
-      progressPercentage.textContent = "0%";
-    }
-
-    // 生成随机结果
-    function generateResult() {
-      try {
-        playSound("complete");
-
-        const index = Math.floor(Math.random() * foodResults.length);
-        const result = foodResults[index];
-
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
-        } catch (err) {
-          console.error("写入本地存储失败:", err);
-        }
-
-        showResult(result);
-      } catch (error) {
-        console.error("生成结果失败:", error);
-        alert("生成结果失败，请重试！");
-        resetProgress();
-        instruction.textContent = "长按圆圈，看看今天吃什么～";
-      }
-    }
-
-    // 展示结果
-    function showResult(result) {
-      testArea.classList.add("hidden");
-      resultArea.classList.remove("hidden");
-
-      resultEmoji.textContent = result.emoji || "🍽️";
-      resultTitle.textContent = result.name;
-      resultDescription.textContent = result.description;
-      resultAnalysis.textContent = result.analysis || "";
-
-      resultArea.style.opacity = "0";
-      resultArea.style.transform = "translateY(16px)";
-      resultArea.style.transition = "opacity 0.4s, transform 0.4s";
-
-      setTimeout(() => {
-        resultArea.style.opacity = "1";
-        resultArea.style.transform = "translateY(0)";
-      }, 10);
-    }
-
-    // 播放音效（完成提示）
-    function playSound(type) {
-      try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
-
-        const oscillator = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        oscillator.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        if (type === "complete") {
-          oscillator.type = "sine";
-          oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-          oscillator.frequency.setValueAtTime(
-            659.25,
-            audioCtx.currentTime + 0.1
-          ); // E5
-          oscillator.frequency.setValueAtTime(
-            783.99,
-            audioCtx.currentTime + 0.2
-          ); // G5
-
-          gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-          gainNode.gain.exponentialRampToValueAtTime(
-            0.01,
-            audioCtx.currentTime + 0.3
-          );
-
-          oscillator.start(audioCtx.currentTime);
-          oscillator.stop(audioCtx.currentTime + 0.3);
-        }
-      } catch (error) {
-        console.error("播放音效失败:", error);
-      }
-    }
-
-    // 重新测试
-    function handleRetest() {
-      try {
-        localStorage.removeItem(STORAGE_KEY);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
       } catch (err) {
-        console.error("清除本地存储失败:", err);
+        console.error("写入本地存储失败:", err);
       }
 
+      showResult(result);
+    } catch (error) {
+      console.error("生成结果失败:", error);
+      alert("生成结果失败，请重试！");
+      instruction.textContent = `长按圆圈，看看今天${SLOT_LABEL[currentSlot]}吃什么～`;
       resetProgress();
-      testArea.classList.remove("hidden");
-      resultArea.classList.add("hidden");
-      instruction.textContent =
-        "将手指放到中间圆圈，长按 3 秒，让命运决定今天吃什么";
     }
+  }
 
-    // 事件监听
+  // ================== 展示结果 ==================
+  function showResult(result) {
+    testArea.classList.add("hidden");
+    resultArea.classList.remove("hidden");
+
+    resultEmoji.textContent = result.emoji || "🍽️";
+    resultTitle.textContent = result.name;
+    resultDescription.textContent = result.description;
+    resultAnalysis.textContent = result.analysis || "";
+
+    resultArea.style.opacity = "0";
+    resultArea.style.transform = "translateY(16px)";
+    resultArea.style.transition = "opacity 0.4s, transform 0.4s";
+
+    setTimeout(() => {
+      resultArea.style.opacity = "1";
+      resultArea.style.transform = "translateY(0)";
+    }, 10);
+  }
+
+  // ================== 播放音效 ==================
+  function playSound(type) {
     try {
-      const progressContainer = document.querySelector(".progress-container");
-      if (progressContainer) {
-        progressContainer.addEventListener("mousedown", handleHoldStart);
-        progressContainer.addEventListener("touchstart", handleHoldStart, {
-          passive: false
-        });
-      }
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const audioCtx = new AudioContext();
 
-      document.addEventListener("mouseup", handleHoldEnd);
-      document.addEventListener(
-        "touchend",
-        function (e) {
-          e.preventDefault();
-          handleHoldEnd();
-        },
-        { passive: false }
-      );
-      document.addEventListener("touchcancel", handleHoldEnd);
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
 
-      if (retestButton) {
-        retestButton.addEventListener("click", handleRetest);
+      if (type === "complete") {
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+        oscillator.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+        oscillator.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2);
+
+        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+
+        oscillator.start(audioCtx.currentTime);
+        oscillator.stop(audioCtx.currentTime + 0.3);
       }
     } catch (error) {
-      console.error("添加事件监听失败:", error);
+      console.error("播放音效失败:", error);
+    }
+  }
+
+  // ================== 重新测试 ==================
+  function handleRetest() {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (err) {
+      console.error("清除本地存储失败:", err);
     }
 
+    resetProgress();
+    testArea.classList.remove("hidden");
+    resultArea.classList.add("hidden");
+    instruction.textContent = `将手指放到中间圆圈，长按 3 秒，让命运决定今天${SLOT_LABEL[currentSlot]}吃什么`;
+  }
 
+  // ================== 事件监听 ==================
+  try {
+    const progressContainer = document.querySelector(".progress-container");
+    if (progressContainer) {
+      progressContainer.addEventListener("mousedown", handleHoldStart);
+      progressContainer.addEventListener("touchstart", handleHoldStart, {
+        passive: false
+      });
+    }
 
+    document.addEventListener("mouseup", handleHoldEnd);
+    document.addEventListener(
+      "touchend",
+      function (e) {
+        e.preventDefault();
+        handleHoldEnd();
+      },
+      { passive: false }
+    );
+    document.addEventListener("touchcancel", handleHoldEnd);
+
+    if (retestButton) {
+      retestButton.addEventListener("click", handleRetest);
+    }
+  } catch (error) {
+    console.error("添加事件监听失败:", error);
+  }
 </script>
 </body>
 </html>
