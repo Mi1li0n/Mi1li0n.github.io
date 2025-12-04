@@ -1126,22 +1126,28 @@
   try {
     const progressContainer = document.querySelector(".progress-container");
     if (progressContainer) {
+      // 按下开始长按
       progressContainer.addEventListener("mousedown", handleHoldStart);
       progressContainer.addEventListener("touchstart", handleHoldStart, {
         passive: false
       });
+
+      // 在圆圈里松手时结束长按
+      progressContainer.addEventListener(
+        "touchend",
+        function (e) {
+          e.preventDefault(); // 防止页面被莫名点一下
+          handleHoldEnd();
+        },
+        { passive: false }
+      );
+
+      progressContainer.addEventListener("touchcancel", handleHoldEnd);
     }
 
+    // 鼠标松开依然用全局就行（PC端）
     document.addEventListener("mouseup", handleHoldEnd);
-    document.addEventListener(
-      "touchend",
-      function (e) {
-        e.preventDefault();
-        handleHoldEnd();
-      },
-      { passive: false }
-    );
-    document.addEventListener("touchcancel", handleHoldEnd);
+
 
     if (retestButton) {
       retestButton.addEventListener("click", handleRetest);
