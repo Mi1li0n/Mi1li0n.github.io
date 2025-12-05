@@ -240,14 +240,6 @@
       slots: ["dinner","lateNight"]
     },
     {
-      id: "kebab",
-      name: "中东烤肉卷",
-      emoji: "🌯",
-      description: "烤肉、蔬菜和酱料卷在一起，一口异域风情。",
-      analysis: "你现在想尝点不一样的味道，对日常菜单有点厌倦了，适合来点新鲜的文化体验。",
-      slots: ["lunch","dinner","lateNight"]
-    },
-    {
       id: "ramen",
       name: "日式拉面",
       emoji: "🍜",
@@ -305,7 +297,7 @@
     },
     {
       id: "sandwich",
-      name: "三明治 / 潜艇堡",
+      name: "三明治",
       emoji: "🥪",
       description: "叠满食材，一手就能拿着走的便携正餐。",
       analysis: "你今天行程有点忙，不想浪费太久在吃饭上，但又不想随便糊弄，三明治是理智选择。",
@@ -369,7 +361,7 @@
     },
     {
       id: "hot-dry-noodles",
-      name: "热干面 / 拌面",
+      name: "热干面",
       emoji: "🍜",
       description: "芝麻酱、辣椒和面条搅拌在一起，香味扑鼻。",
       analysis: "你今天想要的是那种一搅就很香的满足感，吃完会觉得“啊，这才叫吃饭”。",
@@ -377,19 +369,11 @@
     },
     {
       id: "liangpi",
-      name: "凉皮 / 凉拌粉",
+      name: "凉皮",
       emoji: "🥡",
       description: "酸辣劲爽，一口下去整个人都清醒了。",
       analysis: "你有点热、有点困，适合来点冰冰凉凉的东西唤醒味蕾和大脑。",
       slots: ["lunch","dinner","lateNight"]
-    },
-    {
-      id: "sushi-rolls",
-      name: "寿司卷外带",
-      emoji: "🍣",
-      description: "切好的一卷卷寿司，拿着就走，非常方便。",
-      analysis: "你今天偏向轻量级和方便携带的食物，适合边走边吃或者边工作边慢慢消灭。",
-      slots: ["breakfast","lunch"]
     },
     {
       id: "hotpot",
@@ -405,11 +389,11 @@
       emoji: "🌶️",
       description: "想吃什么自己串，麻麻辣辣才算过瘾。",
       analysis: "你今天有点想放纵一下，不想算卡路里，只想痛痛快快吃一顿重口味。",
-      always: true
+      slots: ["lunch","dinner"]
     },
     {
       id: "rice-noodle",
-      name: "螺蛳粉 / 米线",
+      name: "螺蛳粉",
       emoji: "🍜",
       description: "一碗热乎乎的粉，灵魂来自汤底。",
       analysis: "你现在有点需要“灵魂汤”，想找点熟悉的味道安慰自己。适合一个人安静地吃完再慢慢发会儿呆。",
@@ -425,7 +409,7 @@
     },
     {
       id: "sushi",
-      name: "寿司 / 日料",
+      name: "寿司",
       emoji: "🍣",
       description: "小小一口，精致又满足。",
       analysis: "你今天比较细腻，想吃得清爽一点，又有一点仪式感，适合慢慢品、慢慢聊。",
@@ -449,7 +433,7 @@
     },
     {
       id: "spicy",
-      name: "湘菜 / 川菜",
+      name: "！湘菜！",
       emoji: "🔥",
       description: "没有辣就没有灵魂的一餐。",
       analysis: "你今天需要一点刺激，可能最近有点累，想靠辣味唤醒一下自己。",
@@ -480,12 +464,156 @@
       always: true
     },
     {
+      id: "cantonese-breakfast",
+      name: "肠粉+烧卖早晨",
+      emoji: "🍱",
+      description: "一份鲜虾肠粉配几颗烧卖，简化版早茶体验。",
+      analysis: "你今天有点想精致但又懒得全套早茶，这种轻量版组合既有仪式感，又不会太折腾时间。",
+      slots: ["breakfast"]
+    },
+    {
+      id: "fruit-yogurt-breakfast",
+      name: "酸奶水果杯",
+      emoji: "🍓",
+      description: "酸奶配上水果块和一点麦片，清爽又颜值在线。",
+      analysis: "你今天想吃得轻盈一点，让身体和心情都感觉没那么沉重，是非常适合“元气少女/少年”风的早餐。",
+      slots: ["breakfast"]
+    },
+    {
+      id: "breakfast-burger",
+      name: "早餐汉堡+咖啡",
+      emoji: "🍔",
+      description: "鸡蛋、培根、生菜夹在面包里，再配一杯热咖啡。",
+      analysis: "你今天需要迅速加载“上班模式”，一手汉堡一手咖啡，能让你的理智和清醒值一起上线。",
+      slots: ["breakfast"]
+    },
+    {
+      id: "toast-sandwich-breakfast",
+      name: "吐司三明治早餐",
+      emoji: "🥪",
+      description: "烤吐司夹鸡蛋、芝士和蔬菜，清爽又不失饱腹感。",
+      analysis: "你想吃得相对清淡一点，但又不能太敷衍胃，一份简单的三明治刚好平衡了健康与满足。",
+      slots: ["breakfast"]
+    },
+    {
+      id: "soy-milk-youtiao",
+      name: "豆浆油条",
+      emoji: "🥛",
+      description: "一杯热豆浆配上一根酥脆的油条，经典国民早餐组合。",
+      analysis: "你今天想要最熟悉、最不容易出错的那一口。简单、便宜、接地气，能把瞌睡慢慢赶跑。",
+      slots: ["breakfast"]
+    },
+    {
+      id: "xiaolongbao",
+      name: "小笼包",
+      emoji: "⚪",
+      description: "一笼热气腾腾的小笼包，轻轻一咬汤汁就涌出来。",
+      analysis: "你今天需要一点精致小确幸，用一笼小笼包开启早晨，会觉得这一天都变得温柔了一点。",
+      slots: ["breakfast"]
+    },
+    {
+      id: "baozi-breakfast",
+      name: "包子铺套餐",
+      emoji: "🥯",
+      description: "几个大包子，配上一杯豆浆或一碗粥，非常顶饿。",
+      analysis: "你今天可能要忙一天，需要一顿比较抗饿的早餐，把肚子填得踏实一点才有安全感。",
+      slots: ["breakfast"]
+    },
+    {
+      id: "kungpao-chicken-rice",
+      name: "宫保鸡丁盖饭",
+      emoji: "🍛",
+      description: "酸甜微辣的鸡丁加上花生米，浇在热腾腾的米饭上。",
+      analysis: "你今天需要一点带劲但不过分的辣，既要有肉、有酱汁，又要能干掉一大碗饭，宫保鸡丁是午休前的战斗力补给。",
+      slots: ["lunch"]
+    },
+    {
+      id: "red-braised-pork-rice",
+      name: "红烧肉盖饭",
+      emoji: "🍖",
+      description: "肥瘦相间的红烧肉配上浓郁的酱汁，浇满整碗饭。",
+      analysis: "你现在非常需要一点高热量安慰剂，红烧肉能快速恢复你的打工体力，吃完下午继续硬撑也有动力。",
+      slots: ["lunch"]
+    },
+    {
+      id: "tomato-beef-stew-rice",
+      name: "番茄炖牛腩饭",
+      emoji: "🥘",
+      description: "番茄的酸香加上软烂牛腩，配白米饭特别下饭。",
+      analysis: "你今天适合来点温柔但有存在感的肉食，番茄的酸甜会把油腻感中和掉，让你吃得舒服又满足。",
+      slots: ["lunch"]
+    },
+    {
+      id: "fish-flavor-eggplant-rice",
+      name: "鱼香茄子盖饭",
+      emoji: "🍆",
+      description: "裹满酱汁的茄子软糯入味，配饭一绝。",
+      analysis: "你现在不一定非要吃很多肉，更在意酱汁和风味，鱼香茄子这种“下饭选手”非常适合午饭时好好干一碗饭。",
+      slots: ["lunch"]
+    },
+    {
+      id: "pork-chop-rice",
+      name: "炸猪排饭",
+      emoji: "🥩",
+      description: "一大块酥脆猪排切成条，旁边是米饭和一点小菜。",
+      analysis: "你今天需要一点“看起来就很有份量”的正餐，用一块大猪排来告诉自己：午饭不能随便糊弄。",
+      slots: ["lunch"]
+    },
+    {
+      id: "stirfried-rice-noodle",
+      name: "炒粉",
+      emoji: "🥣",
+      description: "锅气十足的炒粉，菜、蛋、肉一起拌进去香气四溢。",
+      analysis: "你现在想吃点有锅气、有油香的主食，吃完会有那种“认真吃过一顿饭”的满足感，而不是草草对付。",
+      slots: ["lunch"]
+    },
+    {
+      id: "mixed-veg-rice-bowl",
+      name: "杂菜大碗饭",
+      emoji: "🥗",
+      description: "几种蔬菜加一点肉，全部铺在一大碗米饭上。",
+      analysis: "你今天想吃得均衡一点，既不想全是肉，也不想只有菜，这种荤素搭配的大碗饭正好对你的胃口。",
+      slots: ["lunch"]
+    },
+    {
+      id: "japanese-donburi",
+      name: "日式丼饭",
+      emoji: "🍱",
+      description: "照烧鸡、猪排、牛肉都能铺在饭上，一碗就是一顿小套餐。",
+      analysis: "你现在想吃得稍微精致一点，但时间又不多，一碗丼饭既有仪式感，又不用点一大桌菜。",
+      slots: ["lunch"]
+    },
+    {
+      id: "office-set-lunch",
+      name: "写字楼快餐套餐",
+      emoji: "🥡",
+      description: "两荤一素或者一荤两素，标准打工人午餐配置。",
+      analysis: "你今天以“效率第一”为主，只要干净、管饱、选择不要太复杂就行，这种快餐式套餐刚好适合中午短暂休息时间。",
+      slots: ["lunch"]
+    },
+    {
+      id: "spicy-chicken-rice-bowl",
+      name: "香辣鸡块饭",
+      emoji: "🌶️",
+      description: "香辣鸡块配上米饭和一点蔬菜，辣得很上头。",
+      analysis: "你现在可能有点困乏，想靠一点辣味把自己唤醒，香辣鸡块配饭能让你从午休模式切换回战斗模式。",
+      slots: ["lunch"]
+    },
+    {
       id: "noodles",
       name: "简简单单一碗面",
       emoji: "🍜",
       description: "清汤、红烧、拌面，总有一款适合你。",
       analysis: "你今天不太想费脑子纠结，快速解决温饱最重要。泡个面，刚刚好。",
-      always: true
+      slots: ["lunch","breakfast"]
+    },
+    {
+      id: "kebab",
+      name: "路边烤肉串",
+      emoji: "🍢",
+      description: "滋滋冒油的烤肉串，再撒一把孜然和辣椒面。",
+      analysis: "你今天适合来点热闹的重口味，边吃烤串边聊天，越吃越放松。非常适合当作加班后的慰劳或者夜宵主角。",
+      slots: ["dinner", "lateNight"]
     },
     {
       id: "takeout",
@@ -505,7 +633,7 @@
     },
     {
       id: "fried-rice",
-      name: "炒饭 / 扬州炒饭",
+      name: "炒饭",
       emoji: "🥘",
       description: "锅气十足的蛋炒饭，加点火腿粒和青豆刚刚好。",
       analysis: "你今天适合来点简单粗暴的炒饭，什么菜都能往里扔，一盘端上桌就很有安全感。",
@@ -521,7 +649,7 @@
     },
     {
       id: "wonton-soup",
-      name: "馄饨 / 云吞",
+      name: "馄饨",
       emoji: "🥟",
       description: "薄皮大馅，配上一碗清汤或红油，暖胃又暖心。",
       analysis: "你现在需要一点被温柔对待的感觉，一碗热乎乎的馄饨能给你刚好的温度。",
@@ -553,7 +681,7 @@
     },
     {
       id: "guokui",
-      name: "锅盔 / 烧饼夹菜",
+      name: "烧饼夹菜",
       emoji: "🥯",
       description: "脆脆的饼里夹满菜，路边摊的灵魂美食。",
       analysis: "你今天适合来点街头风味，不用太正式，只要好吃、随手买得到就行。",
@@ -569,7 +697,7 @@
     },
     {
       id: "cold-noodles",
-      name: "韩式冷面 / 冷面",
+      name: "冷面",
       emoji: "🥢",
       description: "冰冰凉凉的汤里泡着筋道的面条和小菜。",
       analysis: "你今天可能有点浮躁或上火，适合吃点清凉解暑的面，让脑子也降温一下。",
@@ -609,7 +737,7 @@
     },
     {
       id: "yakitori",
-      name: "日式烤串 / 鸡肉串",
+      name: "日式烧鸟",
       emoji: "🍡",
       description: "一串一串的烤鸡肉、蔬菜，蘸点酱就很香。",
       analysis: "你今天适合小酌小吃的节奏，不必吃到很撑，只要慢慢品、慢慢聊就很幸福。",
@@ -617,7 +745,7 @@
     },
     {
       id: "cheese-burger-rice",
-      name: "汉堡排饭 / 日式洋食",
+      name: "汉堡排饭",
       emoji: "🍱",
       description: "煎好的肉排配上咖喱或肉汁酱，再加一勺米饭。",
       analysis: "你现在在中餐和西餐之间摇摆，那就来份折中一点的日式洋食，两边的快乐都要。",
@@ -649,7 +777,7 @@
     },
     {
       id: "spicy-snacks",
-      name: "辣条 / 小零食大集合",
+      name: "小零食大集合",
       emoji: "🧃",
       description: "辣条、薯片、膨化食品，一整包罪恶小组。",
       analysis: "你今天的状态是：正餐可以简单点，嘴巴必须很忙。偶尔一次“垃圾快乐餐”也无妨。",
@@ -681,7 +809,7 @@
     },
     {
       id: "pancake-fruit",
-      name: "煎饼果子 / 鸡蛋饼",
+      name: "煎饼果子",
       emoji: "🥞",
       description: "饼里加蛋、里脊、油条，卷起来边走边吃。",
       analysis: "你今天适合来点接地气的主食，价格友好、味道熟悉，吃完会觉得“这就叫生活”。",
@@ -713,7 +841,7 @@
     },
     {
       id: "seafood-rice",
-      name: "海鲜炒饭 / 海鲜饭",
+      name: "海鲜饭",
       emoji: "🦐",
       description: "海鲜和米饭一起翻炒或焗烤，满嘴都是鲜味。",
       analysis: "你今天想吃点“有点讲究”的饭，又不想太正式，有海鲜加持就会觉得这顿值了。",
@@ -729,7 +857,7 @@
     },
     {
       id: "fish-soup-noodle",
-      name: "鲜鱼汤米线 / 面",
+      name: "鲜鱼汤米线",
       emoji: "🐟",
       description: "奶白色的鱼汤配上米线或面条，鲜而不腻。",
       analysis: "你今天适合喝点有营养的汤水，让胃和心情一起被好好安抚一下。",
@@ -745,7 +873,7 @@
     },
     {
       id: "thai-curry",
-      name: "泰式咖喱 / 冬阴功",
+      name: "冬阴功",
       emoji: "🍤",
       description: "椰奶、香茅、辣椒混在一起，酸辣中带着热带风情。",
       analysis: "你今天有点想去旅行的心情，先用一顿泰式料理骗骗自己，假装在海边。",
@@ -761,7 +889,7 @@
     },
     {
       id: "tacos",
-      name: "塔可 / 墨西哥卷",
+      name: "塔可",
       emoji: "🌮",
       description: "脆皮或软饼里塞满肉和蔬菜，一口一个很过瘾。",
       analysis: "你今天想体验点异国街头摊的感觉，一手一个小卷，边吃边聊最开心。",
@@ -769,7 +897,7 @@
     },
     {
       id: "burrito",
-      name: "卷饼大卷 / Burrito",
+      name: "卷饼",
       emoji: "🌯",
       description: "饭、肉、豆子和各种配料裹成一个大卷，握着就能吃。",
       analysis: "你现在可能挺饿的，又不太想分步骤吃，就想一卷在手、天下我有。",
@@ -785,7 +913,7 @@
     },
     {
       id: "cheese-potato",
-      name: "芝士土豆泥 / 烤土豆",
+      name: "烤土豆",
       emoji: "🥔",
       description: "软乎乎的土豆配上芝士和黄油，热量爆棚也很幸福。",
       analysis: "你现在的状态是：卡路里以后再算，今天先把心情喂饱，土豆是很靠谱的选择。",
@@ -801,7 +929,7 @@
     },
     {
       id: "rice-burger",
-      name: "饭团 / 饭团汉堡",
+      name: "饭团",
       emoji: "🍙",
       description: "米饭捏成团或做成夹心，一手就能拿着吃。",
       analysis: "你现在想要轻便又有饱腹感的东西，吃完就走、不耽误行程，非常适合作为移动中的一餐。",
@@ -841,7 +969,7 @@
     },
     {
       id: "zongzi",
-      name: "粽子 / 糯米点心",
+      name: "粽子",
       emoji: "🌯",
       description: "咸蛋黄肉粽、豆沙粽都行，糯叽叽的很治愈。",
       analysis: "你今天想吃点黏糯又扎实的主食，小小一个粽子就能让你感觉到节日感和仪式感。",
@@ -878,6 +1006,166 @@
       description: "一碗热乎乎的羊肉汤配上酥脆烧饼，越喝越暖。",
       analysis: "你现在需要从胃开始的安全感，一碗汤下去，整个人都慢慢暖和起来。",
       slots: ["breakfast","lunch","dinner"]
+    },
+    {
+      id: "family-hotpot-dinner",
+      name: "和朋友/家人吃火锅",
+      emoji: "🍲",
+      description: "约上几个人围着一口锅，慢慢涮、慢慢聊。",
+      analysis: "你今天适合热闹一点的晚餐，边吃边聊天，把白天的情绪都丢进锅里涮掉，是很治愈的一顿。",
+      slots: ["dinner"]
+    },
+    {
+      id: "three-dishes-one-soup",
+      name: "三个小菜一碗汤",
+      emoji: "🥢",
+      description: "两素一荤再加一碗热汤，家常又舒服。",
+      analysis: "你现在更想好好吃一顿“正常晚饭”，不需要太花哨，只要有菜有汤，就会觉得生活很有质感。",
+      slots: ["dinner"]
+    },
+    {
+      id: "late-congee-stall",
+      name: "深夜粥铺",
+      emoji: "🥣",
+      description: "一碗皮蛋瘦肉粥或艇仔粥，再来两笼小点心。",
+      analysis: "你今天是嘴馋多过真饿，想要一点暖暖的安慰感，又不想太刺激肠胃，深夜粥铺最适合慢慢喝、慢慢困。",
+      slots: ["lateNight"]
+    },
+    {
+      id: "late-bbq-street",
+      name: "路边烧烤摊",
+      emoji: "🍢",
+      description: "烤肉、烤菜、烤豆皮，刷上酱再撒一把孜然和辣椒面。",
+      analysis: "你现在需要的是“夜生活仪式感”，不一定多饿，但一定要听见滋滋的烤架声，感受一下夜晚的烟火气。",
+      slots: ["lateNight"]
+    },
+    {
+      id: "late-fried-chicken",
+      name: "深夜炸鸡",
+      emoji: "🍗",
+      description: "外脆里嫩的炸鸡块，加一杯冰饮，快乐指数直线上升。",
+      analysis: "你很清楚这顿不健康，但你就是想爽一把。明天再减肥，今晚先让炸鸡安慰一下打工人的灵魂。",
+      slots: ["lateNight"]
+    },
+    {
+      id: "late-stirfried-noodles",
+      name: "炒粉 / 炒面夜宵",
+      emoji: "🍜",
+      description: "大火快炒的炒粉炒面，加点豆芽、青菜和肉丝香气扑鼻。",
+      analysis: "你今天夜里还有精神力要续，用一份热乎乎的炒粉炒面把能量条拉回一半，再继续肝也不怕。",
+      slots: ["lateNight"]
+    },
+    {
+      id: "late-crayfish",
+      name: "小龙虾大作战",
+      emoji: "🦞",
+      description: "十三香、蒜香、麻辣都行，边剥边吃到手上全是味道。",
+      analysis: "你今晚不只是想吃，是想“搞个大事情”。小龙虾属于那种吃起来很麻烦但很爽的夜宵，适合发泄压力。",
+      slots: ["lateNight"]
+    },
+    {
+      id: "late-potstickers",
+      name: "煎饺锅贴",
+      emoji: "🥟",
+      description: "底部煎得金黄酥脆，里面还是多汁馅料。",
+      analysis: "你现在想找点“有咬劲”的夜宵，既能当主食，又有小吃满足感，煎饺锅贴刚好兼顾这两点。",
+      slots: ["lateNight"]
+    },
+    {
+      id: "late-oden",
+      name: "关东煮 / 丸子拼盘",
+      emoji: "🍢",
+      description: "各种丸子、萝卜、鱼板泡在热汤里，想吃啥捞啥。",
+      analysis: "你想吃点热乎的东西，但又不想太油，汤汤水水的关东煮很适合边聊天边慢慢夹着吃。",
+      slots: ["lateNight"]
+    },
+    {
+      id: "late-cold-noodle",
+      name: "凉皮 / 凉面夜宵",
+      emoji: "🥡",
+      description: "酸辣劲爽，凉凉的酱汁裹住每一根面或凉皮。",
+      analysis: "你今晚有点上火或太热，想吃点清爽又带点刺激的东西，用一份凉皮凉面把睡前的困倦和闷热一起冲掉。",
+      slots: ["lateNight"]
+    },
+    {
+      id: "late-burger-fries",
+      name: "汉堡+薯条夜宵",
+      emoji: "🍔",
+      description: "一个小汉堡配一份薯条，简单粗暴的快乐组合。",
+      analysis: "你现在不追求精致，只想快速来点高热量犒劳一下加班后的自己，汉堡薯条一上桌，心态立刻从“社畜”切回“人”。",
+      slots: ["lateNight"]
+    },
+    {
+      id: "late-luwei-platter",
+      name: "卤味拼盘",
+      emoji: "🥓",
+      description: "鸭脖、鸡爪、藕片、豆干……一大盘越啃越上头。",
+      analysis: "你今晚更像是“边追剧边啃东西”的模式，卤味属于那种可以慢慢吃、慢慢刷剧的长线夜宵选手。",
+      slots: ["lateNight"]
+    },
+    {
+      id: "kbbq-night",
+      name: "韩式烤肉之夜",
+      emoji: "🥓",
+      description: "烤肉、泡菜、生菜叶，一口肉一口菜，不知不觉吃撑。",
+      analysis: "你今天很适合认真“犒劳一下自己”，烤肉配聊天，就是那种结束忙碌一天的仪式感晚餐。",
+      slots: ["dinner"]
+    },
+    {
+      id: "seafood-boil-dinner",
+      name: "海鲜大餐",
+      emoji: "🦀",
+      description: "虾、蟹、贝类排满一桌，蘸酱吃到手指都停不下来。",
+      analysis: "你今天的晚餐想要一点“排面”，适合来一顿隆重点的聚餐，好好享受一下认真吃饭的快乐。",
+      slots: ["dinner"]
+    },
+    {
+      id: "western-steak-set",
+      name: "西式牛排套餐",
+      emoji: "🥩",
+      description: "一块牛排配沙拉、汤和小甜点，慢慢吃很有仪式感。",
+      analysis: "你现在想要一顿有点“正式感”的晚餐，也许是犒劳自己，也许是想好好放空一下脑子。",
+      slots: ["dinner"]
+    },
+    {
+      id: "izakaya-style-dinner",
+      name: "日式居酒屋小菜拼盘",
+      emoji: "🍢",
+      description: "几道热菜+几份小串，配点饮料慢慢聊。",
+      analysis: "你今天适合吃点“多样但不一定很多”的晚餐，多点几样小菜，一边夹一边聊，氛围感满满。",
+      slots: ["dinner"]
+    },
+    {
+      id: "claypot-chicken-rice-dinner",
+      name: "砂锅鸡肉饭",
+      emoji: "🍚",
+      description: "砂锅里咕嘟咕嘟的鸡肉和米饭，锅巴香气扑鼻。",
+      analysis: "你今晚适合来点热气腾腾的主食，砂锅端上桌的那一刻，就会觉得这一天终于安定下来了。",
+      slots: ["dinner"]
+    },
+    {
+      id: "onepot-rice-evening",
+      name: "电饭煲一锅焖饭",
+      emoji: "🍲",
+      description: "把米、菜、肉全都丢进锅里焖，开盖就是一整锅香。",
+      analysis: "你今天不太想折腾做很多菜，但又想吃得丰盛，一锅焖饭是懒人晚餐里的天花板。",
+      slots: ["dinner"]
+    },
+    {
+      id: "light-evening-noodle-soup",
+      name: "清淡一点的面条晚餐",
+      emoji: "🍜",
+      description: "来一碗青菜鸡蛋面或清汤面，简单但很暖胃。",
+      analysis: "你现在可能有点累，不想吃太油太重，只想让胃轻松一点，用一碗热面安静结束这一天。",
+      slots: ["dinner"]
+    },
+    {
+      id: "salad-plus-protein-dinner",
+      name: "沙拉+主食简餐晚饭",
+      emoji: "🥗",
+      description: "一份大沙拉配上鸡胸、牛肉或三文鱼，再来点主食。",
+      analysis: "你今晚既想吃得健康一点，又不想太清汤寡水，沙拉加优质蛋白是对身体和身材都比较“友好”的选择。",
+      slots: ["dinner"]
     },
     {
       id: "soup-dumpling",
@@ -944,7 +1232,7 @@
 
   // ================== 进度条相关 ==================
   const circumference = 2 * Math.PI * 85;
-  const requiredHoldTime = 2000;
+  const requiredHoldTime = 1500;
   let startTime = 0;
   let isHolding = false;
   let progressInterval = null;

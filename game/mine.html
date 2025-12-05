@@ -1,0 +1,2567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <title>地底矿工 Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    :root {
+      --bg: #020617;
+      --panel-bg: #0f172a;
+      --accent: #fbbf24;
+      --danger: #f97373;
+      --good: #4ade80;
+      --grid-border: #1f2937;
+      --rock: #111827;
+      --floor: #020617;
+      --ore: #1d4ed8;
+      --hole: #111827;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: radial-gradient(circle at top, #020617, #000);
+      font-family: -apple-system, BlinkMacSystemFont,"Segoe UI",Roboto,
+        "PingFang SC","Microsoft YaHei",sans-serif;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    body {
+      padding: 8px;
+    }
+    .hidden { display: none !important; }
+
+    #game-root {
+      width: 100%;
+      max-width: 1100px;
+      height: 620px;
+      max-height: 100vh;
+      background: linear-gradient(145deg,#020617,#020617 60%,#020617);
+      border-radius: 18px;
+      box-shadow: 0 24px 60px rgba(15,23,42,0.9);
+      display: grid;
+      grid-template-columns: 3fr 1.2fr;
+      overflow: hidden;
+      border: 1px solid #1f2937;
+    }
+
+    /* 开场故事 */
+    #start-screen {
+      width: 100%;
+      max-width: 900px;
+      height: 560px;
+      max-height: 100vh;
+      background: radial-gradient(circle at top,#0f172a,#000);
+      border-radius: 18px;
+      box-shadow: 0 24px 60px rgba(15,23,42,0.9);
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #1f2937;
+    }
+    .story-illu {
+      flex: 1;
+      border-radius: 16px;
+      background: radial-gradient(circle at top,#1e293b,#020617);
+      border: 1px solid #1f2937;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .story-illu::before {
+      content:"";
+      position:absolute;
+      inset:-20%;
+      background:
+        radial-gradient(circle at top left,rgba(251,191,36,0.18),transparent 60%),
+        radial-gradient(circle at bottom right,rgba(59,130,246,0.22),transparent 55%);
+      mix-blend-mode: screen;
+      opacity:0.9;
+    }
+    .story-miner {
+      position: relative;
+      width: 180px;
+      height: 220px;
+      border-radius: 24px;
+      background: radial-gradient(circle at top,#facc15,#f97316);
+      box-shadow: 0 18px 40px rgba(234,179,8,0.6);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      color:#111827;
+      font-weight:700;
+    }
+    .story-miner span.big {
+      font-size: 60px;
+      filter: drop-shadow(0 6px 10px rgba(15,23,42,0.6));
+    }
+    .story-miner span.text {
+      margin-top:4px;
+      font-size: 13px;
+      letter-spacing: 2px;
+    }
+    .story-torch {
+      position:absolute;
+      right:40px;
+      bottom:40px;
+      width:70px;
+      height:120px;
+      border-radius:18px;
+      background: radial-gradient(circle at top,#fed7aa,#9a3412 70%,#000);
+      box-shadow: 0 20px 40px rgba(248,113,113,0.6);
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      padding-bottom:10px;
+      font-size:32px;
+    }
+    .story-text {
+      margin-top: 12px;
+      min-height: 110px;
+      font-size: 14px;
+      line-height: 1.7;
+      color:#e5e7eb;
+      white-space: pre-line;
+    }
+    .story-step {
+      font-size: 12px;
+      color:#9ca3af;
+    }
+    .story-controls {
+      margin-top: 8px;
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+    }
+    .btn {
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,0.8);
+      background: radial-gradient(circle at top,#1f2937,#020617);
+      color:#e5e7eb;
+      padding:6px 14px;
+      font-size: 13px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      box-shadow: 0 6px 18px rgba(15,23,42,0.9);
+      transition:transform 0.1s ease,box-shadow 0.1s ease,background 0.1s ease;
+    }
+    .btn-primary {
+      border-color: #fbbf24;
+      background: linear-gradient(120deg,#facc15,#f97316);
+      color:#111827;
+      box-shadow: 0 8px 20px rgba(251,191,36,0.6);
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 26px rgba(15,23,42,0.9);
+    }
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 3px 10px rgba(15,23,42,0.8);
+    }
+
+    /* 左侧主视图 */
+    .main-view {
+      background: radial-gradient(circle at top,#020617,#020617 60%,#000);
+      padding: 10px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .top-hud {
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      padding: 4px 6px;
+      border-radius:12px;
+      background: rgba(15,23,42,0.85);
+      border:1px solid #111827;
+      box-shadow: inset 0 0 0 1px rgba(148,163,184,0.12);
+      font-size: 13px;
+    }
+    .hud-left, .hud-right {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .hud-pill {
+      padding:4px 9px;
+      border-radius:999px;
+      background: rgba(15,23,42,0.85);
+      border:1px solid rgba(148,163,184,0.6);
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .hud-label {
+      color:#9ca3af;
+      font-size:12px;
+    }
+    .hearts, .armor {
+      display:flex;
+      gap:2px;
+      font-size:16px;
+    }
+
+    .view-container {
+      flex:1;
+      border-radius: 16px;
+      background: radial-gradient(circle at top,#020617,#000);
+      border:1px solid #111827;
+      box-shadow: 0 16px 40px rgba(15,23,42,0.9);
+      padding:8px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .grid {
+      display:grid;
+      background:#020617;
+      border-radius: 10px;
+      padding:4px;
+      border:1px solid #1f2937;
+    }
+    .base-grid {
+      grid-template-columns: repeat(3, 42px);
+      grid-template-rows: repeat(3, 42px);
+      gap:3px;
+    }
+    .dungeon-grid {
+      grid-template-columns: repeat(14, 26px);
+      grid-template-rows: repeat(14, 26px);
+      gap:2px;
+    }
+    .tile {
+      width:100%;
+      height:100%;
+      border-radius:5px;
+      font-size:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+      transition: background 0.08s ease, box-shadow 0.08s ease, transform 0.08s ease, filter 0.08s ease;
+    }
+    .tile.base {
+      background:#020617;
+      border:1px solid #1f2937;
+    }
+    .tile.base.bed { background:#172554; }
+    .tile.base.chest { background:#78350f; }
+    .tile.base.stairs { background:#064e3b; }
+    .tile.base.merchant { background:#4b5563; }
+    .tile.base.player { box-shadow:0 0 0 2px #facc15;}
+
+    .tile.dungeon { background: #020617; border:1px solid #020617; font-size:14px;}
+    .tile.rock { background: var(--rock); }
+    .tile.floor { background: var(--floor); border-color:#1f2937;}
+    .tile.ore { background: radial-gradient(circle at top,#1d4ed8,#020617); border-color:#1d4ed8; }
+    .tile.hole { background: radial-gradient(circle at top,#111827,#000); }
+    .tile.stair-up { background:#065f46;}
+    .tile.chest { background:#78350f;}
+    .tile.monster { box-shadow:0 0 0 1px rgba(248,113,113,0.8);}
+    .tile.player {
+      box-shadow:0 0 0 2px #facc15;
+      position:relative;
+    }
+    .tile.bomb {
+      box-shadow:0 0 0 2px rgba(248,113,113,0.8);
+    }
+
+    .tile.fog {
+      background:#000;
+      border-color:#000;
+    }
+    .tile.dim {
+      filter: brightness(0.55) grayscale(0.6);
+    }
+
+    .log-panel {
+      position:absolute;
+      left:8px;
+      bottom:8px;
+      right:8px;
+      pointer-events:none;
+      font-size:13px;
+      color:#9ca3af;
+      background: linear-gradient(to top,rgba(15,23,42,0.9),rgba(15,23,42,0));
+      padding:2px 4px 4px;
+      border-radius:10px;
+    }
+    .log-line { opacity:0.9; }
+    .log-line.important { color:#facc15;}
+
+    /* 右侧信息栏 */
+    .side-panel {
+      background: var(--panel-bg);
+      border-left:1px solid #111827;
+      padding:10px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .side-section {
+      background: rgba(15,23,42,0.8);
+      border-radius:12px;
+      border:1px solid #111827;
+      padding:8px;
+      font-size:13px;
+    }
+    .side-title {
+      font-size:12px;
+      color:#9ca3af;
+      margin-bottom:4px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .stat-row {
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:2px;
+    }
+    .controls-list span.key {
+      display:inline-block;
+      border-radius:6px;
+      border:1px solid #4b5563;
+      padding:1px 4px;
+      margin-right:4px;
+      font-size:11px;
+      background:#020617;
+    }
+
+    /* 背包 / 箱子格子 */
+    .inv-grid {
+      display:grid;
+      gap:3px;
+    }
+    .inv-backpack {
+      grid-template-columns: repeat(2, 26px);
+    }
+    .inv-chest {
+      grid-template-columns: repeat(5, 26px);
+    }
+    .inv-slot {
+      width:26px;
+      height:26px;
+      border-radius:5px;
+      background:#020617;
+      border:1px solid #4b5563;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:16px;
+      position:relative;
+      cursor:pointer;
+    }
+    .inv-slot-empty {
+      opacity:0.4;
+      font-size:12px;
+    }
+    .inv-count {
+      position:absolute;
+      right:2px;
+      bottom:0;
+      font-size:10px;
+      color:#e5e7eb;
+      text-shadow:0 0 4px #000;
+    }
+
+    /* 模态框 */
+    .modal {
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:40;
+    }
+    .modal.hidden { display:none; }
+    .modal-backdrop {
+      position:absolute;
+      inset:0;
+      background:rgba(15,23,42,0.8);
+    }
+    .modal-content {
+      position:relative;
+      z-index:41;
+      background:#020617;
+      border-radius:14px;
+      border:1px solid #4b5563;
+      padding:10px 11px;
+      width:340px;
+      max-width:92vw;
+      box-shadow:0 18px 50px rgba(0,0,0,0.9);
+      font-size:13px;
+    }
+    .modal-title {
+      margin:0 0 6px;
+      font-size:14px;
+      color:#e5e7eb;
+    }
+    .modal-body { margin-bottom:6px; }
+    .shop-item {
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      margin-bottom:4px;
+    }
+    .shop-name { font-weight:500; }
+    .shop-desc {
+      font-size:11px;
+      color:#9ca3af;
+    }
+    .tag {
+      display:inline-block;
+      border-radius:999px;
+      border:1px solid #4b5563;
+      padding:1px 6px;
+      font-size:10px;
+      color:#9ca3af;
+    }
+    .text-danger { color:var(--danger);}
+    .text-good { color:var(--good);}
+
+    @media (max-width:960px) {
+      #game-root {
+        grid-template-columns: 1.7fr 1.3fr;
+      }
+      .dungeon-grid {
+        grid-template-columns: repeat(14, 22px);
+        grid-template-rows: repeat(14, 22px);
+      }
+    }
+    @media (max-width:720px) {
+      #game-root {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1.5fr auto;
+        height:auto;
+      }
+      .side-panel {
+        border-left:none;
+        border-top:1px solid #111827;
+        flex-direction:row;
+        flex-wrap:wrap;
+      }
+      .side-section {
+        flex:1 1 45%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="start-screen">
+  <div class="story-illu">
+    <div class="story-miner">
+      <span class="big">⛏️</span>
+      <span class="text">被困矿工</span>
+    </div>
+    <div class="story-torch">🔥</div>
+  </div>
+  <div class="story-text" id="story-text"></div>
+  <div class="story-controls">
+    <div class="story-step" id="story-step"></div>
+    <div>
+      <button class="btn" id="btn-skip">跳过</button>
+      <button class="btn btn-primary" id="btn-next">下一段</button>
+    </div>
+  </div>
+</div>
+
+<div id="game-root" class="hidden">
+  <div class="main-view">
+    <div class="top-hud">
+      <div class="hud-left">
+        <div class="hud-pill">
+          <span class="hud-label">天数</span>
+          <span id="hud-day">1</span>
+        </div>
+        <div class="hud-pill">
+          <span class="hud-label">回合</span>
+          <span id="hud-turns">-</span>
+        </div>
+        <div class="hud-pill">
+          <span class="hud-label">矿石</span>
+          <span id="hud-ore">0</span>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-pill">
+          <span class="hud-label">生命</span>
+          <div class="hearts" id="hud-hearts"></div>
+        </div>
+        <div class="hud-pill">
+          <span class="hud-label">护甲</span>
+          <div class="armor" id="hud-armor"></div>
+        </div>
+        <div class="hud-pill">
+          <span class="hud-label">稿子</span>
+          <span id="hud-pickaxe"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="view-container">
+      <div id="base-view" class="grid base-grid"></div>
+      <div id="dungeon-view" class="grid dungeon-grid hidden"></div>
+
+      <div class="log-panel" id="log-panel"></div>
+    </div>
+  </div>
+
+  <div class="side-panel">
+    <div class="side-section">
+      <div class="side-title">
+        <span>角色状态</span>
+        <span class="tag" id="tag-location">基地</span>
+      </div>
+      <div class="stat-row">
+        <span>当前地点</span><span id="stat-loc-text">临时基地</span>
+      </div>
+      <div class="stat-row">
+        <span>临时生命</span><span id="stat-temp-hp">0</span>
+      </div>
+      <div class="stat-row">
+        <span>眩晕回合</span><span id="stat-stun">0</span>
+      </div>
+      <div class="stat-row">
+        <span>怪物数量</span><span id="stat-monsters">0</span>
+      </div>
+      <div class="stat-row">
+        <span>护符数量</span><span id="stat-charm">0</span>
+      </div>
+      <div class="stat-row">
+        <span>尖刺盾牌</span><span id="stat-shield">0</span>
+      </div>
+    </div>
+
+    <div class="side-section">
+      <div class="side-title">
+        <span>背包 2×2</span>
+      </div>
+      <div class="inv-grid inv-backpack" id="backpack-grid"></div>
+      <div style="margin-top:6px;font-size:11px;color:#9ca3af;">
+        面包：<span id="stat-bread">0</span>，
+        火把：<span id="stat-torch">0</span>，
+        炸药包：<span id="stat-bomb">0</span>，
+        绳索：<span id="stat-rope">0</span>
+      </div>
+    </div>
+
+    <div class="side-section">
+      <div class="side-title">
+        <span>操作说明</span>
+      </div>
+      <div class="controls-list">
+        <div><span class="key">WASD</span><span class="key">↑↓←→</span>移动</div>
+        <div><span class="key">E</span><span class="key">空格</span>交互 / 上下楼</div>
+        <div><span class="key">B</span>吃面包（+1 生命或临时生命）</div>
+        <div><span class="key">T</span>插下火把（矿洞）</div>
+        <div><span class="key">F</span>放置炸药包（矿洞）</div>
+        <div><span class="key">R</span>使用绳索（设置/回到锚点）</div>
+        <div style="margin-top:4px;color:#9ca3af;">地下：走进岩石 = 挖掘，走进怪物 = 攻击</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 商人 -->
+<div class="modal hidden" id="modal-merchant">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content">
+    <h3 class="modal-title">地底流浪商人 🧙‍♂️</h3>
+    <div class="modal-body">
+      <div style="font-size:12px;margin-bottom:6px;">
+        手里有些什么要换？你当前有
+        <span class="text-good" id="shop-ore">0</span> 块矿石。
+      </div>
+      <div id="shop-list"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:4px;">
+      <button class="btn" id="btn-shop-close">离开</button>
+    </div>
+  </div>
+</div>
+
+<!-- 箱子 -->
+<div class="modal hidden" id="modal-chest">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content">
+    <h3 class="modal-title">临时基地箱子 📦</h3>
+    <div class="modal-body">
+      <div style="margin-bottom:4px;font-size:12px;color:#9ca3af;">
+        点击背包格子可存入箱子，点击箱子格子可取回到背包。
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;">
+          <div class="side-title" style="margin-bottom:4px;">
+            <span>箱子 5×5</span>
+          </div>
+          <div class="inv-grid inv-chest" id="chest-grid"></div>
+        </div>
+        <div style="flex:0 0 80px;">
+          <div class="side-title" style="margin-bottom:4px;">
+            <span>背包</span>
+          </div>
+          <div class="inv-grid inv-backpack" id="bp-grid-modal"></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:4px;">
+      <button class="btn" id="btn-chest-close">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- Game Over -->
+<div class="modal hidden" id="modal-gameover">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content">
+    <h3 class="modal-title">你被埋在黑暗之中……</h3>
+    <div class="modal-body">
+      <p style="font-size:12px;line-height:1.6;">
+        矿工的故事暂时在这里画上句号。<br/>
+        但洞穴还在那儿，等你重新点亮第一支火把。
+      </p>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:4px;">
+      <button class="btn btn-primary" id="btn-restart-run">重新开始</button>
+    </div>
+  </div>
+</div>
+
+<!-- Demo 结束 -->
+<div class="modal hidden" id="modal-demoend">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content">
+    <h3 class="modal-title">女巫的终结仪式 ✨</h3>
+    <div class="modal-body">
+      <p style="font-size:12px;line-height:1.7;">
+        第十天的夜里，女巫挥手，简陋的临时基地在咒语中崩塌。<br/>
+        你侥幸活了下来，却只能重新开始规划一切。<br/><br/>
+        <span class="text-good">感谢游玩 Demo！</span>
+      </p>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:4px;">
+      <button class="btn btn-primary" id="btn-demo-restart">再来一轮</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ============ 故事开场 ============
+
+  const storyTexts = [
+    "这是一个剑与魔法的时代，也是矿石和黄金的时代。\n你，是一名普通到不能再普通的矿工。",
+    "一次普通的挖掘任务中，地底的岩壁突然塌陷。\n塌方、尘土、尖叫，最后只剩下黑暗和耳鸣。",
+    "当你醒来时，你被困在一处临时搭建的小型基地里。\n上方的通道已经被完全掩埋，唯一的出路——\n只有继续向更深处挖掘。",
+    "在洞穴深处，潜伏着矿脉、宝物，还有饥饿的怪物。\n活下去，挖到足够的资源，也许还能等来救援……\n或是，遇到更可怕的东西。"
+  ];
+  let storyIndex = 0;
+  const storyTextEl = document.getElementById("story-text");
+  const storyStepEl = document.getElementById("story-step");
+  const startScreenEl = document.getElementById("start-screen");
+  const gameRootEl = document.getElementById("game-root");
+
+  function renderStory() {
+    storyTextEl.innerText = storyTexts[storyIndex];
+    storyStepEl.textContent = `段落 ${storyIndex+1} / ${storyTexts.length}`;
+    const nextBtn = document.getElementById("btn-next");
+    nextBtn.textContent = storyIndex === storyTexts.length-1 ? "开始游戏" : "下一段";
+  }
+
+  document.getElementById("btn-next").addEventListener("click", () => {
+    if (storyIndex < storyTexts.length - 1) {
+      storyIndex++;
+      renderStory();
+    } else {
+      startScreenEl.classList.add("hidden");
+      gameRootEl.classList.remove("hidden");
+      startNewRun();
+    }
+  });
+  document.getElementById("btn-skip").addEventListener("click", () => {
+    startScreenEl.classList.add("hidden");
+    gameRootEl.classList.remove("hidden");
+    startNewRun();
+  });
+
+  renderStory();
+
+  // ============ 工具函数 ============
+
+  function makeRng(seed) {
+    let x = seed % 2147483647;
+    if (x <= 0) x += 2147483646;
+    return function() {
+      x = x * 16807 % 2147483647;
+      return (x - 1) / 2147483646;
+    };
+  }
+
+  function randInt(rng, min, max) {
+    return Math.floor(rng() * (max - min + 1)) + min;
+  }
+
+  function hasLineOfSight(sx, sy, tx, ty, ignoreRock = false) {
+    const d = gameState.dungeon;
+    if (!d) return false;
+    if (sx === tx && sy === ty) return true;
+
+    let x0 = sx, y0 = sy;
+    let x1 = tx, y1 = ty;
+    let dx = Math.abs(x1 - x0);
+    let dy = Math.abs(y1 - y0);
+    let sxStep = x0 < x1 ? 1 : -1;
+    let syStep = y0 < y1 ? 1 : -1;
+    let err = dx - dy;
+
+    let x = x0, y = y0;
+    while (!(x === x1 && y === y1)) {
+      const e2 = 2 * err;
+      if (e2 > -dy) { err -= dy; x += sxStep; }
+      if (e2 < dx) { err += dx; y += syStep; }
+      if (x === x1 && y === y1) break;
+
+      if (!ignoreRock && d.tiles[y][x].type === TILE_ROCK) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+
+  function clamp(v, min, max) {
+    return v < min ? min : (v > max ? max : v);
+  }
+
+  function shuffle(rng, arr) {
+    for (let i=arr.length-1;i>0;i--) {
+      const j = Math.floor(rng()* (i+1));
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+  }
+
+  // ============ 常量 ============
+
+  const TILE_ROCK = "rock";
+  const TILE_FLOOR = "floor";
+  const TILE_ORE = "ore";
+  const TILE_HOLE = "hole";
+  const TILE_STAIR_UP = "stair_up";
+  const TILE_CHEST = "chest";
+  const PLAYER_LIGHT_RADIUS = 3; // 玩家基础光照半径（视野半径）
+
+  const MON_ZOMBIE = "zombie";
+  const MON_SLIME = "slime";
+  const MON_GHOST = "ghost";
+
+  const GameMode = {
+    BASE: "base",
+    DUNGEON: "dungeon"
+  };
+
+  const INV_BACKPACK_W = 2;
+  const INV_BACKPACK_H = 2;
+  const INV_CHEST_W = 5;
+  const INV_CHEST_H = 5;
+
+  const ITEM_DEFS = {
+    ore:   { icon:"💎", name:"矿石", maxStack:32 },
+    bread: { icon:"🍞", name:"面包", maxStack:1 },
+    torch: { icon:"🔥", name:"火把", maxStack:4 },
+    bomb:  { icon:"💣", name:"炸药包", maxStack:4 },
+    rope:  { icon:"🧵", name:"绳索", maxStack:4 }
+  };
+
+  // ============ 游戏状态 ============
+
+  const gameState = {
+    day: 1,
+    turnsLeft: -1,
+    maxTurnsPerDay: 100,
+    inDungeon: false,
+    mode: GameMode.BASE,
+    rng: null,
+    base: {
+      width: 3,
+      height: 3,
+      player: {x:1,y:1},
+      merchant: false
+    },
+    dungeon: null,
+    dungeonSpawn: {x:0,y:0},
+    playerPos: null,
+    player: {
+      hp: 2,
+      maxHp: 3,
+      tempHp: 0,
+      armor: 2,
+      maxArmor: 3,
+      stunned: 0,
+      facing: {dx:0,dy:-1},
+      pickaxe: {
+        type: "basic",
+        durability: 30,
+        maxDurability: 30
+      },
+      // 装备类计数
+      charmCharges: 0,
+      shieldCharges: 0
+    },
+    monsters: [],
+    ghostMoveCounter: 0,
+    bombs: [],
+    ropeAnchor: null,
+    runSeedBase: 0,
+    logLines: [],
+    inventory: {
+      backpack: [],
+      chest: []
+    }
+  };
+
+  function pushLog(msg, important=false) {
+    gameState.logLines.push({msg,important});
+    if (gameState.logLines.length > 4) {
+      gameState.logLines.shift();
+    }
+    renderLog();
+  }
+
+  // ============ 背包 / 箱子逻辑 ============
+
+  function makeEmptyInv(w,h) {
+    const arr = [];
+    for (let i=0;i<w*h;i++) arr.push(null);
+    return arr;
+  }
+
+  function addItemToSlots(slots, type, count) {
+    const def = ITEM_DEFS[type];
+    if (!def || count <= 0) return 0;
+    let remain = count;
+
+    // 先往已有同类堆叠
+    for (let i=0;i<slots.length && remain>0;i++) {
+      const slot = slots[i];
+      if (slot && slot.type === type && slot.count < def.maxStack) {
+        const add = Math.min(def.maxStack - slot.count, remain);
+        slot.count += add;
+        remain -= add;
+      }
+    }
+    // 再找空格
+    for (let i=0;i<slots.length && remain>0;i++) {
+      const slot = slots[i];
+      if (!slot) {
+        const add = Math.min(def.maxStack, remain);
+        slots[i] = {type, count:add};
+        remain -= add;
+      }
+    }
+    return remain; // 剩余没放进去的数量
+  }
+
+  function addItem(type, count=1, preferBackpack=true) {
+    let remain = count;
+    if (preferBackpack) {
+      remain = addItemToSlots(gameState.inventory.backpack, type, remain);
+      if (remain > 0) remain = addItemToSlots(gameState.inventory.chest, type, remain);
+    } else {
+      remain = addItemToSlots(gameState.inventory.chest, type, remain);
+      if (remain > 0) remain = addItemToSlots(gameState.inventory.backpack, type, remain);
+    }
+    if (remain > 0) {
+      const def = ITEM_DEFS[type];
+      pushLog(`背包和箱子都放不下 ${def ? def.name : type}，有 ${remain} 个留在了地上。`, true);
+    }
+  }
+
+  function consumeItemFromSlots(slots, type, count=1) {
+    let remain = count;
+    for (let i=0;i<slots.length && remain>0;i++) {
+      const slot = slots[i];
+      if (slot && slot.type === type) {
+        const use = Math.min(slot.count, remain);
+        slot.count -= use;
+        remain -= use;
+        if (slot.count <= 0) slots[i] = null;
+      }
+    }
+    return remain === 0;
+  }
+
+  function consumeItem(type, count=1, backpackOnly=false) {
+    if (backpackOnly) {
+      return consumeItemFromSlots(gameState.inventory.backpack, type, count);
+    }
+    // 优先背包，再箱子
+    let remain = count;
+    if (!consumeItemFromSlots(gameState.inventory.backpack, type, remain)) {
+      const stillNeed = count - (count - remain); // 简化写法，实际直接全用箱子重算更简单
+    }
+    let ok = consumeItemFromSlots(gameState.inventory.backpack, type, count);
+    if (!ok) {
+      const usedInBackpack = count - (function() {
+        let tmp = count;
+        const slots = gameState.inventory.backpack;
+        for (let i=0;i<slots.length && tmp>0;i++) {
+          const sl = slots[i];
+          if (sl && sl.type === type) {
+            const use = Math.min(sl.count, tmp);
+            tmp -= use;
+          }
+        }
+        return tmp;
+      })();
+      const needFromChest = count - usedInBackpack;
+      if (needFromChest > 0) {
+        ok = consumeItemFromSlots(gameState.inventory.chest, type, needFromChest);
+        if (!ok) return false;
+      }
+    }
+    return true;
+  }
+
+  function getItemCount(type) {
+    let n = 0;
+    for (const slot of [...gameState.inventory.backpack, ...gameState.inventory.chest]) {
+      if (slot && slot.type === type) n += slot.count;
+    }
+    return n;
+  }
+
+  function getTotalOre() {
+    return getItemCount("ore");
+  }
+
+  function spendOre(amount) {
+    let total = getTotalOre();
+    if (total < amount) return false;
+    let remain = amount;
+    const lists = [gameState.inventory.backpack, gameState.inventory.chest];
+    for (const slots of lists) {
+      for (let i=0;i<slots.length && remain>0;i++) {
+        const slot = slots[i];
+        if (slot && slot.type === "ore") {
+          const use = Math.min(slot.count, remain);
+          slot.count -= use;
+          remain -= use;
+          if (slot.count <= 0) slots[i] = null;
+        }
+      }
+    }
+    return true;
+  }
+
+  // ============ 运行 / 新一轮 ============
+
+  function computeTodaySeed(dayOffset=0) {
+    const d = new Date();
+    const base = d.getFullYear()*10000 + (d.getMonth()+1)*100 + d.getDate();
+    return base + dayOffset;
+  }
+
+  function resetPlayerFull() {
+    gameState.player.hp = 4;
+    gameState.player.maxHp = 5;
+    gameState.player.tempHp = 1;
+    gameState.player.armor = 2;
+    gameState.player.maxArmor = 5;
+    gameState.player.stunned = 0;
+    gameState.player.pickaxe = {
+      type: "basic",
+      durability: 30,
+      maxDurability: 30
+    };
+    gameState.player.charmCharges = 0;
+    gameState.player.shieldCharges = 0;
+  }
+
+  function rebuildRngForDay() {
+    const seed = gameState.runSeedBase + gameState.day*37;
+    gameState.rng = makeRng(seed);
+  }
+
+  function updateMerchantForDay() {
+    gameState.base.merchant = (gameState.day === 2 || gameState.day === 5 || gameState.day === 8);
+  }
+
+  function startNewRun() {
+    gameState.runSeedBase = computeTodaySeed();
+    gameState.day = 1;
+    resetPlayerFull();
+
+    gameState.inventory.backpack = makeEmptyInv(INV_BACKPACK_W, INV_BACKPACK_H);
+    gameState.inventory.chest = makeEmptyInv(INV_CHEST_W, INV_CHEST_H);
+    // 初始 2 个面包在箱子里
+    addItemToSlots(gameState.inventory.chest, "bread", 2);
+
+    gameState.base.player = {x:1,y:1};
+    gameState.mode = GameMode.BASE;
+    gameState.inDungeon = false;
+    gameState.turnsLeft = -1;
+    gameState.logLines = [];
+    gameState.bombs = [];
+    gameState.ropeAnchor = null;
+    pushLog("你在临时基地中醒来。");
+    rebuildRngForDay();
+    updateMerchantForDay();
+    renderAll();
+  }
+
+  function startNewDay() {
+    gameState.day += 1;
+    if (gameState.day >= 10) {
+      showDemoEnd();
+      return;
+    }
+    // 睡觉恢复 1 点真实生命，否则 +1 临时生命
+    if (gameState.player.hp < gameState.player.maxHp) {
+      gameState.player.hp += 1;
+    } else {
+      gameState.player.tempHp += 1;
+    }
+
+    gameState.base.player = {x:1,y:1};
+    gameState.mode = GameMode.BASE;
+    gameState.inDungeon = false;
+    gameState.turnsLeft = -1;
+    gameState.logLines = [];
+    gameState.bombs = [];
+    gameState.ropeAnchor = null;
+    rebuildRngForDay();
+    updateMerchantForDay();
+    pushLog("新的一天开始了。");
+    renderAll();
+  }
+
+  // ============ 地下生成（空洞 + 矿物 + 怪物） ============
+
+  function generateDungeon() {
+    const width = 14, height = 14;
+    const tiles = [];
+    for (let y = 0; y < height; y++) {
+      const row = [];
+      for (let x = 0; x < width; x++) {
+        row.push({
+          type: TILE_ROCK,
+          discovered: false,
+          visible: false,
+          hasTorch: false
+        });
+      }
+      tiles.push(row);
+    }
+
+    const rng = gameState.rng;
+
+    // 出生点 & 3×3 安全区
+    const spawnX = 7, spawnY = 7;
+    gameState.dungeonSpawn = { x: spawnX, y: spawnY };
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        const x = spawnX + dx;
+        const y = spawnY + dy;
+        if (x < 0 || x >= width || y < 0 || y >= height) continue;
+        tiles[y][x].type = TILE_FLOOR;
+      }
+    }
+
+    // 生成两个空洞（洞窟）
+    const caves = [];
+    for (let ci = 0; ci < 2; ci++) {
+      let cx = 0, cy = 0;
+      let attempts = 0;
+      let chosen = false;
+      while (attempts < 40 && !chosen) {
+        cx = randInt(rng, 2, width - 3);
+        cy = randInt(rng, 2, height - 3);
+        // 尽量别太贴出生点
+        if (Math.abs(cx - spawnX) <= 2 && Math.abs(cy - spawnY) <= 2) {
+          attempts++;
+          continue;
+        }
+        chosen = true;
+      }
+      if (!chosen) {
+        cx = randInt(rng, 2, width - 3);
+        cy = randInt(rng, 2, height - 3);
+      }
+
+      const radius = randInt(rng, 2, 3); // 控制大致 3×3~接近 5×5
+      const candidates = [];
+      for (let y = cy - radius; y <= cy + radius; y++) {
+        for (let x = cx - radius; x <= cx + radius; x++) {
+          if (x < 0 || x >= width || y < 0 || y >= height) continue;
+          const dx = x - cx;
+          const dy = y - cy;
+          if (dx * dx + dy * dy <= radius * radius + 1 &&
+              tiles[y][x].type === TILE_ROCK) {
+            candidates.push({ x, y });
+          }
+        }
+      }
+      if (candidates.length === 0) continue;
+      shuffle(rng, candidates);
+      const desiredSize = randInt(rng, 9, 24);
+      const actualSize = Math.min(desiredSize, candidates.length);
+      const caveCells = [];
+      for (let i = 0; i < actualSize; i++) {
+        const { x, y } = candidates[i];
+        tiles[y][x].type = TILE_HOLE;
+        caveCells.push({ x, y });
+      }
+      caves.push({ cells: caveCells });
+    }
+
+    // 从出生点挖通到每个空洞（保底连通）
+    function carveCorridorTo(targetCell) {
+      if (!targetCell) return;
+      let x = spawnX, y = spawnY;
+      let safety = 200;
+      while ((x !== targetCell.x || y !== targetCell.y) && safety-- > 0) {
+        if (x < targetCell.x) x++;
+        else if (x > targetCell.x) x--;
+        else if (y < targetCell.y) y++;
+        else if (y > targetCell.y) y--;
+
+        const t = tiles[y][x];
+        if (t.type === TILE_ROCK || t.type === TILE_ORE) {
+          t.type = TILE_FLOOR;
+        }
+      }
+    }
+
+    caves.forEach(cave => {
+      if (!cave.cells.length) return;
+      const target = cave.cells[randInt(rng, 0, cave.cells.length - 1)];
+      carveCorridorTo(target);
+    });
+
+    // ===== 非群矿物：10~20 个，1 或 2 连续 =====
+    let nonClusterOreCells = randInt(rng, 10, 20);
+    while (nonClusterOreCells > 0) {
+      const rockPositions = [];
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          if (tiles[y][x].type === TILE_ROCK) rockPositions.push({ x, y });
+        }
+      }
+      if (!rockPositions.length) break;
+      const pos = rockPositions[randInt(rng, 0, rockPositions.length - 1)];
+      tiles[pos.y][pos.x].type = TILE_ORE;
+      nonClusterOreCells--;
+
+      if (nonClusterOreCells <= 0) break;
+
+      // 50% 概率在旁边+1
+      if (rng() < 0.5) {
+        const dirs = [
+          { dx: 1, dy: 0 }, { dx: -1, dy: 0 },
+          { dx: 0, dy: 1 }, { dx: 0, dy: -1 }
+        ];
+        shuffle(rng, dirs);
+        for (const d of dirs) {
+          const nx = pos.x + d.dx;
+          const ny = pos.y + d.dy;
+          if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+          if (tiles[ny][nx].type === TILE_ROCK && nonClusterOreCells > 0) {
+            tiles[ny][nx].type = TILE_ORE;
+            nonClusterOreCells--;
+            break;
+          }
+        }
+      }
+    }
+
+    // ===== 矿物群：1~3 组，每组 8~12 连通 =====
+    const clusterCount = randInt(rng, 1, 3);
+    for (let c = 0; c < clusterCount; c++) {
+      const size = randInt(rng, 8, 12);
+      let attempts = 0;
+      let sx = -1, sy = -1;
+      while (attempts < 30) {
+        const x = randInt(rng, 0, width - 1);
+        const y = randInt(rng, 0, height - 1);
+        if (tiles[y][x].type === TILE_ROCK) {
+          sx = x; sy = y;
+          break;
+        }
+        attempts++;
+      }
+      if (sx === -1) continue;
+      const frontier = [{ x: sx, y: sy }];
+      tiles[sy][sx].type = TILE_ORE;
+      let placed = 1;
+      while (frontier.length > 0 && placed < size) {
+        const idx = randInt(rng, 0, frontier.length - 1);
+        const { x, y } = frontier[idx];
+        const dirs = [
+          { dx: 1, dy: 0 }, { dx: -1, dy: 0 },
+          { dx: 0, dy: 1 }, { dx: 0, dy: -1 }
+        ];
+        shuffle(rng, dirs);
+        let expanded = false;
+        for (const d of dirs) {
+          const nx = x + d.dx;
+          const ny = y + d.dy;
+          if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+          if (tiles[ny][nx].type === TILE_ROCK) {
+            tiles[ny][nx].type = TILE_ORE;
+            frontier.push({ x: nx, y: ny });
+            placed++;
+            expanded = true;
+            if (placed >= size) break;
+          }
+        }
+        if (!expanded) frontier.splice(idx, 1);
+      }
+    }
+
+    // ===== 宝箱：放在任意 FLOOR/HOLE 上 =====
+    const openCells = [];
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const t = tiles[y][x].type;
+        if ((t === TILE_FLOOR || t === TILE_HOLE) &&
+            !(Math.abs(x - spawnX) <= 1 && Math.abs(y - spawnY) <= 1)) {
+          openCells.push({ x, y });
+        }
+      }
+    }
+    shuffle(rng, openCells);
+    if (openCells.length > 0) {
+      const chestPos = openCells[0];
+      tiles[chestPos.y][chestPos.x].type = TILE_CHEST;
+    }
+
+    // ===== 怪物生成：7~10 只（部分在岩石中，部分在洞里） =====
+    const rockCells = [];
+    const walkCells = [];
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        if (Math.abs(x - spawnX) <= 1 && Math.abs(y - spawnY) <= 1) continue;
+        const t = tiles[y][x].type;
+        if (t === TILE_ROCK) rockCells.push({ x, y });
+        else if (t === TILE_FLOOR || t === TILE_HOLE) walkCells.push({ x, y });
+      }
+    }
+    shuffle(rng, rockCells);
+    shuffle(rng, walkCells);
+
+    const maxSpots = rockCells.length + walkCells.length;
+    const monCount = Math.min(randInt(rng, 7, 10), maxSpots);
+    const monsters = [];
+
+    for (let i = 0; i < monCount; i++) {
+      const roll = rng();
+      let type = MON_ZOMBIE;
+      if (roll < 0.33) type = MON_ZOMBIE;
+      else if (roll < 0.66) type = MON_SLIME;
+      else type = MON_GHOST;
+
+      let pos;
+      if (type === MON_GHOST || rockCells.length === 0 || rng() < 0.4) {
+        // 幽灵 & 一部分普通怪生成在已挖开的空间
+        pos = walkCells.length ? walkCells.pop() : rockCells.pop();
+      } else {
+        // 非幽灵，有一部分直接埋在岩石里
+        pos = rockCells.length ? rockCells.pop() : walkCells.pop();
+      }
+
+      const tileType = tiles[pos.y][pos.x].type;
+      const buried = (tileType === TILE_ROCK && type !== MON_GHOST);
+
+      monsters.push({
+        id: i + 1,
+        type,
+        x: pos.x,
+        y: pos.y,
+        alive: true,
+        buried,
+        wakeDelay: 0,
+        homeX: pos.x,
+        homeY: pos.y,
+        roamRadius: type === MON_GHOST ? 2 : 0
+      });
+    }
+
+    // 初始可见状态
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        tiles[y][x].discovered = false;
+        tiles[y][x].visible = false;
+        tiles[y][x].hasTorch = false;
+      }
+    }
+
+    gameState.dungeon = { width, height, tiles };
+    gameState.monsters = monsters;
+    gameState.bombs = [];
+    gameState.ropeAnchor = null;
+    gameState.ghostMoveCounter = 0;
+  }
+
+
+  function updateVisibility() {
+    if (!gameState.inDungeon || !gameState.dungeon || !gameState.playerPos) return;
+    const d = gameState.dungeon;
+    const w = d.width, h = d.height;
+
+    // 清空 visible
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        d.tiles[y][x].visible = false;
+      }
+    }
+
+    const sources = [];
+    // 玩家光源
+    sources.push({
+      x: gameState.playerPos.x,
+      y: gameState.playerPos.y,
+      r: PLAYER_LIGHT_RADIUS
+    });
+    // 火把光源
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        if (d.tiles[y][x].hasTorch) {
+          sources.push({ x, y, r: 3 });
+        }
+      }
+    }
+
+    for (const src of sources) {
+      const minX = Math.max(0, src.x - src.r - 1);
+      const maxX = Math.min(w - 1, src.x + src.r + 1);
+      const minY = Math.max(0, src.y - src.r - 1);
+      const maxY = Math.min(h - 1, src.y + src.r + 1);
+
+      for (let y = minY; y <= maxY; y++) {
+        for (let x = minX; x <= maxX; x++) {
+          const cheb = Math.max(Math.abs(x - src.x), Math.abs(y - src.y));
+          if (cheb > src.r) continue;
+          if (!hasLineOfSight(src.x, src.y, x, y, false)) continue;
+          const tile = d.tiles[y][x];
+          tile.visible = true;
+          tile.discovered = true;
+        }
+      }
+    }
+  }
+
+
+  // ============ 渲染 ============
+
+  function renderHUD() {
+    document.getElementById("hud-day").textContent = gameState.day;
+    document.getElementById("hud-turns").textContent = gameState.inDungeon ? gameState.turnsLeft : "-";
+    document.getElementById("hud-ore").textContent = getTotalOre();
+
+    const heartsEl = document.getElementById("hud-hearts");
+    heartsEl.innerHTML = "";
+    const hp = gameState.player.hp;
+    const maxHp = gameState.player.maxHp;
+    const tempHp = gameState.player.tempHp;
+    for (let i=0;i<maxHp;i++) {
+      const span = document.createElement("span");
+      if (i < hp) {
+        span.textContent = "❤️";
+      } else if (i < hp + tempHp) {
+        span.textContent = "🤍";
+      } else {
+        span.textContent = "🖤";
+      }
+      heartsEl.appendChild(span);
+    }
+
+    const armorEl = document.getElementById("hud-armor");
+    armorEl.innerHTML = "";
+    for (let i=0;i<gameState.player.maxArmor;i++) {
+      const span = document.createElement("span");
+      if (i < gameState.player.armor) {
+        span.textContent = "🛡️";
+      } else {
+        span.textContent = "⬜";
+      }
+      armorEl.appendChild(span);
+    }
+
+    const pickaxe = gameState.player.pickaxe;
+    const pickaxeEl = document.getElementById("hud-pickaxe");
+    pickaxeEl.textContent = `${pickaxe.durability}/${pickaxe.maxDurability}`;
+    if (pickaxe.durability <= 0) pickaxeEl.classList.add("text-danger");
+    else pickaxeEl.classList.remove("text-danger");
+
+    // side stats
+    document.getElementById("tag-location").textContent =
+      gameState.mode === GameMode.BASE ? "基地" : "矿洞";
+    document.getElementById("stat-loc-text").textContent =
+      gameState.mode === GameMode.BASE ? "临时基地" : "地底通道";
+    document.getElementById("stat-temp-hp").textContent = gameState.player.tempHp;
+    document.getElementById("stat-stun").textContent = gameState.player.stunned;
+    document.getElementById("stat-monsters").textContent =
+      gameState.monsters.filter(m=>m.alive).length;
+    document.getElementById("stat-charm").textContent = gameState.player.charmCharges;
+    document.getElementById("stat-shield").textContent = gameState.player.shieldCharges;
+
+    document.getElementById("stat-bread").textContent = getItemCount("bread");
+    document.getElementById("stat-torch").textContent = getItemCount("torch");
+    document.getElementById("stat-bomb").textContent = getItemCount("bomb");
+    document.getElementById("stat-rope").textContent = getItemCount("rope");
+
+    renderBackpackMini();
+  }
+
+  function renderBackpackMini() {
+    const grid = document.getElementById("backpack-grid");
+    grid.innerHTML = "";
+    const slots = gameState.inventory.backpack;
+    for (let i=0;i<slots.length;i++) {
+      const slot = slots[i];
+      const div = document.createElement("div");
+      div.className = "inv-slot";
+      if (!slot) {
+        div.classList.add("inv-slot-empty");
+        div.textContent = "";
+      } else {
+        const def = ITEM_DEFS[slot.type];
+        div.textContent = def ? def.icon : "?";
+        if (slot.count > 1) {
+          const c = document.createElement("span");
+          c.className = "inv-count";
+          c.textContent = slot.count;
+          div.appendChild(c);
+        }
+      }
+      grid.appendChild(div);
+    }
+  }
+
+  function renderLog() {
+    const panel = document.getElementById("log-panel");
+    panel.innerHTML = "";
+    gameState.logLines.forEach(line => {
+      const div = document.createElement("div");
+      div.className = "log-line" + (line.important ? " important" : "");
+      div.textContent = "· " + line.msg;
+      panel.appendChild(div);
+    });
+  }
+
+  function renderBase() {
+    const baseView = document.getElementById("base-view");
+    const dungeonView = document.getElementById("dungeon-view");
+    if (gameState.mode === GameMode.BASE) {
+      baseView.classList.remove("hidden");
+      dungeonView.classList.add("hidden");
+    } else {
+      baseView.classList.add("hidden");
+      dungeonView.classList.remove("hidden");
+      return;
+    }
+
+    baseView.innerHTML = "";
+    const w = gameState.base.width;
+    const h = gameState.base.height;
+
+    for (let y=0;y<h;y++) {
+      for (let x=0;x<w;x++) {
+        const tile = document.createElement("div");
+        tile.className = "tile base";
+
+        let symbol = "";
+        // (0,1) 箱子, (2,1) 床, (1,2) 地道入口, (2,0) 商人
+        if (x === 0 && y === 1) {
+          symbol = "📦";
+          tile.classList.add("chest");
+        }
+        if (x === 2 && y === 1) {
+          symbol = "🛏️";
+          tile.classList.add("bed");
+        }
+        if (x === 1 && y === 2) {
+          symbol = "⬇️";
+          tile.classList.add("stairs");
+        }
+        if (gameState.base.merchant && x === 2 && y === 0) {
+          symbol = "🧙‍♂️";
+          tile.classList.add("merchant");
+        }
+
+        if (gameState.base.player.x === x && gameState.base.player.y === y) {
+          tile.classList.add("player");
+          symbol = "⛏️";
+        }
+
+        tile.textContent = symbol;
+        baseView.appendChild(tile);
+      }
+    }
+  }
+
+  function renderDungeon() {
+    if (gameState.mode !== GameMode.DUNGEON || !gameState.dungeon) return;
+    const baseView = document.getElementById("base-view");
+    const dungeonView = document.getElementById("dungeon-view");
+    baseView.classList.add("hidden");
+    dungeonView.classList.remove("hidden");
+    dungeonView.innerHTML = "";
+
+    const dungeon = gameState.dungeon;
+    const width = dungeon.width;
+    const height = dungeon.height;
+
+    for (let y=0;y<height;y++) {
+      for (let x=0;x<width;x++) {
+        const tileData = dungeon.tiles[y][x];
+        const tile = document.createElement("div");
+        let classes = ["tile","dungeon"];
+        let symbol = "";
+
+        if (!tileData.discovered && !tileData.visible) {
+          classes.push("fog");
+          tile.className = classes.join(" ");
+          tile.textContent = "";
+          dungeonView.appendChild(tile);
+          continue;
+        }
+
+        // 地形
+        switch(tileData.type) {
+          case TILE_ROCK:
+            classes.push("rock");
+            break;
+          case TILE_FLOOR:
+            classes.push("floor");
+            break;
+          case TILE_ORE:
+            classes.push("ore");
+            symbol = "⛏️";
+            break;
+          case TILE_HOLE:
+            classes.push("hole");
+            break;
+          case TILE_STAIR_UP:
+            classes.push("stair-up");
+            symbol = "⬆️";
+            break;
+          case TILE_CHEST:
+            classes.push("chest");
+            symbol = "💰";
+            break;
+        }
+
+        if (!tileData.visible) {
+          classes.push("dim");
+        }
+
+        // 怪物 / 炸药 / 玩家，只显示在可见范围内
+        if (tileData.visible) {
+          const mon = gameState.monsters.find(m => m.alive && !m.buried && m.x === x && m.y === y);
+          if (mon) {
+            classes.push("monster");
+            if (mon.type === MON_ZOMBIE) symbol = "🧟";
+            else if (mon.type === MON_SLIME) symbol = "🟢";
+            else if (mon.type === MON_GHOST) symbol = "👻";
+          }
+
+          const bombHere = gameState.bombs.find(b=>b.x===x && b.y===y);
+          if (bombHere) {
+            classes.push("bomb");
+            symbol = "💣";
+          }
+
+          if (gameState.playerPos && gameState.playerPos.x === x && gameState.playerPos.y === y) {
+            classes.push("player");
+            symbol = "⛏️";
+          }
+        }
+
+        tile.className = classes.join(" ");
+        tile.textContent = symbol;
+        dungeonView.appendChild(tile);
+      }
+    }
+  }
+
+  function renderAll() {
+    renderHUD();
+    renderBase();
+    renderDungeon();
+    renderLog();
+  }
+
+  // ============ 商人 ============
+
+  const modalMerchant = document.getElementById("modal-merchant");
+  const shopListEl = document.getElementById("shop-list");
+
+  function openMerchant() {
+    buildShopForToday();
+    document.getElementById("shop-ore").textContent = getTotalOre();
+    modalMerchant.classList.remove("hidden");
+  }
+
+  function closeMerchant() {
+    modalMerchant.classList.add("hidden");
+    renderAll();
+  }
+
+  document.getElementById("btn-shop-close").addEventListener("click", closeMerchant);
+  modalMerchant.querySelector(".modal-backdrop").addEventListener("click", closeMerchant);
+
+  function buildShopForToday() {
+    shopListEl.innerHTML = "";
+    const day = gameState.day;
+    const items = [];
+
+    // 通用
+    items.push({
+      id: "bread",
+      name: "面包 🍞",
+      price: 1,
+      desc: "吃掉后回复 1 点生命（优先真实生命）。",
+      type: "consumable"
+    });
+    items.push({
+      id: "armor",
+      name: "护甲 4/4 🛡️",
+      price: 10,
+      desc: "替换当前护甲为 4/4，挡伤害优先消耗护甲。",
+      type: "armor"
+    });
+    items.push({
+      id: "pickaxe_basic",
+      name: "普通稿子 30/30 ⛏️",
+      price: 10,
+      desc: "替换当前稿子为 30/30。",
+      type: "pickaxe"
+    });
+
+    if (day >= 2) {
+      items.push({
+        id: "torch",
+        name: "火把 🔥",
+        price: 2,
+        desc: "插在地面上提供额外光照。",
+        type: "torch"
+      });
+    }
+
+    if (day >= 5) {
+      items.push({
+        id: "pickaxe_light",
+        name: "轻便稿子 20/20 🪓",
+        price: 12,
+        desc: "更轻便的工具（Demo 中仅数值不同）。",
+        pickaxe: {type:"light",dur:20},
+        type: "pickaxe"
+      });
+      items.push({
+        id: "pickaxe_heavy",
+        name: "重型稿子 40/40 ⚒️",
+        price: 15,
+        desc: "更耐用的重型工具。",
+        pickaxe: {type:"heavy",dur:40},
+        type: "pickaxe"
+      });
+      items.push({
+        id: "helmet",
+        name: "矿工头盔 ⛑️",
+        price: 8,
+        desc: "提供 +1 护甲耐久，护甲全部损坏时头盔会破碎。",
+        type: "helmet"
+      });
+      items.push({
+        id: "shield",
+        name: "尖刺盾牌 🛡️",
+        price: 6,
+        desc: "首次被僵尸或粘液怪贴脸攻击时，直接反击秒杀对方并免疫这次伤害。",
+        type: "shield"
+      });
+    }
+
+    if (day >= 8) {
+      items.push({
+        id: "pickaxe_magic",
+        name: "魔法稿子 30/30 ✨",
+        price: 18,
+        desc: "击杀怪物时有小概率额外掉矿石。",
+        pickaxe: {type:"magic",dur:30},
+        type: "pickaxe"
+      });
+      items.push({
+        id: "bomb",
+        name: "炸药包 💣",
+        price: 5,
+        desc: "两回合后在 3×3 区域爆炸，炸开岩石并伤害怪物。",
+        type: "bomb"
+      });
+      items.push({
+        id: "rope",
+        name: "绳索 🧵",
+        price: 4,
+        desc: "可以设置一个锚点，再次使用时瞬移回锚点。",
+        type: "rope"
+      });
+      items.push({
+        id: "charm",
+        name: "幽灵之眼护符 👁️",
+        price: 7,
+        desc: "幽灵在远处时不会主动靠近你，贴脸攻击时护符碎裂。",
+        type: "charm"
+      });
+    }
+
+    items.forEach(item => {
+      const row = document.createElement("div");
+      row.className = "shop-item";
+
+      const left = document.createElement("div");
+      const name = document.createElement("div");
+      name.className = "shop-name";
+      name.textContent = item.name;
+      const desc = document.createElement("div");
+      desc.className = "shop-desc";
+      desc.textContent = item.desc;
+      left.appendChild(name);
+      left.appendChild(desc);
+
+      const right = document.createElement("div");
+      const price = document.createElement("div");
+      price.innerHTML = `<span class="text-good">${item.price}</span> 矿石`;
+      const btn = document.createElement("button");
+      btn.className = "btn";
+      btn.style.padding = "2px 8px";
+      btn.style.fontSize = "11px";
+      btn.textContent = "购买";
+      btn.addEventListener("click", () => {
+        buyShopItem(item);
+      });
+      right.appendChild(price);
+      right.appendChild(btn);
+
+      row.appendChild(left);
+      row.appendChild(right);
+      shopListEl.appendChild(row);
+    });
+  }
+
+  function buyShopItem(item) {
+    if (!spendOre(item.price)) {
+      pushLog("矿石不够。", true);
+      document.getElementById("shop-ore").textContent = getTotalOre();
+      return;
+    }
+    document.getElementById("shop-ore").textContent = getTotalOre();
+
+    switch(item.type) {
+      case "consumable":
+        addItem("bread",1,true);
+        pushLog("买到了面包。");
+        break;
+      case "armor":
+        gameState.player.maxArmor = 4;
+        gameState.player.armor = 4;
+        pushLog("换上了新的护甲。");
+        break;
+      case "pickaxe":
+        if (item.pickaxe) {
+          gameState.player.pickaxe.type = item.pickaxe.type;
+          gameState.player.pickaxe.maxDurability = item.pickaxe.dur;
+          gameState.player.pickaxe.durability = item.pickaxe.dur;
+        } else {
+          gameState.player.pickaxe.type = "basic";
+          gameState.player.pickaxe.maxDurability = 30;
+          gameState.player.pickaxe.durability = 30;
+        }
+        pushLog("换上了新的稿子。");
+        break;
+      case "torch":
+        addItem("torch",1,true);
+        pushLog("拿到了一支火把。");
+        break;
+      case "helmet":
+        gameState.player.maxArmor += 1;
+        gameState.player.armor += 1;
+        pushLog("戴上了矿工头盔。");
+        break;
+      case "shield":
+        gameState.player.shieldCharges += 1;
+        pushLog("拿到了尖刺盾牌。");
+        break;
+      case "bomb":
+        addItem("bomb",1,true);
+        pushLog("买了一个炸药包。");
+        break;
+      case "rope":
+        addItem("rope",1,true);
+        pushLog("收下了一根绳索。");
+        break;
+      case "charm":
+        gameState.player.charmCharges += 1;
+        pushLog("佩戴了幽灵之眼护符。");
+        break;
+    }
+    renderHUD();
+  }
+
+  // ============ 箱子 Modal ============
+
+  const modalChest = document.getElementById("modal-chest");
+  const chestGridEl = document.getElementById("chest-grid");
+  const bpGridModalEl = document.getElementById("bp-grid-modal");
+
+  function openChest() {
+    renderChestModal();
+    modalChest.classList.remove("hidden");
+  }
+
+  function closeChest() {
+    modalChest.classList.add("hidden");
+    renderAll();
+  }
+
+  document.getElementById("btn-chest-close").addEventListener("click", closeChest);
+  modalChest.querySelector(".modal-backdrop").addEventListener("click", closeChest);
+
+  function renderChestModal() {
+    const chestSlots = gameState.inventory.chest;
+    const bpSlots = gameState.inventory.backpack;
+
+    chestGridEl.innerHTML = "";
+    for (let i=0;i<chestSlots.length;i++) {
+      const slot = chestSlots[i];
+      const div = document.createElement("div");
+      div.className = "inv-slot";
+      if (!slot) {
+        div.classList.add("inv-slot-empty");
+      } else {
+        const def = ITEM_DEFS[slot.type];
+        div.textContent = def ? def.icon : "?";
+        if (slot.count > 1) {
+          const c = document.createElement("span");
+          c.className = "inv-count";
+          c.textContent = slot.count;
+          div.appendChild(c);
+        }
+      }
+      div.addEventListener("click", () => {
+        if (!slot) return;
+        const remain = addItemToSlots(gameState.inventory.backpack, slot.type, slot.count);
+        if (remain === 0) {
+          chestSlots[i] = null;
+        } else {
+          chestSlots[i].count = remain;
+        }
+        renderChestModal();
+        renderHUD();
+      });
+      chestGridEl.appendChild(div);
+    }
+
+    bpGridModalEl.innerHTML = "";
+    for (let i=0;i<bpSlots.length;i++) {
+      const slot = bpSlots[i];
+      const div = document.createElement("div");
+      div.className = "inv-slot";
+      if (!slot) {
+        div.classList.add("inv-slot-empty");
+      } else {
+        const def = ITEM_DEFS[slot.type];
+        div.textContent = def ? def.icon : "?";
+        if (slot.count > 1) {
+          const c = document.createElement("span");
+          c.className = "inv-count";
+          c.textContent = slot.count;
+          div.appendChild(c);
+        }
+      }
+      div.addEventListener("click", () => {
+        if (!slot) return;
+        const remain = addItemToSlots(gameState.inventory.chest, slot.type, slot.count);
+        if (remain === 0) {
+          bpSlots[i] = null;
+        } else {
+          bpSlots[i].count = remain;
+        }
+        renderChestModal();
+        renderHUD();
+      });
+      bpGridModalEl.appendChild(div);
+    }
+  }
+
+  // ============ Game Over / Demo End ============
+
+  const modalGameover = document.getElementById("modal-gameover");
+  document.getElementById("btn-restart-run").addEventListener("click", () => {
+    modalGameover.classList.add("hidden");
+    startNewRun();
+  });
+  modalGameover.querySelector(".modal-backdrop").addEventListener("click", () => {});
+
+  const modalDemoEnd = document.getElementById("modal-demoend");
+  document.getElementById("btn-demo-restart").addEventListener("click", () => {
+    modalDemoEnd.classList.add("hidden");
+    startNewRun();
+  });
+  modalDemoEnd.querySelector(".modal-backdrop").addEventListener("click", () => {});
+
+  function showGameOver() {
+    modalGameover.classList.remove("hidden");
+  }
+  function showDemoEnd() {
+    modalDemoEnd.classList.remove("hidden");
+  }
+
+  // ============ 战斗 / 伤害 ============
+
+  function eatBread() {
+    if (!consumeItem("bread",1,false)) {
+      pushLog("没有面包了。", true);
+      renderHUD();
+      return;
+    }
+    if (gameState.player.hp < gameState.player.maxHp) {
+      gameState.player.hp += 1;
+      pushLog("吃掉一个面包，恢复 1 点生命。");
+    } else {
+      gameState.player.tempHp += 1;
+      pushLog("吃掉一个面包，获得 1 点临时生命。");
+    }
+    renderAll();
+  }
+
+  function applyDamage(amount, ignoreArmor=false) {
+    let dmg = amount;
+    if (!ignoreArmor && gameState.player.armor > 0) {
+      const used = Math.min(gameState.player.armor, dmg);
+      gameState.player.armor -= used;
+      dmg -= used;
+    }
+    if (dmg > 0) {
+      if (gameState.player.tempHp > 0) {
+        const used = Math.min(gameState.player.tempHp, dmg);
+        gameState.player.tempHp -= used;
+        dmg -= used;
+      }
+      if (dmg > 0) {
+        gameState.player.hp -= dmg;
+      }
+    }
+
+    if (gameState.player.hp <= 0) {
+      pushLog("你倒在了地底的黑暗中……", true);
+      renderAll();
+      showGameOver();
+    } else {
+      renderAll();
+    }
+  }
+
+  function monsterAt(x,y) {
+    return gameState.monsters.find(m=>m.alive && m.x===x && m.y===y);
+  }
+
+  function isWalkable(x,y,ignoreWalls=false) {
+    const d = gameState.dungeon;
+    if (!d) return false;
+    if (x < 0 || x >= d.width || y < 0 || y >= d.height) return false;
+    const t = d.tiles[y][x].type;
+    if (ignoreWalls) return true;
+    return (t === TILE_FLOOR || t === TILE_STAIR_UP || t === TILE_CHEST || t === TILE_HOLE);
+  }
+
+  // ============ 玩家行动（矿洞） ============
+
+  function mineOrMove(dx, dy) {
+    if (gameState.player.stunned > 0) {
+      gameState.player.stunned -= 1;
+      pushLog("你被粘液怪定身，无法行动这一回合。");
+      endPlayerTurn();
+      return;
+    }
+    const d = gameState.dungeon;
+    if (!d || !gameState.playerPos) return;
+
+    const px = gameState.playerPos.x;
+    const py = gameState.playerPos.y;
+    const nx = px + dx;
+    const ny = py + dy;
+    gameState.player.facing = { dx, dy };
+
+    if (nx < 0 || nx >= d.width || ny < 0 || ny >= d.height) {
+      pushLog("前方是坚硬的岩壁。");
+      endPlayerTurn();
+      return;
+    }
+
+    const tile = d.tiles[ny][nx];
+
+    // 1. 如果是岩石 / 矿石 => 挖掘逻辑（可能挖出怪物）
+    if (tile.type === TILE_ROCK || tile.type === TILE_ORE) {
+      if (gameState.player.pickaxe.durability <= 0) {
+        pushLog("稿子已经完全损坏，无法挖掘！", true);
+        endPlayerTurn();
+        return;
+      }
+      gameState.player.pickaxe.durability = Math.max(0, gameState.player.pickaxe.durability - 1);
+      if (tile.type === TILE_ORE) {
+        addItem("ore", 1, true);
+        pushLog("挖到了一块矿石。");
+      } else {
+        pushLog("你在岩壁上凿出了一条裂缝。");
+      }
+
+      // 挖掉石头
+      tile.type = TILE_FLOOR;
+      gameState.playerPos = { x: nx, y: ny };
+
+      // 检查有没有埋在石头里的怪
+      const buriedMon = gameState.monsters.find(
+        m => m.alive && m.buried && m.x === nx && m.y === ny
+      );
+      if (buriedMon) {
+        buriedMon.buried = false;
+        buriedMon.wakeDelay = 1; // 一回合后才开始动
+        pushLog("你挖开岩石，一只怪物露出了身影……", true);
+      }
+
+      updateVisibility();
+      endPlayerTurn();
+      return;
+    }
+
+    // 2. 否则先看这里是否有怪 => 攻击
+    const mon = monsterAt(nx, ny);
+    if (mon && !mon.buried) {
+      if (gameState.player.pickaxe.durability <= 0) {
+        pushLog("稿子已经完全损坏，无法攻击！", true);
+        endPlayerTurn();
+        return;
+      }
+      gameState.player.pickaxe.durability = Math.max(0, gameState.player.pickaxe.durability - 5);
+      mon.alive = false;
+      pushLog("你挥动稿子，击碎了面前的怪物。");
+      if (gameState.player.pickaxe.type === "magic" && gameState.rng() < 0.3) {
+        addItem("ore", 1, true);
+        pushLog("魔法残光凝结成了一块额外的矿石。");
+      }
+      updateVisibility();
+      endPlayerTurn();
+      return;
+    }
+
+    // 3. 没有怪 => 尝试移动
+    if (isWalkable(nx, ny, false)) {
+      gameState.playerPos = { x: nx, y: ny };
+      if (tile.type === TILE_CHEST) {
+        openDungeonChest();
+      }
+      if (tile.type === TILE_STAIR_UP) {
+        pushLog("回到出生点，按 E 可以返回基地。");
+      }
+    } else {
+      pushLog("这里走不过去。");
+    }
+
+    updateVisibility();
+    endPlayerTurn();
+  }
+
+
+  function openDungeonChest() {
+    const roll = gameState.rng();
+    if (roll < 0.4) {
+      addItem("bread",1,true);
+      pushLog("宝箱里有一个面包。", true);
+    } else {
+      const gain = randInt(gameState.rng,1,3);
+      addItem("ore",gain,true);
+      pushLog(`你在宝箱里翻到 ${gain} 块矿石。`, true);
+    }
+  }
+
+  function endPlayerTurn() {
+    if (!gameState.inDungeon) {
+      renderAll();
+      return;
+    }
+    gameState.turnsLeft -= 1;
+    if (gameState.turnsLeft <= 0) {
+      gameState.turnsLeft = 0;
+      pushLog("洞顶开始掉落碎石，你被迫撤回了基地。", true);
+      returnToBaseFromDungeon();
+      return;
+    }
+    updateMonsters();
+    updateBombs();
+    updateVisibility();
+    renderAll();
+  }
+
+  function updateBombs() {
+    const d = gameState.dungeon;
+    if (!d) return;
+    const newBombs = [];
+    for (const b of gameState.bombs) {
+      b.timer -= 1;
+      if (b.timer <= 0) {
+        pushLog("炸药包炸响了！", true);
+        for (let dy=-1; dy<=1; dy++) {
+          for (let dx=-1; dx<=1; dx++) {
+            const x = b.x + dx;
+            const y = b.y + dy;
+            if (x<0 || x>=d.width || y<0 || y>=d.height) continue;
+            const tile = d.tiles[y][x];
+            if (tile.type === TILE_ROCK || tile.type === TILE_ORE || tile.type === TILE_HOLE) {
+              if (tile.type === TILE_ORE) {
+                if (gameState.rng() < 0.5) {
+                  addItem("ore",1,true);
+                }
+              }
+              tile.type = TILE_FLOOR;
+            }
+            const mon = monsterAt(x,y);
+            if (mon) mon.alive = false;
+            if (gameState.playerPos && gameState.playerPos.x === x && gameState.playerPos.y === y) {
+              applyDamage(2,false);
+            }
+          }
+        }
+      } else {
+        newBombs.push(b);
+      }
+    }
+    gameState.bombs = newBombs;
+  }
+
+  function updateMonsters() {
+    if (!gameState.playerPos || !gameState.dungeon) return;
+    const d = gameState.dungeon;
+    const px = gameState.playerPos.x;
+    const py = gameState.playerPos.y;
+
+    gameState.ghostMoveCounter += 1;
+
+    function manhattan(x1, y1, x2, y2) {
+      return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+    }
+
+    for (const m of gameState.monsters) {
+      if (!m.alive) continue;
+
+      const tileHere = d.tiles[m.y][m.x];
+
+      // 非幽灵：在岩石中就是埋着
+      if (m.type !== MON_GHOST && tileHere.type === TILE_ROCK) {
+        m.buried = true;
+      }
+      // 如果埋着但脚下不再是岩石，说明被挖出来（保险兜底）
+      if (m.buried && tileHere.type !== TILE_ROCK) {
+        m.buried = false;
+        m.wakeDelay = Math.max(m.wakeDelay || 0, 1);
+      }
+
+      if (m.buried) continue;
+      if (m.wakeDelay && m.wakeDelay > 0) {
+        m.wakeDelay -= 1;
+        continue;
+      }
+
+      const dist = manhattan(m.x, m.y, px, py);
+
+      // 贴脸优先攻击
+      if (dist === 1) {
+        monsterAttack(m, m.type === MON_GHOST);
+        continue;
+      }
+
+      // 幽灵：每 3 回合才行动一次
+      if (m.type === MON_GHOST && (gameState.ghostMoveCounter % 3 !== 0)) {
+        continue;
+      }
+
+      // 仇恨判定
+      let aggro = false;
+      if (m.type === MON_GHOST) {
+        if (dist <= 2) aggro = true;
+      } else {
+        if (dist <= PLAYER_LIGHT_RADIUS &&
+            hasLineOfSight(m.x, m.y, px, py, false)) {
+          aggro = true;
+        }
+      }
+
+      if (aggro) {
+        // 追击模式
+        if (m.type === MON_ZOMBIE) {
+          moveMonsterTowardsPlayer(m, 1, false, false);
+        } else if (m.type === MON_SLIME) {
+          for (let step = 0; step < 3; step++) {
+            moveMonsterTowardsPlayer(m, 1, false, false);
+            const d2 = manhattan(m.x, m.y, px, py);
+            if (d2 === 1) {
+              monsterAttack(m, false);
+              break;
+            }
+          }
+        } else if (m.type === MON_GHOST) {
+          for (let step = 0; step < 2; step++) {
+            moveMonsterTowardsPlayer(m, 1, true, true); // 无视岩石，限制在出生 5×5
+            const d3 = manhattan(m.x, m.y, px, py);
+            if (d3 === 1) {
+              monsterAttack(m, true);
+              break;
+            }
+          }
+        }
+      } else {
+        // 游荡模式：在空洞里会更常乱走
+        if (m.type === MON_GHOST) {
+          randomMonsterStep(m, true, true);
+        } else {
+          const here = d.tiles[m.y][m.x];
+          const wanderProb = (here.type === TILE_HOLE ? 0.7 : 0.25);
+          if (gameState.rng() < wanderProb) {
+            randomMonsterStep(m, false, false);
+          }
+        }
+      }
+    }
+  }
+
+  function isWithinHome(m, x, y) {
+    if (!m.roamRadius || typeof m.homeX !== "number") return true;
+    return (Math.abs(x - m.homeX) <= m.roamRadius &&
+            Math.abs(y - m.homeY) <= m.roamRadius);
+  }
+
+  function canMonsterMoveTo(m, x, y, ignoreWalls, restrictHome) {
+    const d = gameState.dungeon;
+    if (!d) return false;
+    if (x < 0 || x >= d.width || y < 0 || y >= d.height) return false;
+    if (restrictHome && !isWithinHome(m, x, y)) return false;
+    if (ignoreWalls) return true;
+    const t = d.tiles[y][x].type;
+    return (t === TILE_FLOOR || t === TILE_HOLE || t === TILE_STAIR_UP || t === TILE_CHEST);
+  }
+
+  function randomMonsterStep(m, ignoreWalls, restrictHome) {
+    const d = gameState.dungeon;
+    if (!d) return;
+    const dirs = [
+      { dx: 1, dy: 0 }, { dx: -1, dy: 0 },
+      { dx: 0, dy: 1 }, { dx: 0, dy: -1 }
+    ];
+    shuffle(gameState.rng, dirs);
+    for (const dir of dirs) {
+      const nx = m.x + dir.dx;
+      const ny = m.y + dir.dy;
+      if (!canMonsterMoveTo(m, nx, ny, ignoreWalls, restrictHome)) continue;
+      if (monsterAt(nx, ny)) continue;
+      m.x = nx;
+      m.y = ny;
+      break;
+    }
+  }
+
+  function moveMonsterTowardsPlayer(m, stepCount, ignoreWalls, restrictHome) {
+    if (!gameState.playerPos || !gameState.dungeon) return;
+    const px = gameState.playerPos.x;
+    const py = gameState.playerPos.y;
+
+    for (let step = 0; step < stepCount; step++) {
+      let dx = px - m.x;
+      let dy = py - m.y;
+      if (dx === 0 && dy === 0) return;
+      const ax = Math.abs(dx), ay = Math.abs(dy);
+
+      const dirs = [];
+      if (ax >= ay && dx !== 0) {
+        dirs.push({ dx: Math.sign(dx), dy: 0 });
+        if (dy !== 0) dirs.push({ dx: 0, dy: Math.sign(dy) });
+      } else if (ay > ax && dy !== 0) {
+        dirs.push({ dx: 0, dy: Math.sign(dy) });
+        if (dx !== 0) dirs.push({ dx: Math.sign(dx), dy: 0 });
+      } else {
+        dirs.push(
+          { dx: 1, dy: 0 }, { dx: -1, dy: 0 },
+          { dx: 0, dy: 1 }, { dx: 0, dy: -1 }
+        );
+      }
+
+      let moved = false;
+      for (const dir of dirs) {
+        const nx = m.x + dir.dx;
+        const ny = m.y + dir.dy;
+        if (!canMonsterMoveTo(m, nx, ny, ignoreWalls, restrictHome)) continue;
+        if (monsterAt(nx, ny)) continue;
+        m.x = nx;
+        m.y = ny;
+        moved = true;
+        break;
+      }
+      if (!moved) return;
+    }
+  }
+
+
+  function monsterAttack(m, ghostIgnoreArmor=false) {
+    if (m.type === MON_ZOMBIE) {
+      // 尖刺盾牌优先
+      if (gameState.player.shieldCharges > 0) {
+        gameState.player.shieldCharges -= 1;
+        m.alive = false;
+        pushLog("尖刺盾牌发力，僵尸被反击击碎！", true);
+        return;
+      }
+      pushLog("僵尸咬了你一口。", true);
+      applyDamage(1,false);
+    } else if (m.type === MON_SLIME) {
+      if (gameState.player.shieldCharges > 0) {
+        gameState.player.shieldCharges -= 1;
+        m.alive = false;
+        pushLog("尖刺盾牌反击，将粘液怪戳成一滩。", true);
+        return;
+      }
+      if (gameState.player.armor > 0) {
+        pushLog("粘液怪撞碎了你的护甲。", true);
+        applyDamage(1,false);
+      } else {
+        pushLog("粘液怪附着在你身上，你被定住一回合。", true);
+        gameState.player.stunned = 1;
+        m.alive = false;
+      }
+    } else if (m.type === MON_GHOST) {
+      if (gameState.player.charmCharges > 0) {
+        gameState.player.charmCharges = 0;
+        pushLog("幽灵贴近时，你的护符碎裂了。", true);
+      }
+      pushLog("幽灵的爪子掠过你的心脏。", true);
+      applyDamage(1,true);
+    }
+  }
+
+  // ============ 火把 / 炸药 / 绳索 ============
+
+  function placeTorch() {
+    if (!gameState.inDungeon) {
+      pushLog("只有在矿洞里才能插火把。");
+      return;
+    }
+    if (!consumeItem("torch",1,true)) {
+      pushLog("你没有火把。", true);
+      renderHUD();
+      return;
+    }
+    const d = gameState.dungeon;
+    if (!d || !gameState.playerPos) return;
+    const t = d.tiles[gameState.playerPos.y][gameState.playerPos.x];
+    t.hasTorch = true;
+    pushLog("你在脚边插下一支火把。");
+    updateVisibility();
+    endPlayerTurn();
+  }
+
+  function placeBomb() {
+    if (!gameState.inDungeon) {
+      pushLog("只有在矿洞里才能放置炸药包。");
+      return;
+    }
+    if (!consumeItem("bomb",1,true)) {
+      pushLog("你没有炸药包。", true);
+      renderHUD();
+      return;
+    }
+    if (!gameState.playerPos) return;
+    gameState.bombs.push({x:gameState.playerPos.x, y:gameState.playerPos.y, timer:2});
+    pushLog("你放下了一个炸药包，两回合后会爆炸。");
+    endPlayerTurn();
+  }
+
+  function useRope() {
+    if (!gameState.inDungeon) {
+      pushLog("绳索只能在矿洞里使用。");
+      return;
+    }
+    const d = gameState.dungeon;
+    if (!d || !gameState.playerPos) return;
+
+    if (!gameState.ropeAnchor) {
+      // 设置锚点
+      if (!consumeItem("rope",1,true)) {
+        pushLog("你没有绳索。", true);
+        renderHUD();
+        return;
+      }
+      gameState.ropeAnchor = {x:gameState.playerPos.x, y:gameState.playerPos.y};
+      pushLog("你在这里设置了一个绳索锚点。");
+      endPlayerTurn();
+    } else {
+      // 回到锚点
+      gameState.playerPos = {...gameState.ropeAnchor};
+      gameState.ropeAnchor = null;
+      pushLog("你沿着绳索回到了锚点位置。");
+      updateVisibility();
+      endPlayerTurn();
+    }
+  }
+
+  // ============ 视图切换 & 进入矿洞 / 返回基地 ============
+
+  function enterDungeon() {
+    generateDungeon();
+    gameState.inDungeon = true;
+    gameState.mode = GameMode.DUNGEON;
+    gameState.playerPos = {...gameState.dungeonSpawn};
+    gameState.turnsLeft = gameState.maxTurnsPerDay;
+    gameState.player.stunned = 0;
+    pushLog("你走下了通往更深处的通道。");
+    pushLog("每一次行动都会消耗 1 回合，总共 100 回合。");
+    updateVisibility();
+    renderAll();
+  }
+
+  function returnToBaseFromDungeon() {
+    gameState.mode = GameMode.BASE;
+    gameState.inDungeon = false;
+    gameState.turnsLeft = -1;
+    gameState.playerPos = null;
+    gameState.bombs = [];
+    gameState.ropeAnchor = null;
+    pushLog("你回到了临时基地。");
+    renderAll();
+  }
+
+  // ============ 输入处理 ============
+
+  document.addEventListener("keydown", (e) => {
+    if (!modalGameover.classList.contains("hidden") ||
+        !modalDemoEnd.classList.contains("hidden") ||
+        !modalMerchant.classList.contains("hidden") ||
+        !modalChest.classList.contains("hidden")) {
+      return;
+    }
+
+    const key = e.key;
+
+    if (key === "b" || key === "B") {
+      eatBread();
+      return;
+    }
+    if (key === "t" || key === "T") {
+      placeTorch();
+      return;
+    }
+    if (key === "f" || key === "F") {
+      placeBomb();
+      return;
+    }
+    if (key === "r" || key === "R") {
+      useRope();
+      return;
+    }
+
+    if (gameState.mode === GameMode.BASE) {
+      handleBaseKey(e);
+    } else if (gameState.mode === GameMode.DUNGEON) {
+      handleDungeonKey(e);
+    }
+  });
+
+  function handleBaseKey(e) {
+    const key = e.key;
+    let dx = 0, dy = 0;
+    if (key === "ArrowUp" || key === "w" || key === "W") dy = -1;
+    else if (key === "ArrowDown" || key === "s" || key === "S") dy = 1;
+    else if (key === "ArrowLeft" || key === "a" || key === "A") dx = -1;
+    else if (key === "ArrowRight" || key === "d" || key === "D") dx = 1;
+
+    if (dx !==0 || dy !==0) {
+      const nx = clamp(gameState.base.player.x + dx,0,gameState.base.width-1);
+      const ny = clamp(gameState.base.player.y + dy,0,gameState.base.height-1);
+      gameState.base.player = {x:nx,y:ny};
+      renderBase();
+      return;
+    }
+
+    if (key === " " || key === "Enter" || key === "e" || key === "E") {
+      const x = gameState.base.player.x;
+      const y = gameState.base.player.y;
+
+      // 床：结束当天
+      if (x === 2 && y === 1) {
+        pushLog("你躺上床，结束这一天。", true);
+        startNewDay();
+        return;
+      }
+      // 箱子
+      if (x === 0 && y === 1) {
+        openChest();
+        return;
+      }
+      // 地道入口
+      if (x === 1 && y === 2) {
+        enterDungeon();
+        return;
+      }
+      // 商人
+      if (gameState.base.merchant && x === 2 && y === 0) {
+        openMerchant();
+        return;
+      }
+
+      pushLog("这里没有可以互动的东西。");
+    }
+  }
+
+  function handleDungeonKey(e) {
+    const key = e.key;
+    let dx = 0, dy = 0;
+    if (key === "ArrowUp" || key === "w" || key === "W") dy = -1;
+    else if (key === "ArrowDown" || key === "s" || key === "S") dy = 1;
+    else if (key === "ArrowLeft" || key === "a" || key === "A") dx = -1;
+    else if (key === "ArrowRight" || key === "d" || key === "D") dx = 1;
+
+    if (dx !==0 || dy !==0) {
+      mineOrMove(dx,dy);
+      return;
+    }
+
+    if (key === " " || key === "Enter" || key === "e" || key === "E") {
+      if (gameState.playerPos &&
+          gameState.playerPos.x === gameState.dungeonSpawn.x &&
+          gameState.playerPos.y === gameState.dungeonSpawn.y) {
+        returnToBaseFromDungeon();
+        return;
+      } else {
+        pushLog("只有回到出生点才能沿着梯子爬回基地。");
+      }
+    }
+  }
+
+  // 初始化会在故事结束后 startNewRun()
+</script>
+</body>
+</html>

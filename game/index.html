@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <title>小游戏合集</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: radial-gradient(circle at top, #f6ffed 0, #ffffff 40%, #fff 100%);
+      color: #333;
+    }
+    .layout {
+      display: flex;
+      height: 100vh;
+      max-height: 100vh;
+      overflow: hidden;
+    }
+    .sidebar {
+      width: 230px;
+      background: #f0f5ff;
+      border-right: 1px solid #d6e4ff;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 16px;
+    }
+    .game-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+    .game-btn {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: none;
+      background: #ffffff;
+      box-shadow: 0 2px 4px rgba(24, 144, 255, 0.05);
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    }
+    .game-btn span {
+      font-size: 18px;
+      margin-right: 4px;
+    }
+    .game-btn:hover {
+      background: #e6f7ff;
+      box-shadow: 0 4px 10px rgba(24, 144, 255, 0.15);
+    }
+    .game-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 6px rgba(24, 144, 255, 0.1);
+    }
+    .game-btn.active {
+      background: #bae7ff;
+      box-shadow: 0 4px 12px rgba(24, 144, 255, 0.25);
+    }
+    .footer {
+      font-size: 11px;
+      color: #999;
+      margin-top: 8px;
+    }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #ffffff;
+    }
+    .main-header {
+      padding: 8px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .main-header span {
+      font-weight: 600;
+    }
+    #game-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #game-frame {
+      border: none;
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+      background: #000;
+    }
+
+    @media (max-width: 768px) {
+      .layout {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+        border-right: none;
+        border-bottom: 1px solid #d6e4ff;
+      }
+      .title {
+        width: 100%;
+      }
+      .subtitle {
+        width: 100%;
+      }
+      .game-list {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .game-btn {
+        flex: 1 0 calc(33.33% - 8px);
+        font-size: 13px;
+        padding: 8px 6px;
+      }
+      .footer {
+        display: none;
+      }
+    }
+
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="title">小游戏合集 🎮</div>
+        <div class="subtitle">点击左侧切换游戏，右侧 iframe 里加载子页面</div>
+
+        <div class="game-list">
+            <button class="game-btn active" data-src="game2048.html" data-title="2048">
+                <div><span>🔢</span>2048</div>
+                <small>2048</small>
+            </button>
+
+            <button class="game-btn" data-src="link-game.html" data-title="连连看">
+                  <div><span>🧩</span>连连看</div>
+                  <small>Match</small>
+            </button>
+
+            <button class="game-btn" data-src="mine.html" data-title="掘地求生">
+                <div><span>🧱</span>掘地求生</div>
+                <small>Tetris</small>
+            </button>
+
+        </div>
+
+        <div class="footer">
+            鸣谢:茄特-既皮体。
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="main-header">
+            <div id="game-title">
+                <span>🔢 2048</span>
+            </div>
+            <div style="font-size:12px;color:#999;">方向键控制 / PC 浏览效果最佳</div>
+        </div>
+        <iframe id="game-frame" src="game2048.html"></iframe>
+    </main>
+</div>
+
+<script>
+    const buttons = document.querySelectorAll(".game-btn");
+    const frame = document.getElementById("game-frame");
+    const gameTitle = document.getElementById("game-title");
+
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        buttons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const src = btn.getAttribute("data-src");
+        const title = btn.getAttribute("data-title");
+        const emoji = btn.querySelector("span")?.textContent || "🎮";
+
+        frame.src = src;
+        gameTitle.innerHTML = `<span>${emoji} ${title}</span>`;
+      });
+    });
+
+</script>
+</body>
+</html>
