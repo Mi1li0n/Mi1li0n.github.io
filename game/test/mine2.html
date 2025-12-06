@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <title>地底矿工 Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <!-- 外链样式 -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="start-screen">
+  <div class="story-illu">
+    <div class="story-miner">
+      <span class="big">⛏️</span>
+      <span class="text">掘地求生</span>
+    </div>
+    <div class="story-torch">🔥</div>
+  </div>
+  <div class="story-text" id="story-text"></div>
+  <div class="story-controls">
+    <div class="story-step" id="story-step"></div>
+    <div>
+      <button class="btn" id="btn-skip">跳过</button>
+      <button class="btn btn-primary" id="btn-next">下一段</button>
+    </div>
+  </div>
+</div>
+
+<div id="game-root" class="hidden">
+  <div class="main-view">
+    <div class="top-hud">
+      <div class="hud-left">
+        <div class="hud-pill">
+          <span class="hud-label">天数</span>
+          <span id="hud-day">1</span>
+        </div>
+        <div class="hud-pill">
+          <span class="hud-label">回合</span>
+          <span id="hud-turns">-</span>
+        </div>
+        <div class="hud-pill">
+          <span class="hud-label">矿石</span>
+          <span id="hud-ore">0</span>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-pill">
+          <span class="hud-label">生命</span>
+          <div class="hearts" id="hud-hearts"></div>
+        </div>
+        <div class="hud-pill">
+          <span class="hud-label">护甲</span>
+          <div class="armor" id="hud-armor"></div>
+        </div>
+        <div class="hud-pill">
+          <span class="hud-label">稿子</span>
+          <span id="hud-pickaxe"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="view-container">
+      <div id="base-view" class="grid base-grid"></div>
+      <div id="dungeon-view" class="grid dungeon-grid hidden"></div>
+
+      <div class="log-panel" id="log-panel"></div>
+    </div>
+  </div>
+
+  <div class="side-panel">
+    <div class="side-section">
+      <div class="side-title">
+        <span>角色状态</span>
+        <span class="tag" id="tag-location">基地</span>
+      </div>
+      <div class="stat-row">
+        <span>当前地点</span><span id="stat-loc-text">临时基地</span>
+      </div>
+      <div class="stat-row">
+        <span>临时生命</span><span id="stat-temp-hp">0</span>
+      </div>
+      <div class="stat-row">
+        <span>眩晕回合</span><span id="stat-stun">0</span>
+      </div>
+      <div class="stat-row">
+        <span>怪物数量</span><span id="stat-monsters">0</span>
+      </div>
+      <div class="stat-row">
+        <span>护符数量</span><span id="stat-charm">0</span>
+      </div>
+      <div class="stat-row">
+        <span>尖刺盾牌</span><span id="stat-shield">0</span>
+      </div>
+    </div>
+
+    <div class="side-section">
+      <div class="side-title">
+        <span>背包 2×2</span>
+      </div>
+      <div class="inv-grid inv-backpack" id="backpack-grid"></div>
+      <div style="margin-top:6px;font-size:11px;color:#9ca3af;">
+        面包：<span id="stat-bread">0</span>，
+        火把：<span id="stat-torch">0</span>，
+        炸药包：<span id="stat-bomb">0</span>，
+        绳索：<span id="stat-rope">0</span>
+      </div>
+    </div>
+
+    <div class="side-section">
+      <div class="side-title">
+        <span>操作说明</span>
+      </div>
+      <div class="controls-list">
+        <div><span class="key">WASD</span><span class="key">↑↓←→</span>移动</div>
+        <div><span class="key">E</span><span class="key">空格</span>交互 / 上下楼</div>
+        <div><span class="key">B</span>吃面包（+1 生命或临时生命）</div>
+        <div><span class="key">T</span>插下火把（矿洞）</div>
+        <div><span class="key">F</span>放置炸药包（矿洞）</div>
+        <div><span class="key">R</span>使用绳索（设置/回到锚点）</div>
+        <div style="margin-top:4px;color:#9ca3af;">地下：走进岩石 = 挖掘，走进怪物 = 攻击</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 商人 -->
+<div class="modal hidden" id="modal-merchant">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content">
+    <h3 class="modal-title">地底流浪商人 🧙‍♂️</h3>
+    <div class="modal-body">
+      <div style="font-size:12px;margin-bottom:6px;">
+        手里有些什么要换？你当前有
+        <span class="text-good" id="shop-ore">0</span> 块矿石。
+      </div>
+      <div id="shop-list"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:4px;">
+      <button class="btn" id="btn-shop-close">离开</button>
+    </div>
+  </div>
+</div>
+
+<!-- 箱子 -->
+<div class="modal hidden" id="modal-chest">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content">
+    <h3 class="modal-title">临时基地箱子 📦</h3>
+    <div class="modal-body">
+      <div style="margin-bottom:4px;font-size:12px;color:#9ca3af;">
+        点击背包格子可存入箱子，点击箱子格子可取回到背包。
+      </div>
+      <div style="display:flex;gap:8px;">
+        <div style="flex:1;">
+          <div class="side-title" style="margin-bottom:4px;">
+            <span>箱子 5×5</span>
+          </div>
+          <div class="inv-grid inv-chest" id="chest-grid"></div>
+        </div>
+        <div style="flex:0 0 80px;">
+          <div class="side-title" style="margin-bottom:4px;">
+            <span>背包</span>
+          </div>
+          <div class="inv-grid inv-backpack" id="bp-grid-modal"></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:4px;">
+      <button class="btn" id="btn-chest-close">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- Game Over -->
+<div class="modal hidden" id="modal-gameover">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content">
+    <h3 class="modal-title">你被埋在黑暗之中……</h3>
+    <div class="modal-body">
+      <p style="font-size:12px;line-height:1.6;">
+        矿工的故事暂时在这里画上句号。<br/>
+        但洞穴还在那儿，等你重新点亮第一支火把。
+      </p>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:4px;">
+      <button class="btn btn-primary" id="btn-restart-run">重新开始</button>
+    </div>
+  </div>
+</div>
+
+<!-- Demo 结束 -->
+<div class="modal hidden" id="modal-demoend">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content">
+    <h3 class="modal-title">女巫的终结仪式 ✨</h3>
+    <div class="modal-body">
+      <p style="font-size:12px;line-height:1.7;">
+        第十天的夜里，女巫挥手，简陋的临时基地在咒语中崩塌。<br/>
+        你侥幸活了下来，却只能重新开始规划一切。<br/><br/>
+        <span class="text-good">感谢游玩 Demo！</span>
+      </p>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:4px;">
+      <button class="btn btn-primary" id="btn-demo-restart">再来一轮</button>
+    </div>
+  </div>
+</div>
+
+<!-- 外链脚本 -->
+<script src="inventory.js"></script>
+<script src="dungeonGen.js"></script>
+<script src="monsters.js"></script>
+<script src="uiRender.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
