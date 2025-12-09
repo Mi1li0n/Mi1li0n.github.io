@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <style>
     :root {
+      --tile-size: min(48px, 5vw);
+      --gap: 6px;
       --body-bg: #e5edff;
       --board-bg: #d1d5db;
     }
@@ -88,24 +90,24 @@
     }
     .board {
       background: var(--board-bg);
-      padding: 8px;
+      padding: calc(var(--tile-size) * 0.15);
       border-radius: 12px;
       display: grid;
-      grid-gap: 6px;
+      grid-gap: calc(var(--tile-size) * 0.125);
       box-shadow: 0 8px 20px rgba(148, 163, 184, 0.8);
       position: relative;
       z-index: 1;
       transition: box-shadow 0.2s ease;
     }
     .tile {
-      width: 48px;
-      height: 48px;
+      width: var(--tile-size);
+      height: var(--tile-size);
       border-radius: 10px;
       background: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 26px;
+      font-size: calc(var(--tile-size) * 0.55);
       cursor: pointer;
       user-select: none;
       transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease, border 0.14s ease;
@@ -738,9 +740,11 @@
 
 <script>
     // ====== 基础状态 & DOM ======
-    const TILE_SIZE = 48;
-    const GAP = 6;
-    const PADDING = 8;
+    let TILE_SIZE = 48;
+    let GAP = 6;
+    let PADDING = 8;
+
+
 
     let ROWS = 6;
     let COLS = 8;
@@ -1234,9 +1238,21 @@
     let lastFrameTime = null;
 
     function resizeCanvas() {
-      const rect = boardEl.getBoundingClientRect();
-      pathCanvas.width = rect.width;
-      pathCanvas.height = rect.height;
+      const rect = boardContainer.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+
+      const dpr = window.devicePixelRatio || 1;
+
+      // CSS 尺寸
+      pathCanvas.style.width = rect.width + "px";
+      pathCanvas.style.height = rect.height + "px";
+
+      // 真实像素尺寸
+      pathCanvas.width = rect.width * dpr;
+      pathCanvas.height = rect.height * dpr;
+
+      // 让后续用的坐标仍然按「CSS 像素」来算
+      pathCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
     function clearPath() {
@@ -1359,7 +1375,7 @@
     let comboCount = 0;
     let bestCombo = 0;
     let lastMatchTs = null;
-    const COMBO_WINDOW = 3000;
+    const COMBO_WINDOW = 2300;
     let comboTimeoutId = null;
 
     function showComboBanner(n) {
@@ -1470,6 +1486,29 @@
       return false;
     }
 
+    function tryHit() {
+      const cells = [];
+      for (let r = 1; r <= ROWS; r++) {
+        for (let c = 1; c <= COLS; c++) {
+          const v = board[r][c];
+          if (v != null) {
+            cells.push({ r, c, v });
+          }
+        }
+      }
+      for (let i = 0; i < cells.length; i++) {
+        for (let j = i + 1; j < cells.length; j++) {
+          if (cells[i].v === cells[j].v) {
+            const path = findPath(cells[i].r, cells[i].c, cells[j].r, cells[j].c);
+            if (path) {
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    }
+
     function flashElement(el, className, duration = 700) {
       if (!el) return;
       el.classList.add(className);
@@ -1492,6 +1531,9 @@
         COLS = 14;  // 196
       }
       totalCells = ROWS * COLS;
+    }
+
+    function updateGridSize() {
       boardEl.style.gridTemplateColumns = `repeat(${COLS}, ${TILE_SIZE}px)`;
       boardEl.style.gridTemplateRows = `repeat(${ROWS}, ${TILE_SIZE}px)`;
     }
@@ -1507,6 +1549,15 @@
       const progress = 1 - remainingTiles / totalCells;
       const glow = 0.4 + 0.6 * progress;
       boardEl.style.boxShadow = `0 8px 20px rgba(129,140,248,${glow.toFixed(2)})`;
+    }
+
+    function measureTileSize() {
+      const t = document.querySelector('.tile:not(.empty)');
+      if (!t) return;
+      const rect = t.getBoundingClientRect();
+      TILE_SIZE = rect.width;
+      GAP = TILE_SIZE * 0.125;
+      PADDING = TILE_SIZE * 0.15;
     }
 
     // ====== 随机数（每日挑战种子） ======
@@ -1666,7 +1717,15 @@
       steps = 0;
       firstSelected = null;
       updateInfo();
+      // 先渲染 DOM，让 .tile 真实出现在页面上
       renderBoard();
+
+        // 再等浏览器把这一帧的布局/样式都算完，再去测量和调 canvas
+      requestAnimationFrame(() => {
+        measureTileSize();   // 现在能拿到正确的 tile 宽度
+        updateGridSize();    // 根据最新 TILE_SIZE 调整 grid 列宽
+        resizeCanvas();      // canvas 跟棋盘同步
+      });
     }
 
     function renderBoard() {
@@ -1692,7 +1751,6 @@
           boardEl.appendChild(tile);
         }
       }
-      resizeCanvas();
     }
 
     function isEmptyCell(r, c) {
@@ -1974,6 +2032,10 @@
           prevEl.classList.remove("shake");
           prevEl.classList.remove("selected");
         }, 180);
+      }
+      const ok = tryHit();
+      if (ok) {} else {
+        shuffleBoard();
       }
     }
 
@@ -2315,6 +2377,8 @@
     // ====== 事件绑定 & 启动 ======
     boardEl.addEventListener("click", handleTileClick);
     window.addEventListener("resize", () => {
+      measureTileSize();
+      updateGridSize();
       resizeCanvas();
     });
 

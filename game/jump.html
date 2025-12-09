@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Doodle Jump 手绘版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #f3f0e6;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "PingFang SC", "Microsoft YaHei", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wrapper {
+      text-align: center;
+      padding: 10px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #374151;
+      text-shadow: 0 1px 0 #fff;
+      transform: rotate(-1.5deg);
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .stat-card {
+      min-width: 90px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 4px 0 #d4d4d8;
+      transform: rotate(-0.5deg);
+    }
+    .stat-card:nth-child(2) {
+      transform: rotate(1.2deg);
+    }
+    .stat-label {
+      font-size: 11px;
+      color: #6b7280;
+    }
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .game-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 6px;
+    }
+
+    .game-card {
+      background: #f9fafb;
+      padding: 10px;
+      border-radius: 14px;
+      box-shadow: 0 10px 26px rgba(15,23,42,0.25);
+      display: inline-flex;
+      flex-direction: column;
+      align-items: stretch;
+      border: 1px solid #e5e7eb;
+    }
+
+    .game-inner {
+      position: relative;
+      width: min(360px, 90vw);
+      aspect-ratio: 3 / 5;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 0 #d4d4d8;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #fdfaf3;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15,23,42,0.38);
+      color: #f9fafb;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 12px;
+      font-size: 14px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    .overlay-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .overlay.hidden {
+      display: none;
+    }
+
+    .touch-controls {
+      margin-top: 10px;
+      display: none;
+      gap: 10px;
+    }
+    .touch-btn {
+      flex: 1;
+      padding: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      background: #fefce8;
+      color: #374151;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #e5e7eb;
+    }
+    .touch-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 0 #e5e7eb;
+    }
+
+    @media (max-width: 768px) {
+      .touch-controls {
+        display: flex;
+      }
+    }
+
+    .tip {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <h1>Doodle Jump</h1>
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-label">当前高度</div>
+            <div class="stat-value" id="score">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">最佳高度</div>
+            <div class="stat-value" id="best">0</div>
+        </div>
+    </div>
+
+    <div class="game-wrap">
+        <div class="game-card">
+            <div class="game-inner" id="game-inner">
+                <canvas id="game"></canvas>
+                <div class="overlay" id="overlay">
+                    <div class="overlay-title">按任意键 / 轻触开始</div>
+                    <div>
+                        ← → 或 A / D 控制方向<br>
+                        落到手绘小砖块上会弹跳，看看能跳多高！
+                    </div>
+                </div>
+            </div>
+            <div class="touch-controls">
+                <button class="touch-btn" id="btn-left">◀ 左</button>
+                <button class="touch-btn" id="btn-right">右 ▶</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="tip">
+        键盘：← → 或 A / D 移动 | 任意键开始 / 重新开始
+    </div>
+</div>
+
+<script>
+  // ========= 画布 & 尺寸 =========
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+  const overlay = document.getElementById("overlay");
+  const scoreEl = document.getElementById("score");
+  const bestEl = document.getElementById("best");
+  const innerEl = document.getElementById("game-inner");
+
+  const btnLeft = document.getElementById("btn-left");
+  const btnRight = document.getElementById("btn-right");
+
+  let cw = 320;
+  let ch = 520;
+
+  function resizeCanvasOnly() {
+    const rect = innerEl.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    cw = rect.width;
+    ch = rect.height || (rect.width * 5 / 3);
+    canvas.width = cw * dpr;
+    canvas.height = ch * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  // ========= 音效（简单一点） =========
+  let audioCtx;
+  function playBeep(freq = 440, duration = 0.06, type = "square", volume = 0.08) {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!audioCtx) audioCtx = new AC();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+      gain.gain.setValueAtTime(volume, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+      osc.start(now);
+      osc.stop(now + duration);
+    } catch (e) {
+      // 失败就静音，不影响游戏
+    }
+  }
+
+  // ========= 颜色 & 手绘工具 =========
+  const colors = {
+    paperTop: "#fdfaf3",
+    paperBottom: "#f5e6c5",
+    grid: "rgba(148,163,184,0.25)",
+    platformNormalFill: "#fef9c3",
+    platformNormalStroke: "#44403c",
+    platformMovingFill: "#bae6fd",
+    platformMovingStroke: "#1d4ed8",
+    platformFragileFill: "#fee2e2",
+    platformFragileStroke: "#b91c1c",
+    playerFill: "#fef3c7",
+    playerStroke: "#374151"
+  };
+
+  function roundRectPath(ctx, x, y, w, h, r) {
+    const radius = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.arcTo(x + w, y,     x + w, y + h, radius);
+    ctx.arcTo(x + w, y + h, x,     y + h, radius);
+    ctx.arcTo(x,     y + h, x,     y,     radius);
+    ctx.arcTo(x,     y,     x + w, y,     radius);
+    ctx.closePath();
+  }
+
+  function sketchRect(x, y, w, h, r, fill, stroke) {
+    ctx.save();
+    // 填充
+    ctx.fillStyle = fill;
+    roundRectPath(ctx, x, y, w, h, r);
+    ctx.fill();
+
+    // 手绘风描边：多次略微偏移的描边
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = 1.5;
+    const offsets = [
+      [0, 0],
+      [0.8, 0.4],
+      [-0.6, -0.5]
+    ];
+    offsets.forEach(([dx, dy]) => {
+      ctx.save();
+      ctx.translate(dx, dy);
+      roundRectPath(ctx, x, y, w, h, r);
+      ctx.stroke();
+      ctx.restore();
+    });
+    ctx.restore();
+  }
+
+  function drawSpring(x, y, w, h) {
+        // x, y 是弹簧区域左上角，w 宽，h 高（大概 10 左右）
+      ctx.save();
+
+      const bottom = y + h;         // 底部 y
+      const top = y + 2;            // 稍微往下，留点空隙
+      const loops = 4;              // 圈数
+      const left = x + w * 0.25;    // 左右两侧的 x
+      const right = x + w * 0.75;
+
+      // 小托盘颜色
+      const plateFill = "#f9fafb";
+      const plateStroke = "#4b5563";
+
+      // 底部托盘（用你已有的 sketchRect，保证风格统一）
+      sketchRect(
+        x + w * 0.15,
+        bottom - 3,
+        w * 0.7,
+        3,
+        2,
+        plateFill,
+        plateStroke
+      );
+
+      // 顶部托盘
+      sketchRect(
+        x + w * 0.22,
+        top - 4,
+        w * 0.56,
+        3,
+        2,
+        plateFill,
+        plateStroke
+      );
+
+      // 中间线圈
+      ctx.strokeStyle = "#111827";
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+
+      let currentY = bottom - 3;
+      ctx.moveTo(left, currentY);
+
+      const span = (bottom - 6 - (top + 1)) / loops; // 每一圈垂直高度
+
+      for (let i = 0; i < loops; i++) {
+        const midY = currentY - span * 0.5;
+        const nextY = currentY - span;
+
+        // 左 -> 右 -> 左 的 S 型曲线
+        ctx.quadraticCurveTo(right, midY, left, nextY);
+        currentY = nextY;
+      }
+
+      ctx.stroke();
+
+      // 轻微抖一点点，增加手绘味道
+      ctx.lineWidth = 0.8;
+      ctx.globalAlpha = 0.4;
+      currentY = bottom - 3;
+      ctx.beginPath();
+      ctx.moveTo(left + 0.6, currentY + 0.4);
+      for (let i = 0; i < loops; i++) {
+        const midY = currentY - span * 0.5 + (Math.random() - 0.5) * 0.6;
+        const nextY = currentY - span + (Math.random() - 0.5) * 0.6;
+        ctx.quadraticCurveTo(right + 0.6, midY, left + 0.6, nextY);
+        currentY = nextY;
+      }
+      ctx.stroke();
+
+      ctx.restore();
+  }
+
+  // ========= 游戏状态 =========
+  const STORAGE_KEY = "doodle_jump_best_v2";
+
+  let state = "ready"; // ready | playing | gameover
+  let player;
+  let platforms = [];
+  let score = 0;       // 用「上升距离」累积
+  let bestScore = 0;
+
+  const keys = { left: false, right: false };
+
+  const GRAVITY = 1500;
+  const JUMP_V = -650;
+  const SUPER_JUMP_V = -900;
+
+  // 根据高度提升水平速度
+  function getMoveSpeed() {
+    const base = 220;
+    const extra = Math.min(260, score / 30); // 高度越高越快
+    return base + extra;
+  }
+
+  function loadBest() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    bestScore = raw ? (parseInt(raw, 10) || 0) : 0;
+    bestEl.textContent = bestScore;
+  }
+
+  function saveBest() {
+    localStorage.setItem(STORAGE_KEY, String(bestScore));
+  }
+
+  function setOverlay(text, title = "", show = true) {
+    if (!overlay) return;
+    overlay.classList.toggle("hidden", !show);
+    if (show) {
+      overlay.innerHTML = "";
+      const titleEl = document.createElement("div");
+      titleEl.className = "overlay-title";
+      titleEl.textContent = title;
+      const bodyEl = document.createElement("div");
+      bodyEl.innerHTML = text.replace(/\n/g, "<br>");
+      overlay.appendChild(titleEl);
+      overlay.appendChild(bodyEl);
+    }
+  }
+
+  // ========= 角色 & 平台 =========
+  function createPlayer() {
+    const width = 32;
+    const height = 40;
+    const baseY = ch - 70; // 和起始平台高度匹配
+    return {
+      x: cw / 2 - width / 2,
+      y: baseY - height,
+      width,
+      height,
+      vy: 0
+    };
+  }
+
+  function createPlatform(y, safe = false) {
+    const width = 60 + Math.random() * 40;
+    const marginX = 16;
+    const x = marginX + Math.random() * (cw - width - marginX * 2);
+
+    let type = "normal";
+    const r = Math.random();
+    if (!safe) {
+      if (r < 0.12) type = "fragile";
+      else if (r < 0.24) type = "moving";
+    }
+
+    const hasSpring = safe ? false : (Math.random() < 0.16);
+
+    return {
+      x,
+      y,
+      width,
+      height: 12,
+      type, // normal / moving / fragile
+      vx: type === "moving" ? (Math.random() < 0.5 ? -70 : 70) : 0,
+      hasSpring,
+      broken: false
+    };
+  }
+
+  function initPlatforms() {
+    platforms = [];
+
+    // 起始安全平台：一定存在
+    const baseY = ch - 70;
+    const baseWidth = 90;
+    platforms.push({
+      x: cw / 2 - baseWidth / 2,
+      y: baseY,
+      width: baseWidth,
+      height: 12,
+      type: "normal",
+      vx: 0,
+      hasSpring: false,
+      broken: false,
+      isBase: true
+    });
+
+    // 往上铺一大段平台，越上方可以越调皮
+    const baseGap = 70;
+    let y = baseY - 80;
+    while (y > -ch) {
+      const safe = y > baseY - 260; // 底部这段是安全区：不易碎、不移动、无弹簧
+      platforms.push(createPlatform(y, safe));
+      const gap = baseGap + Math.random() * 30;
+      y -= gap;
+    }
+  }
+
+  function ensurePlatforms() {
+    if (!platforms.length) {
+      initPlatforms();
+      return;
+    }
+    let minY = Infinity;
+    for (const p of platforms) {
+      if (p.y < minY) minY = p.y;
+    }
+    const targetTop = -ch; // 至少覆盖到屏幕上方一屏
+    let y = minY;
+    while (y > targetTop) {
+      const gap = 70 + Math.random() * 40;
+      y -= gap;
+      platforms.push(createPlatform(y, false));
+    }
+  }
+
+  function updateScoreBoard() {
+    const h = Math.floor(score / 10);
+    scoreEl.textContent = h;
+    bestEl.textContent = bestScore;
+  }
+
+  // ========= 碰撞检测 =========
+  function checkPlatformCollisions(prevY) {
+    if (player.vy <= 0) return; // 向上时不检测落地
+    const playerBottomPrev = prevY + player.height;
+    const playerBottomNow = player.y + player.height;
+
+    for (const p of platforms) {
+      if (playerBottomPrev <= p.y && playerBottomNow >= p.y) {
+        if (player.x + player.width > p.x && player.x < p.x + p.width) {
+          // 落在平台上
+          let v = JUMP_V;
+          if (p.hasSpring) {
+            v = SUPER_JUMP_V;
+            p.hasSpring = false;
+            playBeep(950, 0.09, "triangle", 0.14);
+          } else {
+            playBeep(720, 0.06, "square", 0.09);
+          }
+          player.vy = v;
+          player.y = p.y - player.height;
+
+          //score += 10;  每次成功落地加一点高度
+
+          if (p.type === "fragile" && !p.isBase) {
+            p.broken = true; // 易碎踏板摔一下就消失
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  // ========= 游戏主流程 =========
+  function resetGame() {
+    state = "ready";
+    score = 0;
+    resizeCanvasOnly(); // 防止窗口改过尺寸
+    initPlatforms();
+    player = createPlayer();
+    updateScoreBoard();
+    setOverlay(
+      "← → 或 A / D 控制左右移动\n底部一段是安全区，上面会有移动 / 易碎砖块，还有弹簧超级跳！",
+      "按任意键 / 轻触开始",
+      true
+    );
+  }
+
+  function startGame() {
+    if (state === "playing") return;
+    state = "playing";
+    // 起跳一下，让小人马上动起来
+    player.vy = JUMP_V;
+    setOverlay("", "", false);
+  }
+
+  function gameOver() {
+    state = "gameover";
+    const heightScore = Math.floor(score / 10);
+    if (heightScore > bestScore) {
+      bestScore = heightScore;
+      saveBest();
+    }
+    updateScoreBoard();
+    playBeep(220, 0.25, "sine", 0.14);
+    setOverlay(
+      "高度：" + heightScore + "\n最佳：" + bestScore + "\n\n按任意键 / 轻触重新开始",
+      "游戏结束",
+      true
+    );
+  }
+
+  // ========= 绘制 =========
+  function drawBackground() {
+    // 纸张渐变
+    const g = ctx.createLinearGradient(0, 0, 0, ch);
+    g.addColorStop(0, colors.paperTop);
+    g.addColorStop(1, colors.paperBottom);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, cw, ch);
+
+    // 网格线（手账纸效果）
+    ctx.strokeStyle = colors.grid;
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    const gridSizeY = 26;
+    const gridSizeX = 30;
+    for (let y = 18; y < ch; y += gridSizeY) {
+      ctx.moveTo(0, y);
+      ctx.lineTo(cw, y);
+    }
+    for (let x = 20; x < cw; x += gridSizeX) {
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, ch);
+    }
+    ctx.stroke();
+  }
+
+  function drawPlatforms() {
+    for (const p of platforms) {
+      let fill, stroke;
+      if (p.type === "fragile") {
+        fill = colors.platformFragileFill;
+        stroke = colors.platformFragileStroke;
+      } else if (p.type === "moving") {
+        fill = colors.platformMovingFill;
+        stroke = colors.platformMovingStroke;
+      } else {
+        fill = colors.platformNormalFill;
+        stroke = colors.platformNormalStroke;
+      }
+
+      sketchRect(p.x, p.y, p.width, p.height, 6, fill, stroke);
+
+      // 画弹簧
+      if (p.hasSpring) {
+        drawSpring(p.x + p.width * 0.35, p.y - 10, p.width * 0.3, 12);
+      }
+
+      // 移动平台画一个小箭头
+      if (p.type === "moving") {
+        ctx.save();
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 1;
+        const arrowY = p.y - 6;
+        const centerX = p.x + p.width / 2;
+        ctx.beginPath();
+        ctx.moveTo(centerX - 8, arrowY);
+        ctx.lineTo(centerX + 8, arrowY);
+        ctx.moveTo(centerX + 8 * Math.sign(p.vx || 1), arrowY);
+        ctx.lineTo(centerX + 4 * Math.sign(p.vx || 1), arrowY - 4);
+        ctx.moveTo(centerX + 8 * Math.sign(p.vx || 1), arrowY);
+        ctx.lineTo(centerX + 4 * Math.sign(p.vx || 1), arrowY + 4);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+  }
+
+  function drawPlayer() {
+    const p = player;
+
+    ctx.save();
+
+    // 以角色中心为原点，做一点轻微倾斜（移动时更有手绘感）
+    const cx = p.x + p.width / 2;
+    const cy = p.y + p.height / 2;
+    ctx.translate(cx, cy);
+
+    // 根据水平速度轻微旋转
+    const maxTilt = 0.22; // 弧度，大概 12°
+    const tilt = Math.max(-maxTilt, Math.min(maxTilt, (p.vx || 0) / 6));
+    ctx.rotate(tilt);
+
+    ctx.translate(-p.width / 2, -p.height / 2);
+
+    // 小工具：圆角矩形
+    function roundRect(x, y, w, h, r) {
+      r = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = "#111827";
+
+    // ==== 身体（绿色豆状小怪兽） ====
+    const bodyW = p.width * 0.8;
+    const bodyH = p.height * 0.6;
+    const bodyX = (p.width - bodyW) / 2;
+    const bodyY = p.height * 0.35;
+
+    ctx.fillStyle = "#fb923c"; // 主体绿色
+    roundRect(bodyX, bodyY, bodyW, bodyH, p.width * 0.25);
+    ctx.fill();
+    ctx.stroke();
+
+    // 底部一点阴影，加点“厚度”
+    ctx.fillStyle = "rgba(15,23,42,0.15)";
+    ctx.beginPath();
+    ctx.ellipse(p.width / 2, bodyY + bodyH + 2, bodyW * 0.4, bodyH * 0.22, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // ==== 头部（和身体连在一起的圆顶） ====
+    const headR = p.width * 0.32;
+    const headCx = p.width / 2;
+    const headCy = bodyY;
+
+    ctx.beginPath();
+    ctx.arc(headCx, headCy, headR, Math.PI, 0, false);
+    ctx.lineTo(headCx + headR, bodyY + bodyH * 0.15);
+    ctx.quadraticCurveTo(headCx, bodyY + bodyH * 0.05, headCx - headR, bodyY + bodyH * 0.15);
+    ctx.closePath();
+    ctx.fillStyle = "#4ade80";
+    ctx.fill();
+    ctx.stroke();
+
+    // ==== 眼睛 ====
+    const eyeR = headR * 0.22;
+    const eyeOffsetX = headR * 0.6;
+    const eyeY = headCy - headR * 0.12;
+
+    // 白眼
+    ctx.fillStyle = "#f9fafb";
+    ctx.beginPath();
+    ctx.arc(headCx - eyeOffsetX, eyeY, eyeR, 0, Math.PI * 2);
+    ctx.arc(headCx + eyeOffsetX, eyeY, eyeR, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // 黑瞳（微微朝移动方向偏一点）
+    const pupilR = eyeR * 0.55;
+    const lookDir = Math.max(-1, Math.min(1, (p.vx || 0) / 8));
+    const pupilOffset = eyeR * 0.3 * lookDir;
+
+    ctx.fillStyle = "#0f172a";
+    ctx.beginPath();
+    ctx.arc(headCx - eyeOffsetX + pupilOffset, eyeY, pupilR, 0, Math.PI * 2);
+    ctx.arc(headCx + eyeOffsetX + pupilOffset, eyeY, pupilR, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 高光
+    ctx.fillStyle = "#ffffff";
+    const hlR = pupilR * 0.4;
+    ctx.beginPath();
+    ctx.arc(headCx - eyeOffsetX + pupilOffset - hlR * 0.3, eyeY - hlR * 0.3, hlR, 0, Math.PI * 2);
+    ctx.arc(headCx + eyeOffsetX + pupilOffset - hlR * 0.3, eyeY - hlR * 0.3, hlR, 0, Math.PI * 2);
+    ctx.fill();
+
+    // ==== 嘴巴（简单的小笑） ====
+    const mouthW = bodyW * 0.4;
+    const mouthY = headCy + headR * 0.45;
+    ctx.strokeStyle = "#166534";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(p.width / 2 - mouthW / 2, mouthY);
+    ctx.quadraticCurveTo(p.width / 2, mouthY + headR * 0.25, p.width / 2 + mouthW / 2, mouthY);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+
+
+  function drawHUD() {
+    ctx.fillStyle = "rgba(55,65,81,0.96)";
+    ctx.font = 'bold 14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+    ctx.textAlign = "left";
+    ctx.fillText("高度: " + Math.floor(score / 10), 8, 20);
+    ctx.textAlign = "right";
+    ctx.fillText("最佳: " + bestScore, cw - 8, 20);
+  }
+
+  function draw() {
+    drawBackground();
+    drawPlatforms();
+    drawPlayer();
+    drawHUD();
+  }
+
+  // ========= 更新 =========
+  let lastTime = 0;
+
+  function update(dt) {
+    if (state !== "playing") return;
+
+    // 水平移动
+    const moveSpeed = getMoveSpeed();
+    if (keys.left) {
+      player.x -= moveSpeed * dt;
+    }
+    if (keys.right) {
+      player.x += moveSpeed * dt;
+    }
+
+    // 左右穿屏
+    if (player.x < -player.width) player.x = cw;
+    if (player.x > cw) player.x = -player.width;
+
+    // 垂直物理
+    const prevY = player.y;
+    player.vy += GRAVITY * dt;
+    player.y += player.vy * dt;
+
+    // 平台移动
+    for (const p of platforms) {
+      if (p.type === "moving") {
+        p.x += p.vx * dt;
+        if (p.x < 0) {
+          p.x = 0;
+          p.vx *= -1;
+        }
+        if (p.x + p.width > cw) {
+          p.x = cw - p.width;
+          p.vx *= -1;
+        }
+      }
+    }
+
+    // 碰撞检测
+    checkPlatformCollisions(prevY);
+
+    // 摄像机：人物上升到屏幕上半部分时，整体下移，让人感觉向上跳
+    const threshold = ch * 0.4;
+    if (player.y < threshold) {
+      const dy = threshold - player.y;
+      player.y = threshold;
+      score += dy;
+      for (const p of platforms) {
+        p.y += dy;
+      }
+    }
+
+    // 删除离屏平台
+    platforms = platforms.filter(p => !p.broken && p.y < ch + 40);
+
+    // 保证上方有砖块
+    ensurePlatforms();
+
+    // 掉下去则结束
+    if (player.y > ch + 40) {
+      gameOver();
+    }
+
+    // 更新 DOM 分数（整数高度）
+    const h = Math.floor(score / 10);
+    scoreEl.textContent = h;
+  }
+
+  function loop(timestamp) {
+    if (!lastTime) lastTime = timestamp;
+    const dt = Math.min(0.04, (timestamp - lastTime) / 1000);
+    lastTime = timestamp;
+
+    update(dt);
+    draw();
+
+    requestAnimationFrame(loop);
+  }
+
+  // ========= 输入 =========
+  function onKeyDown(e) {
+    if (state === "ready" || state === "gameover") {
+      if (state === "gameover") {
+        resetGame();
+      }
+      startGame();
+    }
+    if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
+      keys.left = true;
+    }
+    if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
+      keys.right = true;
+    }
+  }
+
+  function onKeyUp(e) {
+    if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
+      keys.left = false;
+    }
+    if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
+      keys.right = false;
+    }
+  }
+
+  window.addEventListener("keydown", onKeyDown);
+  window.addEventListener("keyup", onKeyUp);
+
+  // 点击 / 轻触开始或重开
+  function handleTap() {
+    if (state === "ready") {
+      startGame();
+    } else if (state === "gameover") {
+      resetGame();
+      startGame();
+    }
+  }
+
+  overlay.addEventListener("click", handleTap);
+  canvas.addEventListener("click", () => {
+    if (state !== "playing") handleTap();
+  });
+
+  // 手机左右按钮
+  function bindTouchBtn(btn, keyName) {
+    const down = () => {
+      keys[keyName] = true;
+      if (state === "ready" || state === "gameover") {
+        if (state === "gameover") {
+          resetGame();
+        }
+        startGame();
+      }
+    };
+    const up = () => { keys[keyName] = false; };
+
+    btn.addEventListener("touchstart", e => {
+      e.preventDefault();
+      down();
+    }, { passive: false });
+    btn.addEventListener("touchend", e => {
+      e.preventDefault();
+      up();
+    }, { passive: false });
+    btn.addEventListener("touchcancel", up);
+
+    btn.addEventListener("mousedown", e => {
+      e.preventDefault();
+      down();
+    });
+    btn.addEventListener("mouseup", up);
+    btn.addEventListener("mouseleave", up);
+  }
+
+  bindTouchBtn(btnLeft, "left");
+  bindTouchBtn(btnRight, "right");
+
+  // 窗口缩放时：重算画布 + 重开一局
+  window.addEventListener("resize", () => {
+    resizeCanvasOnly();
+    resetGame();
+  });
+
+  // ========= 启动 =========
+  resizeCanvasOnly();
+  loadBest();
+  resetGame();
+  requestAnimationFrame(loop);
+
+</script>
+</body>
+</html>

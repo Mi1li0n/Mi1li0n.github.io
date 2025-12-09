@@ -132,7 +132,7 @@
       <div class="score">分数：<span id="score">0</span></div>
     </div>
     <div id="grid" class="grid"></div>
-    <div class="tip">方向键移动方块 | 按 R 重新开始</div>
+    <div class="tip">方向键 / 滑动屏幕移动方块 | 按 R 重新开始</div>
   </div>
 
   <script>
@@ -142,6 +142,10 @@
     let grid, score;
     let newTiles = new Set();
     let mergeValuesThisMove = [];
+
+    // === 新增：触摸起点记录 ===
+    let touchStartX = 0;
+    let touchStartY = 0;
 
     // 音效基础
     let audioCtx;
@@ -176,13 +180,11 @@
     function playMergeSounds(values) {
       if (!values.length) return;
       const maxVal = Math.max(...values);
-      // 2048 的数字是 2 * 2^n，所以用 log2 映射
       const n = Math.log2(maxVal); // 1,2,3...
-      const baseFreq = 360;        // 2 时的频率
-      const step = 60;             // 每升一级叠加 Hz
+      const baseFreq = 360;
+      const step = 60;
       const freq = baseFreq + (n - 1) * step;
 
-      // 如果一回合有多个合成，做个小上行“叮叮叮”
       const sorted = [...values].sort((a, b) => a - b);
       sorted.forEach((v, idx) => {
         const nn = Math.log2(v);
@@ -202,8 +204,7 @@
       render();
     }
 
-    // 随机生成 1～maxNew 个新方块（每个 2 或 4）
-    function addRandomTiles(maxNew = 1) {
+    function addRandomTiles(maxNew = 2) {
       newTiles.clear();
       const empties = [];
       for (let r = 0; r < 4; r++) {
@@ -215,7 +216,7 @@
 
       const count = Math.min(
         empties.length,
-        1 + Math.floor(Math.random() * maxNew) // 1 或 2
+        1 + Math.floor(Math.random() * maxNew)
       );
 
       for (let i = 0; i < count; i++) {
@@ -317,7 +318,7 @@
 
       const after = JSON.stringify(grid);
       if (before !== after) {
-        addRandomTiles(2);
+        addRandomTiles(1);
         triggerMoveAnimation(direction);
         playMoveSound();
         if (mergeValuesThisMove.length > 0) {
@@ -372,12 +373,43 @@
       return true;
     }
 
+    // 键盘控制
     window.addEventListener("keydown", e => {
       if (e.key === "ArrowLeft") move("left");
       else if (e.key === "ArrowUp") move("up");
       else if (e.key === "ArrowRight") move("right");
       else if (e.key === "ArrowDown") move("down");
       else if (e.key === "r" || e.key === "R") initGrid();
+    });
+
+    // === 新增：手机触摸滑动控制 ===
+    gridEl.addEventListener("touchstart", e => {
+      if (e.touches.length !== 1) return; // 只处理单指
+      const t = e.touches[0];
+      touchStartX = t.clientX;
+      touchStartY = t.clientY;
+    }, { passive: true });
+
+    gridEl.addEventListener("touchend", e => {
+      if (e.changedTouches.length !== 1) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - touchStartX;
+      const dy = t.clientY - touchStartY;
+      const absX = Math.abs(dx);
+      const absY = Math.abs(dy);
+      const threshold = 25; // 最小滑动距离，防止误触
+
+      if (absX < threshold && absY < threshold) return;
+
+      if (absX > absY) {
+        // 水平滑动
+        if (dx > 0) move("right");
+        else move("left");
+      } else {
+        // 垂直滑动
+        if (dy > 0) move("down");
+        else move("up");
+      }
     });
 
     initGrid();
