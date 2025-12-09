@@ -342,7 +342,7 @@ function generateDungeon() {
   }
 
   const maxSpots = rockCells.length + ghostSpots.length + otherWalkSpots.length;
-  const extraCount = Math.min(randInt(rng, 14, 20), maxSpots);
+  const extraCount = Math.min(randInt(rng, 18, 28), maxSpots);
   let ghostCount = 0;
   const maxGhosts = 4;
 

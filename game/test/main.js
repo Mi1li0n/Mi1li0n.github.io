@@ -152,7 +152,7 @@ const gameState = {
     maxHp: 5,
     tempHp: 0,
     armor: 2,
-    maxArmor: 3,
+    maxArmor: 5,
     stunned: 0,
     facing: { dx: 0, dy: -1 },
     pickaxe: {
@@ -198,7 +198,7 @@ function computeTodaySeed(dayOffset = 0) {
 function resetPlayerFull() {
   gameState.player.hp = 4;
   gameState.player.maxHp = 5;
-  gameState.player.tempHp = 1;
+  gameState.player.tempHp = 0;
   gameState.player.armor = 2;
   gameState.player.maxArmor = 5;
   gameState.player.stunned = 0;
@@ -273,7 +273,7 @@ function startNewDay() {
 // ============ 战斗 / 伤害 ============
 
 function eatBread() {
-  if (!consumeItem("bread", 1, false)) {
+  if (!consumeItem("bread", 1, true)) {
     pushLog("没有面包了。", true);
     renderHUD();
     return;
@@ -470,9 +470,8 @@ function endPlayerTurn() {
     returnToBaseFromDungeon();
     return;
   }
-
-  updateMonsters();
   updateBombs();
+  updateMonsters();
   updateVisibility();
   renderAll();
 }

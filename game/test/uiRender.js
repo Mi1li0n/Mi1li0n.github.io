@@ -7,18 +7,28 @@ function renderHUD() {
 
   const heartsEl = document.getElementById("hud-hearts");
   heartsEl.innerHTML = "";
+
   const hp = gameState.player.hp;
   const maxHp = gameState.player.maxHp;
   const tempHp = gameState.player.tempHp;
+
+  // 可“覆盖”的临时生命数量：只盖在红心上，不盖黑心
+  const visibleTemp = Math.min(tempHp, hp);
+
   for (let i = 0; i < maxHp; i++) {
     const span = document.createElement("span");
-    if (i < hp) {
-      span.textContent = "❤️";
-    } else if (i < hp + tempHp) {
+
+    if (i < visibleTemp) {
+    // 护盾在上层，从左到右覆盖红心
       span.textContent = "💛";
+    } else if (i < hp) {
+    // 没被覆盖的红心
+      span.textContent = "❤️";
     } else {
+    // 空血
       span.textContent = "🖤";
     }
+
     heartsEl.appendChild(span);
   }
 

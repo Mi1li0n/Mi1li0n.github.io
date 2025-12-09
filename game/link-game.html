@@ -1389,10 +1389,7 @@
       }
 
       if (comboCount >= 3 && comboCount % 3 === 0) {
-        if (currentMode === "timed") {
-          timeSec += 3;
-          updateTimeDisplay();
-        } else if (currentMode === "challenge") {
+        if (currentMode === "challenge") {
           timeSec += 1;
           if (timeSec > challengeMaxTime) timeSec = challengeMaxTime;
           updateTimeDisplay();
