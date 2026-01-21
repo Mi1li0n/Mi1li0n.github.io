@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Flash Sequence</title>
+<style>
+/* 基础设置 */
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: #000; /* 最底层的黑 */
+}
+
+/* 1. 背景层：一开始是暗灰色的 */
+#bg-layer {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #222; /* 暗灰色 */
+    z-index: 1;
+}
+
+/* 2. 黑球物体 */
+#ball {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120px;
+    height: 120px;
+    margin-top: -60px;  /* 垂直居中修正 */
+    margin-left: -60px; /* 水平居中修正 */
+    background: #000;   /* 纯黑球体 */
+    border-radius: 50%;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    z-index: 10; /* 在背景之上 */
+
+    /* 初始状态：不可见，缩小 */
+    opacity: 0;
+    transform: scale(0.1) translateY(100px);
+}
+
+/* 黑球弹出的动画类 */
+.ball-pop-in {
+    /* 使用贝塞尔曲线制作带有弹性的进入效果 */
+    animation: popIn 1s cubic-bezier(0.17, 0.89, 0.32, 1.27) forwards;
+}
+
+@keyframes popIn {
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* 黑球被炸飞/消失的状态类 */
+.ball-vanish {
+    opacity: 0 !important;
+    transform: scale(1.5) !important; /* 瞬间变大一点然后消失，增加冲击感 */
+    transition: all 0.1s linear; /* 极快消失 */
+}
+
+
+/* 3. 闪光层 */
+#flash {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #fff; /* 纯白致盲光 */
+    opacity: 0;       /* 初始不可见 */
+    pointer-events: none;
+    z-index: 999; /* 最顶层 */
+}
+
+/* 闪光弹爆炸动画类 */
+.do-flashbang {
+    /* 3秒内缓慢消退 */
+    animation: flashbangAnim 3s cubic-bezier(0.05, 0.7, 0.1, 1) forwards;
+}
+
+@keyframes flashbangAnim {
+    3%   { opacity: 1; } /* 瞬间全白 */
+    28%   { opacity: 1; } /* 维持极短的高亮 */
+    100% { opacity: 0; } /* 缓慢恢复 */
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="bg-layer"></div>
+<div id="ball"></div>
+<div id="flash"></div>
+
+<script>
+window.onload = () => {
+    const ball = document.getElementById('ball');
+    const flash = document.getElementById('flash');
+
+    // --- 时间轴控制 ---
+
+    // 阶段 1: 0.5秒后，黑球弹出
+    setTimeout(() => {
+        ball.classList.add('ball-pop-in');
+    }, 50);
+
+    // 阶段 2: 1.8秒时 (等球稳定后)，闪光弹爆炸
+    setTimeout(() => {
+        // 黑球瞬间消失
+        ball.classList.add('ball-vanish');
+        // 闪光层开始播放动画
+        flash.classList.add('do-flashbang');
+    }, 500);
+};
+</script>
+
+</body>
+</html>

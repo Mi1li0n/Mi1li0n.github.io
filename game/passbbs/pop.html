@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Deep Space Voyager - ID: VOYAGER-X2</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; cursor: grab; font-family: monospace; }
+        body.dragging { cursor: grabbing; }
+        canvas { display: block; width: 100vw; height: 100vh; outline: none; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+    // =================================================================
+    // 1. 场景与摄像机
+    // =================================================================
+    const scene = new THREE.Scene();
+    // 调整雾气浓度，配合更远的视距，让物体在远处柔和消失，而不是突然截断
+    scene.fog = new THREE.FogExp2(0x000000, 0.00025);
+
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 15000); // 增加视锥体远端裁剪距离
+    camera.position.set(0, 0, 0);
+
+    const cameraRig = new THREE.Object3D();
+    cameraRig.add(camera);
+    scene.add(cameraRig);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document.body.appendChild(renderer.domElement);
+
+    const FLIGHT_SPEED = 6.0;
+
+    // =================================================================
+    // 2. 交互逻辑
+    // =================================================================
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+    let targetRotationY = 0;
+    let targetRotationX = 0;
+    const sensitivity = 0.002;
+
+    document.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        document.body.classList.add('dragging');
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        document.body.classList.remove('dragging');
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const deltaX = e.clientX - previousMousePosition.x;
+        const deltaY = e.clientY - previousMousePosition.y;
+
+        targetRotationY -= deltaX * sensitivity;
+        targetRotationX -= deltaY * sensitivity;
+        // 限制上下视角，防止360度翻转导致眩晕
+        targetRotationX = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, targetRotationX));
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+    });
+
+    // =================================================================
+    // 3. 灯光
+    // =================================================================
+    const ambientLight = new THREE.AmbientLight(0x222233, 0.6);
+    scene.add(ambientLight);
+
+    const sunLight = new THREE.DirectionalLight(0xffeedd, 2.0);
+    sunLight.position.set(100, 50, 50);
+    sunLight.castShadow = true;
+    scene.add(sunLight);
+
+    const blueLight = new THREE.PointLight(0x0055ff, 1, 3000);
+    blueLight.position.set(-500, 200, -500);
+    scene.add(blueLight);
+
+    // =================================================================
+    // 4. 环境元素 (修改点：生命周期)
+    // =================================================================
+
+    // --- 星尘场 ---
+    const starGeometry = new THREE.BufferGeometry();
+    const starCount = 10000;
+    const starPositions = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount * 3; i += 3) {
+        starPositions[i] = (Math.random() - 0.5) * 6000;
+        starPositions[i + 1] = (Math.random() - 0.5) * 6000;
+        // 分布范围：从身后 4000 到 前方 8000，覆盖整个路径
+        starPositions[i + 2] = (Math.random() * 12000) - 4000;
+    }
+    starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 1.5, transparent: true, opacity: 0.8, fog: true }); // 开启 fog 让星星也能远距离变暗
+    const starField = new THREE.Points(starGeometry, starMaterial);
+    scene.add(starField);
+
+    // --- 纹理 ---
+    function createNoiseTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 128; canvas.height = 128;
+        const ctx = canvas.getContext('2d');
+        const imgData = ctx.createImageData(128, 128);
+        for (let i = 0; i < imgData.data.length; i += 4) {
+            const val = Math.random() * 255;
+            imgData.data[i] = imgData.data[i+1] = imgData.data[i+2] = val; imgData.data[i+3] = 255;
+        }
+        ctx.putImageData(imgData, 0, 0);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+    const noiseMap = createNoiseTexture();
+
+    // --- 物体池 ---
+    const objects = [];
+
+    function spawnAsteroid() {
+        const geometry = new THREE.IcosahedronGeometry(Math.random() * 15 + 5, 0);
+        const posAttribute = geometry.attributes.position;
+        const vector = new THREE.Vector3();
+        for (let i = 0; i < posAttribute.count; i++) {
+            vector.fromBufferAttribute(posAttribute, i);
+            vector.addScalar((Math.random() - 0.5) * 5);
+            posAttribute.setXYZ(i, vector.x, vector.y, vector.z);
+        }
+        geometry.computeVertexNormals();
+
+        const material = new THREE.MeshStandardMaterial({
+            color: Math.random()>0.5 ? 0x888899 : 0x665544,
+            roughness: 0.9, metalness: 0.1, flatShading: true
+        });
+        const asteroid = new THREE.Mesh(geometry, material);
+        const spread = 4000;
+        // 生成在很远的前方
+        asteroid.position.set((Math.random()-0.5)*spread*2, (Math.random()-0.5)*spread, -10000 - Math.random()*2000);
+        asteroid.userData.rotSpeed = { x: Math.random()*0.02, y: Math.random()*0.02 };
+        scene.add(asteroid);
+        objects.push(asteroid);
+    }
+
+    function spawnPlanet() {
+        const size = Math.random() * 150 + 80;
+        const geometry = new THREE.SphereGeometry(size, 32, 32);
+        const material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color().setHSL(Math.random(), 0.5, 0.5),
+            roughness: 0.7, bumpMap: noiseMap, bumpScale: 2.0
+        });
+        const planet = new THREE.Mesh(geometry, material);
+        const side = Math.random() > 0.5 ? 1 : -1;
+        planet.position.set(side * (Math.random() * 1000 + 500), (Math.random()-0.5)*1000, -12000); // 生成得更远
+        planet.userData.rotSpeed = { y: 0.002 };
+
+
+        if (Math.random() > 0.5) {
+            const ringGeo = new THREE.TorusGeometry(size * 1.6, size * 0.1, 2, 64);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0xaaaaaa, transparent: true, opacity: 0.5 });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.rotation.x = Math.PI / 2 + (Math.random()-0.5);
+            planet.add(ring);
+        }
+        scene.add(planet);
+        objects.push(planet);
+    }
+
+    // --- 核心修复：更新逻辑 ---
+    function updateScene() {
+        // 1. 星星逻辑修复：循环阈值改为身后 5000 (原为100)
+        const positions = starField.geometry.attributes.position.array;
+        for (let i = 2; i < positions.length; i += 3) {
+            positions[i] += FLIGHT_SPEED * 2.5;
+            // 只有当星星飞到身后极远的地方（完全被雾气遮住）才重置到前方
+            if (positions[i] > 5000) {
+                positions[i] = -8000;
+            }
+        }
+        starField.geometry.attributes.position.needsUpdate = true;
+
+        // 2. 物体逻辑修复：销毁阈值改为身后 5000 (原为500)
+        for (let i = objects.length - 1; i >= 0; i--) {
+            const obj = objects[i];
+            obj.position.z += FLIGHT_SPEED;
+
+            if (obj.userData.rotSpeed) {
+                obj.rotation.x += obj.userData.rotSpeed.x || 0;
+                obj.rotation.y += obj.userData.rotSpeed.y || 0;
+            }
+
+            // 只有飞出后视视野极限才销毁
+            if (obj.position.z > 5000) {
+                scene.remove(obj);
+                if(obj.geometry) obj.geometry.dispose();
+                if(obj.material) obj.material.dispose();
+                objects.splice(i, 1);
+            }
+        }
+
+        // 随机生成
+        if (Math.random() < 0.08) spawnAsteroid();
+        if (Math.random() < 0.002) spawnPlanet();
+    }
+
+    // =================================================================
+    // 5. 渲染循环
+    // =================================================================
+    function animate() {
+        requestAnimationFrame(animate);
+        updateScene();
+
+        cameraRig.rotation.x += (targetRotationX - cameraRig.rotation.x) * 0.05;
+        cameraRig.rotation.y += (targetRotationY - cameraRig.rotation.y) * 0.05;
+
+        renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // 预热：让场景里前后都有东西
+    for(let i=0; i<60; i++) {
+        // 手动生成一些在已经在身后的物体，确保回头不是空的
+        spawnAsteroid();
+        objects[objects.length-1].position.z = (Math.random() * 8000) - 4000;
+    }
+    spawnPlanet();
+
+    animate();
+
+</script>
+</body>
+</html>

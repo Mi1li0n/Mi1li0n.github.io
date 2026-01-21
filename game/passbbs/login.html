@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>系统提示 - 龙腾世纪BBS</title>
+<style type="text/css">
+body {
+    background-color: #F5F5F5;
+    font-family: "SimSun", "宋体", sans-serif;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
+    scrollbar-face-color: #DEE3E7;
+    scrollbar-highlight-color: #FFFFFF;
+    scrollbar-shadow-color: #DEE3E7;
+    scrollbar-3dlight-color: #D1D7DC;
+    scrollbar-arrow-color: #006699;
+    scrollbar-track-color: #EFEFEF;
+    scrollbar-darkshadow-color: #98AAB1;
+}
+td, div, input, select {
+    font-family: "SimSun", "宋体";
+    font-size: 12px;
+    color: #000;
+}
+a:link, a:visited { color: #000000; text-decoration: none; }
+a:hover { color: #FF0000; text-decoration: underline; }
+
+/* 典型的论坛边框样式 */
+.tableborder { background-color: #87A3C5; border: 1px solid #87A3C5; }
+.header { background-color: #5B89C8; color: #FFFFFF; font-weight: bold; padding: 5px; }
+.category { background-color: #DDE6F1; color: #000; font-weight: bold; padding: 5px; }
+.row1 { background-color: #F8F8F8; }
+.row2 { background-color: #EFEFEF; }
+
+/* 错误提示专用 */
+.alert-box {
+    border: 1px solid #DDDDDD;
+    background-color: #FFFFF0; /* 经典的淡黄色警告底色 */
+    padding: 20px;
+    line-height: 180%;
+}
+.input-text {
+    border: 1px solid #999;
+    background-color: #FFF;
+    height: 18px;
+}
+.btn {
+    background-color: #EFEFEF;
+    border: 1px solid #999;
+    padding: 2px 10px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body text="#000000" link="#000000">
+<center>
+
+<table width="98%" border="0" cellspacing="0" cellpadding="0" style="margin-top:15px; margin-bottom: 10px;">
+    <tr>
+        <td><a href="bbs.html"><b>龙腾世纪BBS</b></a> &raquo; 提示信息</td>
+    </tr>
+</table>
+
+<table width="600" border="0" cellspacing="0" cellpadding="0" class="tableborder">
+    <tr>
+        <td>
+            <table width="100%" border="0" cellspacing="1" cellpadding="0">
+                <tr class="header">
+                    <td height="25">&nbsp;龙腾世纪BBS 提示信息</td>
+                </tr>
+                <tr>
+                    <td class="row1" style="padding: 20px;">
+
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td width="80" align="center" valign="top">
+                                    <img src="https://via.placeholder.com/64x64/FF0000/FFFFFF?text=X" border="0">
+                                </td>
+                                <td valign="top">
+                                    <span style="font-size: 14px; font-weight: bold; color: #FF0000;">您无权进行当前操作，这可能因以下原因之一造成：</span>
+                                    <br><br>
+                                    <ol style="margin-left: 25px; line-height: 1.8;">
+                                        <li>您还没有登录，请在下方填写用户名和密码登录；</li>
+                                        <li>您所在的会员组没有访问该页面的权限；</li>
+                                        <li>您的账号已被管理员禁止访问；</li>
+                                        <li>系统正在维护，请稍后访问。</li>
+                                    </ol>
+                                    <br>
+                                    <a href="bbs.html">[ 点击这里返回首页 ]</a> &nbsp;
+                                    <a href="javascript:history.back()">[ 点击这里返回上一页 ]</a>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="category">&nbsp;会员登录</td>
+                </tr>
+                <tr>
+                    <td class="row2" align="center" style="padding: 15px;">
+                        <form action="login.html" method="post">
+                        <table border="0" cellspacing="0" cellpadding="4">
+                            <tr>
+                                <td align="right">用户名：</td>
+                                <td><input type="text" name="username" class="input-text" size="25"></td>
+                                <td rowspan="4" valign="middle" style="padding-left: 15px;">
+                                    还没有账号？<br><br>
+                                    <a href="login.html" style="font-weight: bold; color: blue;">&gt;&gt; 立即注册 ID</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right">密　码：</td>
+                                <td><input type="password" name="password" class="input-text" size="25"></td>
+                            </tr>
+                            <tr>
+                                <td align="right">安全提问：</td>
+                                <td>
+                                    <select name="questionid" class="input-text">
+                                        <option value="0">无安全提问</option>
+                                        <option value="1">母亲的名字</option>
+                                        <option value="2">爷爷的名字</option>
+                                        <option value="3">父亲出生的城市</option>
+                                        <option value="4">您其中一位老师的名字</option>
+                                        <option value="5">您个人计算机的型号</option>
+                                        <option value="6">您最喜欢的餐馆名称</option>
+                                        <option value="7">驾驶执照的最后四位数字</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right">回答：</td>
+                                <td><input type="text" name="answer" class="input-text" size="25"></td>
+                            </tr>
+                            <tr>
+                                <td align="right">有效期：</td>
+                                <td>
+                                    <input type="radio" name="cookietime" value="2592000" checked> 一个月
+                                    <input type="radio" name="cookietime" value="86400"> 一天
+                                    <input type="radio" name="cookietime" value="0"> 浏览器进程
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td style="padding-top: 10px;">
+                                    <input type="submit" value=" 登 录 " class="btn"> &nbsp;
+                                    <a href="login.html">找回密码</a>
+                                </td>
+                            </tr>
+                        </table>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<br><br>
+
+<div style="font-family: Tahoma; font-size: 10px; color: #666;">
+    Powered by <b>Discuz! 2.5F</b> &copy; 2001-2002 Comsenz Inc.
+</div>
+<br>
+
+</center>
+</body>
+</html>
