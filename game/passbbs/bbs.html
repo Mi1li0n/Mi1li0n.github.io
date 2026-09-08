@@ -132,10 +132,10 @@ input, select, textarea {
 
     <table width="980" border="0" cellspacing="1" cellpadding="4" class="tableborder">
         <tr class="header-bg" align="center">
-            <td width="10%"><a href="#"><b>论坛首页</b></a></td>
+            <td width="10%"><a href="forum.html"><b>论坛首页</b></a></td>
             <td width="10%"><a href="login.html"><b>个人中心</b></a></td>
             <td width="10%"><a href="login.html"><b>我的帖子</b></a></td>
-            <td width="10%"><a href="login.html"><b>会员列表</b></a></td>
+            <td width="10%"><a href="members.html"><b>会员列表</b></a></td>
             <td width="10%"><a href="login.html"><b>搜索服务</b></a></td>
             <td width="10%"><a href="help.html"><b>帮助手册</b></a></td>
             <td width="10%"><a href="login.html"><b>短信箱</b></a> <font color="yellow">(0)</font></td>
@@ -154,7 +154,7 @@ input, select, textarea {
             <td class="row1" valign="top">
                 <table width="100%" border="0" cellspacing="0" cellpadding="2">
                     <tr>
-                        <td>欢迎您回来，<b>Guest</b>！ <a href="#">[登录]</a> <a href="#">[免费注册]</a></td>
+                        <td>欢迎您回来，<b>Guest</b>！ <a href="login.html">[登录]</a> <a href="login.html">[免费注册]</a></td>
                         <td align="right">当前时间: 2002-11-18 23:45</td>
                     </tr>
                     <tr>
@@ -187,10 +187,10 @@ input, select, textarea {
         <tr>
             <td valign="middle">
                 <img src="https://via.placeholder.com/16x16/006699/FFFFFF?text=H" align="absmiddle">
-                <a href="#">龙腾世纪BBS</a> &raquo; <a href="#">休闲娱乐区</a> &raquo; <b>灌水乐园</b>
+                <a href="forum.html">龙腾世纪BBS</a> &raquo; <a href="forum.html">休闲娱乐区</a> &raquo; <b>灌水乐园</b>
             </td>
             <td align="right">
-                版主: <a href="https://mi1li0n.github.io/about/"><b>超级版主</b></a>, <a href="#"><b>灭绝师太</b></a>, <a href="#"><b>独孤求败</b></a>
+                版主: <a href="https://mi1li0n.github.io/about/"><b>超级版主</b></a>, <a href="member-040.html"><b>灭绝师太</b></a>, <a href="member-006.html"><b>独孤求败</b></a>
             </td>
         </tr>
     </table>
@@ -203,12 +203,12 @@ input, select, textarea {
         <tr class="row1" align="center">
             <td width="5%"><img src="https://via.placeholder.com/30x30/99CCFF/000000?text=ON" border="0"></td>
             <td width="45%" align="left">
-                <a href="https://www.bing.com/search?q=%E6%AD%A3%E7%BB%8F%E4%BA%BA%E8%B0%81%E5%86%99%E6%97%A5%E8%AE%B0%E5%95%8A"><b>心情日记</b></a><br>
+                <a href="board-diary.html"><b>心情日记</b></a><br>
                 <span class="smalltxt">记录生活点滴，分享喜怒哀乐。</span>
             </td>
             <td width="5%"><img src="https://via.placeholder.com/30x30/99CCFF/000000?text=ON" border="0"></td>
             <td width="45%" align="left">
-                <a href="https://www.bing.com/search?q=%E6%90%9E%E7%AC%91%E5%9B%BE%E7%89%87"><b>贴图专区</b></a> <font color="red">(New)</font><br>
+                <a href="board-pictures.html"><b>贴图专区</b></a> <font color="red">(New)</font><br>
                 <span class="smalltxt">美图欣赏，搞笑图片，多图杀猫！</span>
             </td>
         </tr>
@@ -218,22 +218,13 @@ input, select, textarea {
     <table width="980" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 5px;">
         <tr>
             <td>
-                <a href="#"><img src="https://via.placeholder.com/90x25/006699/FFFFFF?text=New+Topic" border="0"
+                <a href="login.html"><img src="https://via.placeholder.com/90x25/006699/FFFFFF?text=New+Topic" border="0"
                                  alt="发新帖"></a>
-                <a href="#"><img src="https://via.placeholder.com/90x25/CC3300/FFFFFF?text=New+Poll" border="0"
+                <a href="login.html"><img src="https://via.placeholder.com/90x25/CC3300/FFFFFF?text=New+Poll" border="0"
                                  alt="发起投票"></a>
             </td>
             <td align="right" valign="bottom">
-                <span class="pages">&lt;&lt;</span>
-                <span class="pages"><b>1</b></span>
-                <a href="#" class="pages">2</a>
-                <a href="#" class="pages">3</a>
-                <a href="#" class="pages">4</a>
-                <a href="#" class="pages">5</a>
-                <a href="#" class="pages">...</a>
-                <a href="#" class="pages">86</a>
-                <a href="#" class="pages">&gt;&gt;</a>
-                <input type="text" size="2" value="1"> <input type="button" value="GO">
+                <div class="pager">页次：1/4　<b class="pages">1</b><a class="pages" href="bbs2.html">2</a><a class="pages" href="bbs3.html">3</a><a class="pages" href="bbs4.html">4</a><a class="pages" href="bbs2.html">下一页 &gt;&gt;</a></div>
             </td>
         </tr>
     </table>
@@ -255,7 +246,7 @@ input, select, textarea {
                 <span class="red bold">[公告]</span>
                 <a href="nt.html" class="red bold">关于严厉打击发布病毒链接的紧急通知！</a>
             </td>
-            <td><a href="#"><b>Administrator</b></a><br><span class="time">2002-10-01</span></td>
+            <td><a href="member-049.html"><b>Administrator</b></a><br><span class="time">2002-10-01</span></td>
             <td><span class="red bold">0</span> / 99999</td>
             <td align="left" class="smalltxt">Administrator<br>2002-10-01 12:00</td>
         </tr>
@@ -268,7 +259,7 @@ input, select, textarea {
                 <a href="pop.html" class="blue bold">庆祝建站三周年，盖楼送 Q币 啦！！（已结束）</a>
                 <span class="smalltxt">[1] [2] ... [108]</span>
             </td>
-            <td><a href="#"><b>站长</b></a><br><span class="time">2002-09-15</span></td>
+            <td><a href="member-065.html"><b>站长</b></a><br><span class="time">2002-09-15</span></td>
             <td>5842 / 12W</td>
             <td align="left" class="smalltxt">路人甲<br>2002-11-15 18:00</td>
         </tr>
@@ -283,7 +274,7 @@ input, select, textarea {
             <td align="left">
                 <a href="bg.html" class="bold" style="color: #006699;">【必读】灌水区版规（2002修订版），新人报道请进！</a>
             </td>
-            <td><a href="#">灭绝师太</a><br><span class="time">2002-05-20</span></td>
+            <td><a href="member-040.html">灭绝师太</a><br><span class="time">2002-05-20</span></td>
             <td>321 / 5420</td>
             <td align="left" class="smalltxt">灭绝师太<br>2002-11-14 09:30</td>
         </tr>
@@ -295,7 +286,7 @@ input, select, textarea {
                 <a href="red.html">[求助] 刚买的 Windows XP 为什么玩红警会死机？在线等！急！</a>
                 <span class="smalltxt">[<font color="red">图片</font>]</span>
             </td>
-            <td><a href="#">林浩然</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="xb.html">林浩然</a><br><span class="time">2002-11-15</span></td>
             <td>3 / 890</td>
             <td align="left" class="smalltxt">路人甲<br>2002-11-15 20:29</td>
         </tr>
@@ -306,7 +297,7 @@ input, select, textarea {
             <td align="left">
                 <a href="hy.html">《流星花园》F4 里面你们最喜欢谁？我觉得仔仔最帅！</a>
             </td>
-            <td><a href="#">花痴少女</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="member-055.html">花痴少女</a><br><span class="time">2002-11-15</span></td>
             <td>2 / 305</td>
             <td align="left" class="smalltxt">道明寺<br>2002-11-15 20:28</td>
         </tr>
@@ -317,7 +308,7 @@ input, select, textarea {
             <td align="left">
                 <a href="sdrj.html">大家都在用什么杀毒软件？瑞星还是金山毒霸？</a>
             </td>
-            <td><a href="#">阿姆斯特朗式阿姆斯特朗回旋炮</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="member-056.html">阿姆斯特朗式阿姆斯特朗回旋炮</a><br><span class="time">2002-11-15</span></td>
             <td>3 / 112</td>
             <td align="left" class="smalltxt">卡巴斯基<br>2002-11-15 20:25</td>
         </tr>
@@ -329,7 +320,7 @@ input, select, textarea {
                 <a href="ls.html">[原创] 给大家讲几个我们宿舍“刘桑”的笑话（苏联笑话版）</a>
                 <span class="smalltxt" style="color: green;">(New)</span>
             </td>
-            <td><a href="#">上铺一哥</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="member-023.html">上铺一哥</a><br><span class="time">2002-11-15</span></td>
             <td>5 / 3401</td>
             <td align="left" class="smalltxt">卖女孩的小火柴<br>2002-11-18 23:20</td>
         </tr>
@@ -340,7 +331,7 @@ input, select, textarea {
             <td align="left">
                 <a href="wk.html">郁闷啊，网吧的网速太慢了，打开个网页要半分钟...</a>
             </td>
-            <td><a href="#">水晶男孩</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="member-057.html">水晶男孩</a><br><span class="time">2002-11-15</span></td>
             <td>4 / 56</td>
             <td align="left" class="smalltxt">无言的结局<br>2002-11-15 20:18</td>
         </tr>
@@ -351,7 +342,7 @@ input, select, textarea {
             <td align="left">
                 <a href="wtf.html">求一个 Photoshop 7.0 的序列号，好人一生平安！</a>
             </td>
-            <td><a href="#">飞天猪</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="member-028.html">飞天猪</a><br><span class="time">2002-11-15</span></td>
             <td>3 / 20</td>
             <td align="left" class="smalltxt">夜行猫<br>2002-11-15 20:28</td>
         </tr>
@@ -362,7 +353,7 @@ input, select, textarea {
             <td align="left">
                 <a href="zq.html">[投票] 2002年世界杯，中国队能进几球？</a>
             </td>
-            <td><a href="#">流浪的云</a><br><span class="time">2002-06-01</span></td>
+            <td><a href="member-058.html">流浪的云</a><br><span class="time">2002-06-01</span></td>
             <td>560 / 8900</td>
             <td align="left" class="smalltxt">谁伴我闯荡<br>2002-11-15 20:10</td>
         </tr>
@@ -373,7 +364,7 @@ input, select, textarea {
             <td align="left">
                 <a href="dhxy.html">有人玩《大话西游2》吗？哪个区人多？</a>
             </td>
-            <td><a href="#">爱你一万年</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="member-059.html">爱你一万年</a><br><span class="time">2002-11-15</span></td>
             <td>6 / 78</td>
             <td align="left" class="smalltxt">笨笨<br>2002-11-15 20:05</td>
         </tr>
@@ -382,9 +373,9 @@ input, select, textarea {
             <td><img src="https://via.placeholder.com/15x15/666666/FFFFFF?text=L" title="锁定"></td>
             <td>&nbsp;</td>
             <td align="left">
-                <a href="#" style="text-decoration: line-through; color: #999;">广告贴：出售各类考试答案（已处理）</a>
+                <a href="ad-removed.html" style="text-decoration: line-through; color: #999;">广告贴：出售各类考试答案（已处理）</a>
             </td>
-            <td><a href="#">卖卡888</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="member-060.html">卖卡888</a><br><span class="time">2002-11-15</span></td>
             <td>0 / 5</td>
             <td align="left" class="smalltxt">超级版主<br>2002-11-15 20:01</td>
         </tr>
@@ -395,7 +386,7 @@ input, select, textarea {
             <td align="left">
                 <a href="https://mi1li0n.github.io/2025/02/06/war/">当年纪中的一些往事：《战争结束了》</a>
             </td>
-            <td><a href="#">RiceSang</a><br><span class="time">2025-02-06</span></td>
+            <td><a href="member-061.html">RiceSang</a><br><span class="time">2025-02-06</span></td>
             <td>22 / 410</td>
             <td align="left" class="smalltxt">楼主穿越哥<br>2002-11-15 19:55</td>
         </tr>
@@ -404,7 +395,7 @@ input, select, textarea {
             <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=N"></td>
             <td>&nbsp;</td>
             <td align="left"><a href="sad.html">心情不好，进来灌水发泄一下...</a></td>
-            <td><a href="#">失落的季节</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="member-062.html">失落的季节</a><br><span class="time">2002-11-15</span></td>
             <td>0 / 12</td>
             <td align="left" class="smalltxt">失落的季节<br>2002-11-15 19:50</td>
         </tr>
@@ -412,7 +403,7 @@ input, select, textarea {
             <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=N"></td>
             <td>&nbsp;</td>
             <td align="left"><a href="wg.html">求《传奇》外挂，要免费的！</a></td>
-            <td><a href="#">狂战天下</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="member-048.html">狂战天下</a><br><span class="time">2002-11-15</span></td>
             <td>5 / 88</td>
             <td align="left" class="smalltxt">小虾米<br>2002-11-15 19:48</td>
         </tr>
@@ -420,7 +411,7 @@ input, select, textarea {
             <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=N"></td>
             <td>&nbsp;</td>
             <td align="left"><a href="jl.html">转帖：世界上最遥远的距离（感动哭了）</a></td>
-            <td><a href="#">雨中漫步</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="member-016.html">雨中漫步</a><br><span class="time">2002-11-15</span></td>
             <td>4 / 200</td>
             <td align="left" class="smalltxt">灌水机<br>2002-11-15 19:45</td>
         </tr>
@@ -428,7 +419,7 @@ input, select, textarea {
             <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=N"></td>
             <td>&nbsp;</td>
             <td align="left"><a href="mm.html">我家猫咪生了，上来晒照片（多图预警）</a></td>
-            <td><a href="#">乖乖</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="member-053.html">乖乖</a><br><span class="time">2002-11-15</span></td>
             <td>5 / 440</td>
             <td align="left" class="smalltxt">杀手冷酷<br>2002-11-15 19:40</td>
         </tr>
@@ -436,7 +427,7 @@ input, select, textarea {
             <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=N"></td>
             <td>&nbsp;</td>
             <td align="left"><a href="njy.html">诺基亚 8250 换壳教程</a></td>
-            <td><a href="#">1390000</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="member-063.html">1390000</a><br><span class="time">2002-11-15</span></td>
             <td>10 / 645</td>
             <td align="left" class="smalltxt">1390000<br>2002-11-15 23:10</td>
         </tr>
@@ -444,7 +435,7 @@ input, select, textarea {
             <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=N"></td>
             <td>&nbsp;</td>
             <td align="left"><a href="wt1.html">[灌水] 楼下的，你中午吃的什么？</a></td>
-            <td><a href="#">路人甲</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="member-002.html">路人甲</a><br><span class="time">2002-11-15</span></td>
             <td>108 / 500</td>
             <td align="left" class="smalltxt">路人乙<br>2002-11-15 19:30</td>
         </tr>
@@ -452,7 +443,7 @@ input, select, textarea {
             <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=N"></td>
             <td>&nbsp;</td>
             <td align="left"><a href="ls2.html">明天要期末考试了，保佑我及格！</a></td>
-            <td><a href="#">好好学习</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="member-036.html">好好学习</a><br><span class="time">2002-11-15</span></td>
             <td>15 / 604</td>
             <td align="left" class="smalltxt">天天向上<br>2002-11-15 19:25</td>
         </tr>
@@ -460,7 +451,7 @@ input, select, textarea {
             <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=N"></td>
             <td>&nbsp;</td>
             <td align="left"><a href="https://im.qq.com/index/">谁有 OICQ 2000b 的安装包？QQ 2003 太卡了</a></td>
-            <td><a href="#">blue_dream</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="member-050.html">blue_dream</a><br><span class="time">2002-11-15</span></td>
             <td>2 / 30</td>
             <td align="left" class="smalltxt">MSN_User<br>2002-11-15 19:20</td>
         </tr>
@@ -468,7 +459,7 @@ input, select, textarea {
             <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=N"></td>
             <td>&nbsp;</td>
             <td align="left"><a href="163.html">刚申请了 163 邮箱，好用吗？</a></td>
-            <td><a href="#">火焰领主</a><br><span class="time">2002-11-15</span></td>
+            <td><a href="member-064.html">火焰领主</a><br><span class="time">2002-11-15</span></td>
             <td>4 / 80</td>
             <td align="left" class="smalltxt">*烦!恼*<br>2002-11-15 19:10</td>
         </tr>
@@ -476,7 +467,7 @@ input, select, textarea {
 <!--            <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=."></td>-->
 <!--            <td></td>-->
 <!--            <td align="left"><a href="#">[水] ..............................</a></td>-->
-<!--            <td><a href="#">沉默是金</a><br><span class="time">2002-11-15</span></td>-->
+<!--            <td><a href="member-001.html">沉默是金</a><br><span class="time">2002-11-15</span></td>-->
 <!--            <td>0/0</td>-->
 <!--            <td align="left" class="smalltxt">沉默是金<br>2002-11-15 19:00</td>-->
 <!--        </tr>-->
@@ -484,7 +475,7 @@ input, select, textarea {
 <!--            <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=."></td>-->
 <!--            <td></td>-->
 <!--            <td align="left"><a href="#">CS 1.5 局域网怎么联机？</a></td>-->
-<!--            <td><a href="#">爆头王</a><br><span class="time">2002-11-15</span></td>-->
+<!--            <td><a href="member-003.html">爆头王</a><br><span class="time">2002-11-15</span></td>-->
 <!--            <td>2/10</td>-->
 <!--            <td align="left" class="smalltxt">警察抓小偷<br>2002-11-15 18:55</td>-->
 <!--        </tr>-->
@@ -492,7 +483,7 @@ input, select, textarea {
 <!--            <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=."></td>-->
 <!--            <td></td>-->
 <!--            <td align="left"><a href="#">求推荐一款好用的 MP3 播放器软件，Winamp 怎么样？</a></td>-->
-<!--            <td><a href="#">音乐虫子</a><br><span class="time">2002-11-15</span></td>-->
+<!--            <td><a href="member-007.html">音乐虫子</a><br><span class="time">2002-11-15</span></td>-->
 <!--            <td>6/50</td>-->
 <!--            <td align="left" class="smalltxt">耳朵怀孕<br>2002-11-15 18:50</td>-->
 <!--        </tr>-->
@@ -500,7 +491,7 @@ input, select, textarea {
 <!--            <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=."></td>-->
 <!--            <td></td>-->
 <!--            <td align="left"><a href="#">有没有认识 xx 中学高三(2)班的李xx？</a></td>-->
-<!--            <td><a href="#">寻找初恋</a><br><span class="time">2002-11-15</span></td>-->
+<!--            <td><a href="member-010.html">寻找初恋</a><br><span class="time">2002-11-15</span></td>-->
 <!--            <td>1/500</td>-->
 <!--            <td align="left" class="smalltxt">校友<br>2002-11-15 18:45</td>-->
 <!--        </tr>-->
@@ -508,7 +499,7 @@ input, select, textarea {
 <!--            <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=."></td>-->
 <!--            <td></td>-->
 <!--            <td align="left"><a href="#">网易聊天室进不去怎么办？</a></td>-->
-<!--            <td><a href="#">网上邻居</a><br><span class="time">2002-11-15</span></td>-->
+<!--            <td><a href="member-012.html">网上邻居</a><br><span class="time">2002-11-15</span></td>-->
 <!--            <td>3/20</td>-->
 <!--            <td align="left" class="smalltxt">拨号上网<br>2002-11-15 18:40</td>-->
 <!--        </tr>-->
@@ -516,7 +507,7 @@ input, select, textarea {
 <!--            <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=."></td>-->
 <!--            <td></td>-->
 <!--            <td align="left"><a href="#">[原创] 即使变成了风，也要拥抱你 (小说连载)</a></td>-->
-<!--            <td><a href="#">紫罗兰</a><br><span class="time">2002-11-15</span></td>-->
+<!--            <td><a href="member-015.html">紫罗兰</a><br><span class="time">2002-11-15</span></td>-->
 <!--            <td>9/90</td>-->
 <!--            <td align="left" class="smalltxt">催稿员<br>2002-11-15 18:35</td>-->
 <!--        </tr>-->
@@ -524,7 +515,7 @@ input, select, textarea {
 <!--            <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=."></td>-->
 <!--            <td></td>-->
 <!--            <td align="left"><a href="#">MUD 游戏怎么玩？全是字头都晕了</a></td>-->
-<!--            <td><a href="#">江湖小虾</a><br><span class="time">2002-11-15</span></td>-->
+<!--            <td><a href="member-018.html">江湖小虾</a><br><span class="time">2002-11-15</span></td>-->
 <!--            <td>5/40</td>-->
 <!--            <td align="left" class="smalltxt">武林盟主<br>2002-11-15 18:30</td>-->
 <!--        </tr>-->
@@ -532,7 +523,7 @@ input, select, textarea {
 <!--            <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=."></td>-->
 <!--            <td></td>-->
 <!--            <td align="left"><a href="#">[推荐] 几款经典的单机游戏，英雄无敌3必玩！</a></td>-->
-<!--            <td><a href="#">GameBoy</a><br><span class="time">2002-11-15</span></td>-->
+<!--            <td><a href="member-022.html">GameBoy</a><br><span class="time">2002-11-15</span></td>-->
 <!--            <td>12/110</td>-->
 <!--            <td align="left" class="smalltxt">SaveLoad<br>2002-11-15 18:25</td>-->
 <!--        </tr>-->
@@ -540,7 +531,7 @@ input, select, textarea {
 <!--            <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=."></td>-->
 <!--            <td></td>-->
 <!--            <td align="left"><a href="#">碧海银沙是不是挂了？</a></td>-->
-<!--            <td><a href="#">冲浪者007</a><br><span class="time">2002-11-15</span></td>-->
+<!--            <td><a href="member-024.html">冲浪者007</a><br><span class="time">2002-11-15</span></td>-->
 <!--            <td>2/15</td>-->
 <!--            <td align="left" class="smalltxt">服务器维护<br>2002-11-15 18:20</td>-->
 <!--        </tr>-->
@@ -548,7 +539,7 @@ input, select, textarea {
 <!--            <td><img src="https://via.placeholder.com/15x15/CCCCCC/000000?text=."></td>-->
 <!--            <td></td>-->
 <!--            <td align="left"><a href="#">如果我有 100 万，我就买很多很多的 Q 币...</a></td>-->
-<!--            <td><a href="#">痴人说梦</a><br><span class="time">2002-11-15</span></td>-->
+<!--            <td><a href="member-027.html">痴人说梦</a><br><span class="time">2002-11-15</span></td>-->
 <!--            <td>20/200</td>-->
 <!--            <td align="left" class="smalltxt">马化腾亲戚<br>2002-11-15 18:15</td>-->
 <!--        </tr>-->
@@ -559,17 +550,11 @@ input, select, textarea {
     <table width="980" border="0" cellspacing="0" cellpadding="0" style="margin-top: 5px;">
         <tr>
             <td>
-                <a href="#"><img src="https://via.placeholder.com/90x25/006699/FFFFFF?text=New+Topic" border="0"></a>
-                <a href="#"><img src="https://via.placeholder.com/90x25/CC3300/FFFFFF?text=New+Poll" border="0"></a>
+                <a href="login.html"><img src="https://via.placeholder.com/90x25/006699/FFFFFF?text=New+Topic" border="0"></a>
+                <a href="login.html"><img src="https://via.placeholder.com/90x25/CC3300/FFFFFF?text=New+Poll" border="0"></a>
             </td>
             <td align="right">
-                <span class="pages">&lt;&lt;</span>
-                <span class="pages"><b>1</b></span>
-                <a href="#" class="pages">2</a>
-                <a href="#" class="pages">3</a>
-                <a href="#" class="pages">...</a>
-                <a href="#" class="pages">86</a>
-                <a href="#" class="pages">&gt;&gt;</a>
+                <div class="pager">页次：1/4　<b class="pages">1</b><a class="pages" href="bbs2.html">2</a><a class="pages" href="bbs3.html">3</a><a class="pages" href="bbs4.html">4</a><a class="pages" href="bbs2.html">下一页 &gt;&gt;</a></div>
             </td>
         </tr>
     </table>
@@ -635,7 +620,7 @@ input, select, textarea {
                 网络游侠, 编程浪子, 沉默是金, 一笑而过,
                 天涯海角, 梦醒时分, 自由飞翔, 龙之传人,
                 狂拽酷炫, 霸气侧漏, 玻璃心, 柠檬草的味道,
-                ... <a href="#">[查看全部详细列表]</a>
+                ... <a href="members.html">[查看全部详细列表]</a>
             </td>
         </tr>
         <tr class="row2">
@@ -653,25 +638,25 @@ input, select, textarea {
         <form>
             <select onchange="window.location=this.options[this.selectedIndex].value">
                 <option value="">-- 跳转版块 --</option>
-                <option value="#">+ 站务管理区</option>
-                <option value="#"> |- 公告发布</option>
-                <option value="#"> |- 投诉建议</option>
-                <option value="#">+ 技术交流区</option>
-                <option value="#"> |- 硬件维护</option>
-                <option value="#"> |- 软件下载</option>
-                <option value="#"> |- 编程开发</option>
-                <option value="#">+ 休闲娱乐区</option>
-                <option value="#" selected> |- 灌水乐园</option>
-                <option value="#"> |- 影视音乐</option>
-                <option value="#"> |- 游戏天地</option>
+                <option value="forum.html">+ 站务管理区</option>
+                <option value="board-notice.html"> |- 公告发布</option>
+                <option value="board-feedback.html"> |- 投诉建议</option>
+                <option value="forum.html">+ 技术交流区</option>
+                <option value="board-hardware.html"> |- 硬件维护</option>
+                <option value="board-software.html"> |- 软件下载</option>
+                <option value="board-code.html"> |- 编程开发</option>
+                <option value="forum.html">+ 休闲娱乐区</option>
+                <option value="bbs.html" selected> |- 灌水乐园</option>
+                <option value="board-music.html"> |- 影视音乐</option>
+                <option value="board-game.html"> |- 游戏天地</option>
             </select>
-            <input type="button" value="Go">
+            <a href="forum.html" style="border: 1px solid #999; padding: 2px 6px; background: #EFEFEF;">Go</a>
         </form>
     </div>
 
     <center>
     <span class="smalltxt">
-    <a href="#">联系我们</a> - <a href="#">龙腾世纪</a> - <a href="#">Archiver</a> - <a href="#">WAP</a><br><br>
+    <a href="contact.html">联系我们</a> - <a href="forum.html">龙腾世纪</a> - <a href="archive.html">Archiver</a> - <a href="wap.html">WAP</a><br><br>
     Powered by <b>Discuz!</b> 2.5F <br>
     &copy; 2001-2003 Comsenz Inc.<br>
     Processed in 0.052148 second(s), 5 queries, Gzip enabled.<br>
