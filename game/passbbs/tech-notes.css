@@ -1,3 +1,21 @@
-body{background:#003366;color:#fff;font:12px/1.7 SimSun,"宋体",serif;margin:20px}a:link,a:visited{color:#0ff;text-decoration:none}a:hover{color:#ff0;text-decoration:underline}
-.main-table{width:750px;margin:auto;background:#fff;color:#000;border:4px double #069}.header{background:#069;color:#fff;font-size:18px;font-weight:bold;padding:10px}.header a{color:#fff}.sidebar{background:#efefef;width:145px;vertical-align:top;padding:12px;border-right:1px solid #069}.sidebar a,.paper a{color:#069}.paper{padding:20px;vertical-align:top;font-size:14px;line-height:1.9}.paper p{font-size:14px;line-height:1.9}.section-title{background:#dde6f1;border-left:5px solid #069;padding-left:8px;margin:20px 0 10px;font-weight:bold;font-size:13px}.smalltxt{font:11px/1.7 Tahoma,SimSun;color:#777}.paper-title{font-size:18px;margin:0 0 6px;color:#036}.footer{text-align:center;color:#ccc;font:10px/1.8 Tahoma;margin:20px}.archive-table{width:100%;border-collapse:collapse}.archive-table td{border-bottom:1px dotted #bbb;padding:9px 4px;font-size:12px}.guest-entry{border:1px solid #87a3c5;margin:12px 0}.guest-title{background:#dde6f1;font-size:12px;padding:5px 8px}.guest-body{padding:12px;font-size:13px}.guest-reply{color:#666;border-top:1px dotted #ccc;margin-top:10px;padding-top:8px;font-size:12px}
 
+/* 2002年极客美学：深色背景，宋体，细边框 */
+body { 
+    background-color: #003366; 
+    color: #FFFFFF; 
+    font-family: "SimSun", "宋体", serif; 
+    font-size: 12px; 
+    margin: 20px;
+}
+a:link, a:visited { color: #00FFFF; text-decoration: none; }
+a:hover { color: #FFFF00; text-decoration: underline; }
+
+.main-table { background-color: #FFFFFF; color: #000000; border: 4px double #006699; }
+.sidebar { background-color: #EFEFEF; width: 150px; vertical-align: top; padding: 10px; border-right: 1px solid #006699; }
+.content { vertical-align: top; padding: 20px; background-color: #FFFFFF; }
+.header { background-color: #006699; color: #FFFFFF; padding: 10px; font-size: 18px; font-weight: bold; }
+.section-title { background-color: #DDE6F1; border-left: 5px solid #006699; padding-left: 10px; margin: 15px 0 10px 0; font-weight: bold; }
+
+/* 模拟当时流行的闪烁效果 */
+.new-tag { color: red; font-weight: bold; font-family: Tahoma; }
+.footer { color: #CCCCCC; font-size: 10px; text-align: center; margin-top: 20px; }

@@ -1,19 +1,96 @@
-body{background:#f5f5f5;color:#000;font-family:SimSun,"宋体",serif;font-size:12px;margin:0;padding:0}
-td,th,p,div,input,select,textarea{font-family:SimSun,"宋体",serif;font-size:12px;line-height:160%}
-a:link,a:visited{color:#006699;text-decoration:none}a:hover{color:red;text-decoration:underline}
-.wrap{width:980px;margin:15px auto}.masthead{width:100%;margin-bottom:10px}.logo{font: bold 25px SimHei,"黑体",serif;color:#006699;line-height:120%}
-.tableborder{background:#87a3c5;width:100%}.header-bg{background:#5b89c8;color:white;font-weight:bold}.header-bg a{color:white}
-.cat-bg{background:#dde6f1;font-weight:bold}.row1{background:#f8f8f8}.row2{background:#efefef}.smalltxt{font:11px/1.6 Tahoma,Verdana,sans-serif;color:#666}
-.breadcrumb{margin:12px 0}.pages{display:inline-block;border:1px solid #ccc;padding:1px 6px;background:#fff;margin-left:3px;font:11px/20px Tahoma}
-.pager{text-align:right;margin:10px 0}.user-info{width:170px;text-align:center;vertical-align:top;padding:15px 6px;background:#f8f8f8}
-.user-info .stats{text-align:left;padding:12px 15px}.avatar{width:86px;height:76px;margin:12px auto 4px;border:1px solid #ccc;background:#e7e7e7;color:#888;padding-top:10px;font:12px/1.6 Tahoma,SimSun}
-.post-bg{background:white;vertical-align:top;padding:10px 18px}.post-head{border-bottom:1px solid #ccc;padding-bottom:5px}.post-body{font-size:14px;line-height:1.9;min-height:55px;padding:15px 0}
-.signature{border-top:1px dashed #ccc;color:#777;font-size:12px;padding-top:10px;margin-top:12px}.footer{text-align:center;margin:25px 0;color:#666;font:10px/1.8 Tahoma}
-input,select,textarea{border:1px solid #999;background:white}.button{display:inline-block;border:1px solid #999;background:#efefef;padding:2px 10px;color:#000!important}
-.notice{padding:16px;background:#fffff0;border:1px solid #ddd;margin:12px 0;line-height:1.8}.list-title{padding:8px 5px}.member-table td{padding:7px}
-.homepage-sample{background:#003366;color:#ff9;text-align:center;width:360px;padding:18px;margin:18px 0;border:4px double #99c}.homepage-sample span{font:12px Courier,monospace}
-.desktop-sample{position:relative;background:#008080;color:white;width:480px;height:270px;border:2px solid #777;margin:18px 0;font:12px SimSun}
-.desktop-icons{padding:16px;line-height:1.2}.desktop-caption{position:absolute;right:18px;bottom:58px;color:#91b5b5;font:15px "Courier New",monospace;letter-spacing:3px}
-.desktop-taskbar{position:absolute;bottom:0;left:0;right:0;height:25px;background:#c0c0c0;border-top:2px solid #fff;color:black;padding:2px 4px}.desktop-taskbar b{display:inline-block;border:2px outset #eee;padding:0 6px}.desktop-taskbar span{float:right;border:1px inset #ddd;padding:0 5px}
-.profile-data td{padding:8px}.section{margin-top:14px}blockquote{border:1px solid #ddd;background:#f8f8f8;margin:10px 0;padding:8px;color:#555}
 
+body {
+    background-color: #F5F5F5;
+    font-family: "SimSun", "宋体", "Courier New", monospace;
+    font-size: 12px;
+    margin: 0px;
+    padding: 0px;
+    scrollbar-base-color: #F5F5F5;
+    scrollbar-arrow-color: #006699;
+    scrollbar-face-color: #DEE3E7;
+    scrollbar-track-color: #EFEFEF;
+}
+
+td, th, div, span, p {
+    font-family: "SimSun", "宋体", sans-serif;
+    font-size: 12px;
+    line-height: 150%;
+}
+
+/* 链接样式 */
+a:link, a:visited {
+    color: #000000;
+    text-decoration: none;
+}
+a:hover {
+    color: #FF0000;
+    text-decoration: underline;
+}
+
+/* 常用颜色类 */
+.header-bg {
+    background-color: #5B89C8; /* 经典的蓝色表头 */
+    color: #FFFFFF;
+}
+.header-bg a {
+    color: #FFFFFF;
+}
+.tableborder {
+    background-color: #87A3C5; /* 表格边框色 */
+}
+.row1 {
+    background-color: #F8F8F8; /* 极浅灰 */
+}
+.row2 {
+    background-color: #EFEFEF; /* 浅灰 */
+}
+.cat-bg {
+    background-color: #DDE6F1;
+    color: #000000;
+    font-weight: bold;
+    height: 25px;
+}
+
+/* 字体修饰 */
+.bold { font-weight: bold; }
+.smalltxt {
+    font-family: Tahoma, Verdana;
+    font-size: 11px;
+    color: #666666;
+}
+.time {
+    font-family: Tahoma;
+    font-size: 10px;
+    color: #666666;
+}
+.red { color: #FF0000; }
+.blue { color: #0000FF; }
+.green { color: #008000; }
+.orange { color: #FF9900; }
+
+/* 模拟输入框 */
+input, select, textarea {
+    border: 1px solid #999;
+    background-color: #FFF;
+    font-size: 12px;
+    font-family: "SimSun";
+}
+
+/* 分页样式 */
+.pages {
+    font-family: Verdana;
+    font-size: 11px;
+    border: 1px solid #CCC;
+    padding: 2px 5px;
+    background-color: #FFF;
+}
+
+    
+.wrap { width:980px; margin:0 auto; }
+.tableborder { width:100%; }
+.breadcrumb { margin:0 0 18px; }
+.pager { text-align:right; margin:5px 0; }
+.section { margin-top:5px; }
+.member-table td { padding:4px; }
+.notice { padding:10px; background:#F8F8F8; border:1px solid #87A3C5; margin:10px 0; }
+.button { border:1px solid #999; background:#EFEFEF; padding:2px 6px; }
