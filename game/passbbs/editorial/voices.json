@@ -1,0 +1,2387 @@
+{
+  "scope": "仅依据可见正文和接话方式分型，昵称、UID、头像、签名、个人简介、账号注册时间、资料页历史帖数均不参与风格判断。",
+  "activity_rules": {
+    "高频参与": "可见发言至少10条，且参与至少5个主题/留言页；同一主题的分页合并。",
+    "间歇参与": "可见发言4至9条；达到10条但集中在不足5个主题的也归此档。",
+    "偶尔出现": "可见发言1至3条；单次发言不推断长期性格。"
+  },
+  "limits": [
+    "活跃度只描述这批静态页面的可见参与，不代表整个虚构论坛的历史发帖数量。",
+    "分类为写作倾向，不是每条话都必须符合的公式；日常回话、叙事、转帖、管理通知允许自然变化。",
+    "50个小类是检查差异的目录，不要求平均分布，也不要求新增角色去凑数。",
+    "禁言提示为系统文字，不算被禁言者的发言，也不据此分配性格。",
+    "转帖的诗、小说、段子本体与签名不作为发言者口吻的直接证据。",
+    "不增加页面中的活跃度/人格徽章，不改论坛统计、虚拟页数、会员资料或布局。"
+  ],
+  "categories": [
+    {
+      "id": "1",
+      "name": "短句直说",
+      "subtypes": [
+        {
+          "id": "1.1",
+          "name": "先给结论",
+          "guide": "先表态或给结果，必要时才补一条根据；少铺垫。"
+        },
+        {
+          "id": "1.2",
+          "name": "只答眼前一件",
+          "guide": "一次只回一个具体点；发问也不把前因后果一次讲全。"
+        },
+        {
+          "id": "1.3",
+          "name": "偏好说得明白",
+          "guide": "喜欢、不喜欢直接说，允许没有长篇理由。"
+        },
+        {
+          "id": "1.4",
+          "name": "报一下现状",
+          "guide": "说眼下看到或做到的事，很少概括别人。"
+        },
+        {
+          "id": "1.5",
+          "name": "省着说",
+          "guide": "常省主语或句尾，短不等于每次只发一个字。"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "边想边说",
+      "subtypes": [
+        {
+          "id": "2.1",
+          "name": "说完又改口",
+          "guide": "会修正上一句的判断，问题想到哪里问到哪里。"
+        },
+        {
+          "id": "2.2",
+          "name": "插一句补充",
+          "guide": "主句中插小补充，说明容易被误解的细节。"
+        },
+        {
+          "id": "2.3",
+          "name": "分几截补完",
+          "guide": "短段续写，后半截才交代关键情况。"
+        },
+        {
+          "id": "2.4",
+          "name": "记不准就说不准",
+          "guide": "记忆与推测有界限，不为了接话装作很懂。"
+        },
+        {
+          "id": "2.5",
+          "name": "说着想到别处",
+          "guide": "从眼前事岔出另一个念头，不必硬绕回来。"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "拿经历来说",
+      "subtypes": [
+        {
+          "id": "3.1",
+          "name": "按发生顺序讲",
+          "guide": "先做了什么、后来怎样，口语铺开，不追求段段有包袱。"
+        },
+        {
+          "id": "3.2",
+          "name": "留下动作细节",
+          "guide": "记得物件、位置、动作，少用概括感受替代事情。"
+        },
+        {
+          "id": "3.3",
+          "name": "复述别人原话",
+          "guide": "用听见的对话带出意见，不过度替对方总结。"
+        },
+        {
+          "id": "3.4",
+          "name": "过后再补一笔",
+          "guide": "先交代眼前事，再补一个以前或后来的结果。"
+        },
+        {
+          "id": "3.5",
+          "name": "绕一段再回来",
+          "guide": "允许长段旁枝，但最后能看出为什么在这个帖里说。"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "追问和核对",
+      "subtypes": [
+        {
+          "id": "4.1",
+          "name": "先把条件问清",
+          "guide": "问清是哪一种情况，不抢着给结论。"
+        },
+        {
+          "id": "4.2",
+          "name": "问具体怎么弄",
+          "guide": "关注按哪儿、接下来做什么，不能突然变成全知解答者。"
+        },
+        {
+          "id": "4.3",
+          "name": "追一句为什么",
+          "guide": "抓住原因不放；不是每句都必须问号。"
+        },
+        {
+          "id": "4.4",
+          "name": "摆两样来比较",
+          "guide": "通过差别说困惑或选择，比较只围绕当下话题。"
+        },
+        {
+          "id": "4.5",
+          "name": "惦记后续",
+          "guide": "追问结果、进展或漏掉的下文，不负责替别人收尾。"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "name": "愿意搭把手",
+      "subtypes": [
+        {
+          "id": "5.1",
+          "name": "先试一个办法",
+          "guide": "一次给一个动作，等实际反应，不写完整客服流程。"
+        },
+        {
+          "id": "5.2",
+          "name": "拿自己的试法作参考",
+          "guide": "说清自己试过的范围，没做过的直接承认。"
+        },
+        {
+          "id": "5.3",
+          "name": "解释时带例子",
+          "guide": "给一个能看懂的例子，解释够用就停。"
+        },
+        {
+          "id": "5.4",
+          "name": "帮人找个去处",
+          "guide": "知道别的入口或替代办法才说，不保证一定解决。"
+        },
+        {
+          "id": "5.5",
+          "name": "先指出容易踩的坑",
+          "guide": "先说别急着做什么，再给可检查的细节。"
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "name": "有异议就说",
+      "subtypes": [
+        {
+          "id": "6.1",
+          "name": "只反驳那一句",
+          "guide": "指出自己不同意的具体话，不把整个人批一遍。"
+        },
+        {
+          "id": "6.2",
+          "name": "把代价算进去",
+          "guide": "关注麻烦、时间、钱或可行性，措辞干脆。"
+        },
+        {
+          "id": "6.3",
+          "name": "区分两个说法",
+          "guide": "爱纠正被混作一回事的细节，避免长篇说教。"
+        },
+        {
+          "id": "6.4",
+          "name": "要个根据",
+          "guide": "对夸大或传闻问证据，也可以摆自己见过的反例。"
+        },
+        {
+          "id": "6.5",
+          "name": "不接受的先说",
+          "guide": "先亮明边界或立场，允许在无关话题里正常闲聊。"
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "name": "随口开个玩笑",
+      "subtypes": [
+        {
+          "id": "7.1",
+          "name": "平着说荒唐事",
+          "guide": "语气平直，笑点藏在事实落差里，不再解释笑点。"
+        },
+        {
+          "id": "7.2",
+          "name": "先拿自己开涮",
+          "guide": "承认自己的糗事，不靠每帖都出丑维持风格。"
+        },
+        {
+          "id": "7.3",
+          "name": "接着别人的梗往上添",
+          "guide": "接已有说法放大，不凭空给每个话题塞段子。"
+        },
+        {
+          "id": "7.4",
+          "name": "顺着一句拐个弯",
+          "guide": "顺着对方的字面说到旁边去，点到为止。"
+        },
+        {
+          "id": "7.5",
+          "name": "轻轻挤兑一句",
+          "guide": "有一点不客气，针对当下的小事，不写成连续挑衅。"
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "name": "陪着聊两句",
+      "subtypes": [
+        {
+          "id": "8.1",
+          "name": "挑个细节接话",
+          "guide": "注意到小处再接，不把楼主整段重述一遍。"
+        },
+        {
+          "id": "8.2",
+          "name": "想起自己也有过",
+          "guide": "用相近经历搭话，不宣称完全理解别人的感受。"
+        },
+        {
+          "id": "8.3",
+          "name": "像熟人那样招呼",
+          "guide": "省掉郑重客套，可以认人、打招呼、随口约一下。"
+        },
+        {
+          "id": "8.4",
+          "name": "关心实际处境",
+          "guide": "问人接下来怎么办、东西放哪儿等，不讲安慰大道理。"
+        },
+        {
+          "id": "8.5",
+          "name": "捎个消息",
+          "guide": "替别人报信或记一件事，说清自己知道多少。"
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "name": "情绪在前面",
+      "subtypes": [
+        {
+          "id": "9.1",
+          "name": "高兴了多说几句",
+          "guide": "热情会增加字数和节奏，不要求每次三个感叹号。"
+        },
+        {
+          "id": "9.2",
+          "name": "忍不住抱怨",
+          "guide": "具体烦哪件事说哪件事，容许话说得不圆。"
+        },
+        {
+          "id": "9.3",
+          "name": "有点不好意思",
+          "guide": "会犹豫、绕一下再提要求，不把谦虚写成套话。"
+        },
+        {
+          "id": "9.4",
+          "name": "低落时收住",
+          "guide": "讲到不想再讲就停，不升华人生、不强行求安慰。"
+        },
+        {
+          "id": "9.5",
+          "name": "着急等个答复",
+          "guide": "信息给得急，催问具体卡住的事，没急事时可平常说话。"
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "name": "把事情交代清楚",
+      "subtypes": [
+        {
+          "id": "10.1",
+          "name": "讲清边界",
+          "guide": "明确哪些能处理、哪些不能，通知语气不外溢到闲聊。"
+        },
+        {
+          "id": "10.2",
+          "name": "回来报进展",
+          "guide": "说明当前做到哪一步，未解决的留着。"
+        },
+        {
+          "id": "10.3",
+          "name": "约时间地点",
+          "guide": "把时间、地点、轮次说清楚，少空泛动员。"
+        },
+        {
+          "id": "10.4",
+          "name": "摆材料给人看",
+          "guide": "列出需要的项目或材料，清单之外仍是正常说话。"
+        },
+        {
+          "id": "10.5",
+          "name": "贴来给人看看",
+          "guide": "说明从哪看见、为什么转来；转贴原文不视作本人文风。"
+        }
+      ]
+    }
+  ],
+  "people": [
+    {
+      "id": "U001",
+      "name": "编程浪子",
+      "utterance_count": 19,
+      "thread_count": 16,
+      "activity": "高频参与",
+      "style": "5.2",
+      "confidence": "较充分",
+      "evidence": [
+        "code-html-notepad:2",
+        "code-right-click:2",
+        "code-table-gap:2"
+      ],
+      "edited": 11
+    },
+    {
+      "id": "U002",
+      "name": "网络游侠",
+      "utterance_count": 18,
+      "thread_count": 18,
+      "activity": "高频参与",
+      "style": "5.1",
+      "confidence": "较充分",
+      "evidence": [
+        "code-html-notepad:4",
+        "code-marquee:2",
+        "code-page-title:2"
+      ],
+      "edited": 12
+    },
+    {
+      "id": "U003",
+      "name": "轻舞飞扬",
+      "utterance_count": 13,
+      "thread_count": 9,
+      "activity": "高频参与",
+      "style": "2.1",
+      "confidence": "较充分",
+      "evidence": [
+        "code-marquee:3",
+        "game-sword-maze:1",
+        "game-sword-maze:4"
+      ],
+      "edited": 6
+    },
+    {
+      "id": "U004",
+      "name": "快乐男孩",
+      "utterance_count": 12,
+      "thread_count": 10,
+      "activity": "高频参与",
+      "style": "3.1",
+      "confidence": "较充分",
+      "evidence": [
+        "bg:2",
+        "code-view-source:1",
+        "diary-rain-shoes:2"
+      ],
+      "edited": 6
+    },
+    {
+      "id": "U005",
+      "name": "玻璃心",
+      "utterance_count": 13,
+      "thread_count": 11,
+      "activity": "高频参与",
+      "style": "9.2",
+      "confidence": "较充分",
+      "evidence": [
+        "cdr:1",
+        "cdr:3",
+        "diary-station-ticket:1"
+      ],
+      "edited": 7
+    },
+    {
+      "id": "U006",
+      "name": "老周",
+      "utterance_count": 12,
+      "thread_count": 10,
+      "activity": "高频参与",
+      "style": "1.1",
+      "confidence": "较充分",
+      "evidence": [
+        "cdr:2",
+        "cdr:5",
+        "code-free-space:2"
+      ],
+      "edited": 7
+    },
+    {
+      "id": "U007",
+      "name": "蓝色妖姬",
+      "utterance_count": 13,
+      "thread_count": 11,
+      "activity": "高频参与",
+      "style": "4.1",
+      "confidence": "较充分",
+      "evidence": [
+        "code-table-gap:1",
+        "diary-borrow-book:1",
+        "game-diablo-mule:1"
+      ],
+      "edited": 5
+    },
+    {
+      "id": "U008",
+      "name": "GameBoy",
+      "utterance_count": 13,
+      "thread_count": 10,
+      "activity": "高频参与",
+      "style": "6.1",
+      "confidence": "较充分",
+      "evidence": [
+        "cs-lan:6",
+        "dorm-sale:2",
+        "dorm-sale:6"
+      ],
+      "edited": 6
+    },
+    {
+      "id": "U009",
+      "name": "狂战天下",
+      "utterance_count": 12,
+      "thread_count": 9,
+      "activity": "高频参与",
+      "style": "6.5",
+      "confidence": "较充分",
+      "evidence": [
+        "cs-team:5",
+        "diary-phone-home:1",
+        "game-ra2-rules-p2:2"
+      ],
+      "edited": 6
+    },
+    {
+      "id": "U010",
+      "name": "往事随风",
+      "utterance_count": 11,
+      "thread_count": 8,
+      "activity": "高频参与",
+      "style": "3.4",
+      "confidence": "较充分",
+      "evidence": [
+        "adsl:2",
+        "cd-order:1",
+        "cd-order:3"
+      ],
+      "edited": 5
+    },
+    {
+      "id": "U011",
+      "name": "小菜鸟",
+      "utterance_count": 12,
+      "thread_count": 9,
+      "activity": "高频参与",
+      "style": "4.2",
+      "confidence": "较充分",
+      "evidence": [
+        "code-button-link:2",
+        "code-guest-counter:2",
+        "frontpage:1"
+      ],
+      "edited": 7
+    },
+    {
+      "id": "U012",
+      "name": "飞天猪",
+      "utterance_count": 11,
+      "thread_count": 10,
+      "activity": "高频参与",
+      "style": "7.2",
+      "confidence": "较充分",
+      "evidence": [
+        "code-right-click:1",
+        "code-source-comment:1",
+        "code-source-comment:3"
+      ],
+      "edited": 7
+    },
+    {
+      "id": "U013",
+      "name": "爆头王",
+      "utterance_count": 11,
+      "thread_count": 9,
+      "activity": "高频参与",
+      "style": "1.2",
+      "confidence": "较充分",
+      "evidence": [
+        "cs-lan:1",
+        "cs-lan:3",
+        "cs-team:2"
+      ],
+      "edited": 6
+    },
+    {
+      "id": "U014",
+      "name": "独孤求败",
+      "utterance_count": 11,
+      "thread_count": 6,
+      "activity": "高频参与",
+      "style": "10.3",
+      "confidence": "较充分",
+      "evidence": [
+        "cs-lan:5",
+        "cs-team:1",
+        "cs-team:4"
+      ],
+      "edited": 5
+    },
+    {
+      "id": "U015",
+      "name": "技术宅",
+      "utterance_count": 16,
+      "thread_count": 10,
+      "activity": "高频参与",
+      "style": "5.5",
+      "confidence": "较充分",
+      "evidence": [
+        "floppy:2",
+        "hah:3",
+        "hardware-budget-machine-p14:4"
+      ],
+      "edited": 6
+    },
+    {
+      "id": "U016",
+      "name": "北斗七星",
+      "utterance_count": 11,
+      "thread_count": 7,
+      "activity": "高频参与",
+      "style": "7.5",
+      "confidence": "较充分",
+      "evidence": [
+        "game-heroes-hotseat:3",
+        "game-ra2-rules-p2:4",
+        "game-ra2-rules:1"
+      ],
+      "edited": 4
+    },
+    {
+      "id": "U017",
+      "name": "灭绝师太",
+      "utterance_count": 10,
+      "thread_count": 8,
+      "activity": "高频参与",
+      "style": "10.1",
+      "confidence": "较充分",
+      "evidence": [
+        "bg:1",
+        "bg:8",
+        "feedback-double-post:2"
+      ],
+      "edited": 4
+    },
+    {
+      "id": "U018",
+      "name": "SaveLoad",
+      "utterance_count": 10,
+      "thread_count": 9,
+      "activity": "高频参与",
+      "style": "7.1",
+      "confidence": "较充分",
+      "evidence": [
+        "diary-dorm-light:1",
+        "game-diablo-mule:2",
+        "game-game-manual:2"
+      ],
+      "edited": 4
+    },
+    {
+      "id": "U019",
+      "name": "自由飞翔",
+      "utterance_count": 9,
+      "thread_count": 8,
+      "activity": "间歇参与",
+      "style": "3.2",
+      "confidence": "较充分",
+      "evidence": [
+        "adsl:4",
+        "game-game-manual:1",
+        "hardware-budget-machine:3"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U020",
+      "name": "音乐虫子",
+      "utterance_count": 9,
+      "thread_count": 8,
+      "activity": "间歇参与",
+      "style": "4.4",
+      "confidence": "较充分",
+      "evidence": [
+        "cd-order:2",
+        "diary-rain-shoes:1",
+        "music-disc-booklet:3"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U021",
+      "name": "blue_dream",
+      "utterance_count": 9,
+      "thread_count": 7,
+      "activity": "间歇参与",
+      "style": "2.4",
+      "confidence": "较充分",
+      "evidence": [
+        "code-free-space:1",
+        "game-worms-round:1",
+        "hardware-fan-sound:3"
+      ],
+      "edited": 4
+    },
+    {
+      "id": "U022",
+      "name": "龙之传人",
+      "utterance_count": 9,
+      "thread_count": 5,
+      "activity": "间歇参与",
+      "style": "6.2",
+      "confidence": "较充分",
+      "evidence": [
+        "code-html-notepad:3",
+        "feedback-signature-size:1",
+        "floppy:1"
+      ],
+      "edited": 4
+    },
+    {
+      "id": "U023",
+      "name": "蓝色的梦",
+      "utterance_count": 9,
+      "thread_count": 8,
+      "activity": "间歇参与",
+      "style": "8.1",
+      "confidence": "较充分",
+      "evidence": [
+        "desktop:1",
+        "desktop:4",
+        "game-save-name:2"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U024",
+      "name": "梦醒时分",
+      "utterance_count": 9,
+      "thread_count": 8,
+      "activity": "间歇参与",
+      "style": "2.3",
+      "confidence": "较充分",
+      "evidence": [
+        "diary-rain-shoes:3",
+        "feedback-lost-edit:1",
+        "game-joystick:2"
+      ],
+      "edited": 4
+    },
+    {
+      "id": "U025",
+      "name": "阿飞",
+      "utterance_count": 8,
+      "thread_count": 6,
+      "activity": "间歇参与",
+      "style": "6.4",
+      "confidence": "较充分",
+      "evidence": [
+        "adsl:1",
+        "adsl:3",
+        "adsl:5"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U026",
+      "name": "小胖",
+      "utterance_count": 8,
+      "thread_count": 8,
+      "activity": "间歇参与",
+      "style": "2.5",
+      "confidence": "较充分",
+      "evidence": [
+        "code-marquee:1",
+        "diary-birthday-noodle:3",
+        "game-worms-round:3"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U027",
+      "name": "路人甲",
+      "utterance_count": 8,
+      "thread_count": 7,
+      "activity": "间歇参与",
+      "style": "1.5",
+      "confidence": "较充分",
+      "evidence": [
+        "hardware-keyboard-wash:2",
+        "mouse-ball:1",
+        "mouse-ball:3"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U028",
+      "name": "冲浪者007",
+      "utterance_count": 7,
+      "thread_count": 5,
+      "activity": "间歇参与",
+      "style": "9.2",
+      "confidence": "较充分",
+      "evidence": [
+        "bihai:1",
+        "bihai:3",
+        "code-guest-counter:1"
+      ],
+      "edited": 4
+    },
+    {
+      "id": "U029",
+      "name": "流星雨",
+      "utterance_count": 9,
+      "thread_count": 9,
+      "activity": "间歇参与",
+      "style": "3.5",
+      "confidence": "较充分",
+      "evidence": [
+        "cdr:4",
+        "game-ra2-rules:3",
+        "late-bus:1"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U030",
+      "name": "孤独剑客",
+      "utterance_count": 7,
+      "thread_count": 6,
+      "activity": "间歇参与",
+      "style": "7.4",
+      "confidence": "较充分",
+      "evidence": [
+        "code-button-link:1",
+        "code-button-link:3",
+        "feedback-clock-fast:2"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U031",
+      "name": "紫罗兰",
+      "utterance_count": 7,
+      "thread_count": 6,
+      "activity": "间歇参与",
+      "style": "9.3",
+      "confidence": "较充分",
+      "evidence": [
+        "code-view-source:3",
+        "game-minesweeper:2",
+        "game-sword-maze:3"
+      ],
+      "edited": 4
+    },
+    {
+      "id": "U032",
+      "name": "乖乖",
+      "utterance_count": 7,
+      "thread_count": 6,
+      "activity": "间歇参与",
+      "style": "8.2",
+      "confidence": "较充分",
+      "evidence": [
+        "desktop:2",
+        "mm:1",
+        "mm:4"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U033",
+      "name": "耳朵怀孕",
+      "utterance_count": 7,
+      "thread_count": 5,
+      "activity": "间歇参与",
+      "style": "4.5",
+      "confidence": "较充分",
+      "evidence": [
+        "diary-laundry:1",
+        "diary-laundry:3",
+        "moderator:2"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U034",
+      "name": "Administrator",
+      "utterance_count": 7,
+      "thread_count": 6,
+      "activity": "间歇参与",
+      "style": "10.2",
+      "confidence": "较充分",
+      "evidence": [
+        "feedback-clock-fast:3",
+        "moderator:1",
+        "notice-old-domain:1"
+      ],
+      "edited": 2
+    },
+    {
+      "id": "U035",
+      "name": "水晶之恋",
+      "utterance_count": 6,
+      "thread_count": 6,
+      "activity": "间歇参与",
+      "style": "8.2",
+      "confidence": "较充分",
+      "evidence": [
+        "bihai:2",
+        "diary-dorm-light:2",
+        "diary-old-address:2"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U036",
+      "name": "江湖小虾",
+      "utterance_count": 6,
+      "thread_count": 4,
+      "activity": "间歇参与",
+      "style": "4.3",
+      "confidence": "较充分",
+      "evidence": [
+        "diary-birthday-noodle:1",
+        "game-save-name:3",
+        "mud:1"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U037",
+      "name": "花痴少女",
+      "utterance_count": 6,
+      "thread_count": 6,
+      "activity": "间歇参与",
+      "style": "9.1",
+      "confidence": "较充分",
+      "evidence": [
+        "diary-birthday-noodle:2",
+        "game-borrowed-save:1",
+        "game-cs-spray:1"
+      ],
+      "edited": 4
+    },
+    {
+      "id": "U038",
+      "name": "雨中漫步",
+      "utterance_count": 6,
+      "thread_count": 6,
+      "activity": "间歇参与",
+      "style": "8.4",
+      "confidence": "较充分",
+      "evidence": [
+        "diary-station-ticket:2",
+        "game-lianzhong:1",
+        "jl:1"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U039",
+      "name": "追风少年",
+      "utterance_count": 6,
+      "thread_count": 4,
+      "activity": "间歇参与",
+      "style": "7.3",
+      "confidence": "较充分",
+      "evidence": [
+        "game-worms-round:2",
+        "hah:1",
+        "music-mp3-list-p2:4"
+      ],
+      "edited": 2
+    },
+    {
+      "id": "U040",
+      "name": "网上邻居",
+      "utterance_count": 5,
+      "thread_count": 4,
+      "activity": "间歇参与",
+      "style": "1.4",
+      "confidence": "中等",
+      "evidence": [
+        "code-free-space:3",
+        "music-tv-volume:1",
+        "netease-chat:1"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U041",
+      "name": "MSN_User",
+      "utterance_count": 5,
+      "thread_count": 4,
+      "activity": "间歇参与",
+      "style": "3.2",
+      "confidence": "中等",
+      "evidence": [
+        "diary-empty-seat:1",
+        "hardware-speaker-radio:1",
+        "hardware-speaker-radio:3"
+      ],
+      "edited": 2
+    },
+    {
+      "id": "U042",
+      "name": "一笑而过",
+      "utterance_count": 5,
+      "thread_count": 5,
+      "activity": "间歇参与",
+      "style": "9.4",
+      "confidence": "中等",
+      "evidence": [
+        "diary-old-address:1",
+        "hardware-monitor-degauss:1",
+        "pictures-ascii-fish:2"
+      ],
+      "edited": 2
+    },
+    {
+      "id": "U043",
+      "name": "催稿员",
+      "utterance_count": 5,
+      "thread_count": 4,
+      "activity": "间歇参与",
+      "style": "1.2",
+      "confidence": "中等",
+      "evidence": [
+        "feedback-double-post:1",
+        "feedback-double-post:3",
+        "game-heroes-hotseat:2"
+      ],
+      "edited": 2
+    },
+    {
+      "id": "U044",
+      "name": "灌水专用",
+      "utterance_count": 5,
+      "thread_count": 3,
+      "activity": "间歇参与",
+      "style": "1.5",
+      "confidence": "中等",
+      "evidence": [
+        "ls2:5",
+        "wt:12",
+        "wt:13"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U045",
+      "name": "1390000",
+      "utterance_count": 4,
+      "thread_count": 3,
+      "activity": "间歇参与",
+      "style": "9.1",
+      "confidence": "中等",
+      "evidence": [
+        "game-minesweeper:1",
+        "hardware-monitor-degauss:3",
+        "njy:1"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U046",
+      "name": "寻找初恋",
+      "utterance_count": 4,
+      "thread_count": 3,
+      "activity": "间歇参与",
+      "style": "8.5",
+      "confidence": "中等",
+      "evidence": [
+        "classmate:1",
+        "classmate:3",
+        "diary-station-ticket:3"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U047",
+      "name": "校友",
+      "utterance_count": 4,
+      "thread_count": 4,
+      "activity": "间歇参与",
+      "style": "1.3",
+      "confidence": "中等",
+      "evidence": [
+        "classmate:2",
+        "music-walkman-battery:1",
+        "pictures-small-banners:1"
+      ],
+      "edited": 2
+    },
+    {
+      "id": "U048",
+      "name": "流浪的云",
+      "utterance_count": 4,
+      "thread_count": 4,
+      "activity": "间歇参与",
+      "style": "6.2",
+      "confidence": "中等",
+      "evidence": [
+        "code-html-notepad:1",
+        "hardware-budget-machine-p2:1",
+        "music-radio-dedication:2"
+      ],
+      "edited": 2
+    },
+    {
+      "id": "U049",
+      "name": "好好学习",
+      "utterance_count": 4,
+      "thread_count": 4,
+      "activity": "间歇参与",
+      "style": "5.4",
+      "confidence": "中等",
+      "evidence": [
+        "floppy:4",
+        "game-red-alert-map:3",
+        "ls2:1"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U050",
+      "name": "火焰领主",
+      "utterance_count": 3,
+      "thread_count": 3,
+      "activity": "偶尔出现",
+      "style": "2.2",
+      "confidence": "中等",
+      "evidence": [
+        "163:1",
+        "music-mv-subtitle:1",
+        "pictures-optical-square:1"
+      ],
+      "edited": 2
+    },
+    {
+      "id": "U051",
+      "name": "爱你一万年",
+      "utterance_count": 3,
+      "thread_count": 3,
+      "activity": "偶尔出现",
+      "style": "4.2",
+      "confidence": "中等",
+      "evidence": [
+        "code-page-title:1",
+        "dhxy:1",
+        "game-joystick:1"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U052",
+      "name": "警察抓小偷",
+      "utterance_count": 3,
+      "thread_count": 3,
+      "activity": "偶尔出现",
+      "style": "1.1",
+      "confidence": "中等",
+      "evidence": [
+        "cs-lan:2",
+        "cs-team:3",
+        "diary-wrong-stop:1"
+      ],
+      "edited": 2
+    },
+    {
+      "id": "U053",
+      "name": "失落的季节",
+      "utterance_count": 3,
+      "thread_count": 3,
+      "activity": "偶尔出现",
+      "style": "3.1",
+      "confidence": "中等",
+      "evidence": [
+        "diary-phone-home:2",
+        "hardware-mouse-pad:1",
+        "sad:1"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U054",
+      "name": "武林盟主",
+      "utterance_count": 3,
+      "thread_count": 3,
+      "activity": "偶尔出现",
+      "style": "4.1",
+      "confidence": "中等",
+      "evidence": [
+        "game-lianzhong:3",
+        "mud:2",
+        "software-realplayer-start:1"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U055",
+      "name": "林浩然",
+      "utterance_count": 4,
+      "thread_count": 4,
+      "activity": "间歇参与",
+      "style": "9.5",
+      "confidence": "中等",
+      "evidence": [
+        "hah:2",
+        "ls:2",
+        "red:1"
+      ],
+      "edited": 4
+    },
+    {
+      "id": "U056",
+      "name": "阿姆斯特朗式阿姆斯特朗回旋炮",
+      "utterance_count": 3,
+      "thread_count": 3,
+      "activity": "偶尔出现",
+      "style": "6.3",
+      "confidence": "中等",
+      "evidence": [
+        "hardware-budget-machine:5",
+        "music-disc-booklet:1",
+        "software-software-cd:3"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U057",
+      "name": "道明寺",
+      "utterance_count": 3,
+      "thread_count": 3,
+      "activity": "偶尔出现",
+      "style": "1.3",
+      "confidence": "中等",
+      "evidence": [
+        "hardware-monitor-desk:1",
+        "hy:2",
+        "music-film-ending:3"
+      ],
+      "edited": 3
+    },
+    {
+      "id": "U058",
+      "name": "灌水机",
+      "utterance_count": 3,
+      "thread_count": 3,
+      "activity": "偶尔出现",
+      "style": "1.5",
+      "confidence": "中等",
+      "evidence": [
+        "jl:4",
+        "wt1:7",
+        "wt2:5"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U059",
+      "name": "痴人说梦",
+      "utterance_count": 3,
+      "thread_count": 2,
+      "activity": "偶尔出现",
+      "style": "7.1",
+      "confidence": "中等",
+      "evidence": [
+        "million-qb:1",
+        "million-qb:3",
+        "software-qq-sound:1"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U060",
+      "name": "沉默是金",
+      "utterance_count": 4,
+      "thread_count": 3,
+      "activity": "间歇参与",
+      "style": "2.3",
+      "confidence": "中等",
+      "evidence": [
+        "million-qb:5",
+        "silence:1",
+        "silence:3"
+      ],
+      "edited": 2
+    },
+    {
+      "id": "U061",
+      "name": "秋天的鱼",
+      "utterance_count": 3,
+      "thread_count": 3,
+      "activity": "偶尔出现",
+      "style": "5.3",
+      "confidence": "中等",
+      "evidence": [
+        "mud:4",
+        "pictures-ascii-house:1",
+        "software-word-font:1"
+      ],
+      "edited": 2
+    },
+    {
+      "id": "U062",
+      "name": "RiceSang",
+      "utterance_count": 3,
+      "thread_count": 3,
+      "activity": "偶尔出现",
+      "style": "2.4",
+      "confidence": "中等",
+      "evidence": [
+        "music-headphone-left:3",
+        "music-old-cassette:1",
+        "pictures-pixel-tree:1"
+      ],
+      "edited": 2
+    },
+    {
+      "id": "U063",
+      "name": "天涯海角",
+      "utterance_count": 2,
+      "thread_count": 2,
+      "activity": "偶尔出现",
+      "style": "8.3",
+      "confidence": "暂定",
+      "evidence": [
+        "bihai:4",
+        "pictures-desktop-icons:1"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U064",
+      "name": "上铺一哥",
+      "utterance_count": 2,
+      "thread_count": 2,
+      "activity": "偶尔出现",
+      "style": "3.3",
+      "confidence": "暂定",
+      "evidence": [
+        "hardware-cd-tray:1",
+        "heroes:5"
+      ],
+      "edited": 2
+    },
+    {
+      "id": "U065",
+      "name": "柠檬草的味道",
+      "utterance_count": 2,
+      "thread_count": 2,
+      "activity": "偶尔出现",
+      "style": "7.4",
+      "confidence": "暂定",
+      "evidence": [
+        "hardware-keyboard-wash:1",
+        "music-recording-noise:2"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U066",
+      "name": "隔壁老王",
+      "utterance_count": 2,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "3.5",
+      "confidence": "暂定",
+      "evidence": [
+        "ls2:2",
+        "ls2:12"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U067",
+      "name": "灌水王",
+      "utterance_count": 2,
+      "thread_count": 2,
+      "activity": "偶尔出现",
+      "style": "7.3",
+      "confidence": "暂定",
+      "evidence": [
+        "ls2:13",
+        "wt:5"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U068",
+      "name": "拨号上网",
+      "utterance_count": 2,
+      "thread_count": 2,
+      "activity": "偶尔出现",
+      "style": "1.4",
+      "confidence": "暂定",
+      "evidence": [
+        "netease-chat:2",
+        "notice-email-board:2"
+      ],
+      "edited": 2
+    },
+    {
+      "id": "U069",
+      "name": "站长",
+      "utterance_count": 2,
+      "thread_count": 2,
+      "activity": "偶尔出现",
+      "style": "10.1",
+      "confidence": "暂定",
+      "evidence": [
+        "notice-birthday-board:1",
+        "notice-email-board:1"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U070",
+      "name": "水晶男孩",
+      "utterance_count": 2,
+      "thread_count": 2,
+      "activity": "偶尔出现",
+      "style": "9.2",
+      "confidence": "暂定",
+      "evidence": [
+        "software-software-cd:1",
+        "wk:1"
+      ],
+      "edited": 2
+    },
+    {
+      "id": "U071",
+      "name": "目标100楼",
+      "utterance_count": 2,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "9.5",
+      "confidence": "暂定",
+      "evidence": [
+        "wt:6",
+        "wt:8"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U072",
+      "name": "伤心小箭",
+      "utterance_count": 2,
+      "thread_count": 2,
+      "activity": "偶尔出现",
+      "style": "7.2",
+      "confidence": "暂定",
+      "evidence": [
+        "wt2:6",
+        "zq:9"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U073",
+      "name": "客场必胜",
+      "utterance_count": 2,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "6.5",
+      "confidence": "暂定",
+      "evidence": [
+        "zq:3",
+        "zq:10"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U074",
+      "name": "米韵",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "5.3",
+      "confidence": "暂定",
+      "evidence": [
+        "163:2"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U075",
+      "name": "合金弹头",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "6.4",
+      "confidence": "暂定",
+      "evidence": [
+        "163:3"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U076",
+      "name": "*烦!恼*",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "9.2",
+      "confidence": "暂定",
+      "evidence": [
+        "163:4"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U077",
+      "name": "流浪剑客",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "9.1",
+      "confidence": "暂定",
+      "evidence": [
+        "bg:3"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U078",
+      "name": "CS_Killer",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "6.1",
+      "confidence": "暂定",
+      "evidence": [
+        "bg:4"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U079",
+      "name": "随风飘",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "8.3",
+      "confidence": "暂定",
+      "evidence": [
+        "bg:5"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U080",
+      "name": "小迷糊",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "4.2",
+      "confidence": "暂定",
+      "evidence": [
+        "bg:6"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U081",
+      "name": "发财致富",
+      "utterance_count": 0,
+      "thread_count": 0,
+      "activity": "无可见发言",
+      "style": null,
+      "confidence": "不可判定",
+      "evidence": [],
+      "edited": 0
+    },
+    {
+      "id": "U082",
+      "name": "至尊宝",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "5.2",
+      "confidence": "暂定",
+      "evidence": [
+        "dhxy:2"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U083",
+      "name": "斧头帮帮主",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "1.3",
+      "confidence": "暂定",
+      "evidence": [
+        "dhxy:3"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U084",
+      "name": "紫霞仙子",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "6.1",
+      "confidence": "暂定",
+      "evidence": [
+        "dhxy:4"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U085",
+      "name": "跑环专业户",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "5.4",
+      "confidence": "暂定",
+      "evidence": [
+        "dhxy:5"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U086",
+      "name": "笨笨",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "8.3",
+      "confidence": "暂定",
+      "evidence": [
+        "dhxy:6"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U087",
+      "name": "痞子蔡",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "6.3",
+      "confidence": "暂定",
+      "evidence": [
+        "jl:3"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U088",
+      "name": "睡在我上铺的兄弟",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "10.5",
+      "confidence": "暂定",
+      "evidence": [
+        "ls:1"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U089",
+      "name": "蓝色百褶裙",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "8.1",
+      "confidence": "暂定",
+      "evidence": [
+        "ls:3"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U090",
+      "name": "狂拽酷炫",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "7.3",
+      "confidence": "暂定",
+      "evidence": [
+        "ls:4"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U091",
+      "name": "卖女孩的小火柴",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "10.5",
+      "confidence": "暂定",
+      "evidence": [
+        "ls:5"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U092",
+      "name": "中奖啦",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "7.1",
+      "confidence": "暂定",
+      "evidence": [
+        "ls2:3"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U093",
+      "name": "楼长大人",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "3.3",
+      "confidence": "暂定",
+      "evidence": [
+        "ls2:4"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U094",
+      "name": "贫嘴法号唐僧肉",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "3.5",
+      "confidence": "暂定",
+      "evidence": [
+        "ls2:6"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U095",
+      "name": "听不懂道理",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "7.1",
+      "confidence": "暂定",
+      "evidence": [
+        "ls2:7"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U096",
+      "name": "潜水员",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "9.1",
+      "confidence": "暂定",
+      "evidence": [
+        "ls2:8"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U097",
+      "name": "吃不上饭别赖我",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "2.5",
+      "confidence": "暂定",
+      "evidence": [
+        "ls2:9"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U098",
+      "name": "艺术系才子",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "3.2",
+      "confidence": "暂定",
+      "evidence": [
+        "ls2:10"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U099",
+      "name": "孤独患者",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "3.3",
+      "confidence": "暂定",
+      "evidence": [
+        "ls2:11"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U100",
+      "name": "扫地僧",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "7.1",
+      "confidence": "暂定",
+      "evidence": [
+        "ls2:14"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U101",
+      "name": "天天向上",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "7.3",
+      "confidence": "暂定",
+      "evidence": [
+        "ls2:15"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U102",
+      "name": "坐看云起",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "8.4",
+      "confidence": "暂定",
+      "evidence": [
+        "mm:2"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U103",
+      "name": "O0olI1",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "6.2",
+      "confidence": "暂定",
+      "evidence": [
+        "mm:3"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U104",
+      "name": "杀手冷酷",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "9.3",
+      "confidence": "暂定",
+      "evidence": [
+        "mm:5"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U105",
+      "name": "拆机狂",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "5.5",
+      "confidence": "暂定",
+      "evidence": [
+        "njy:3"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U106",
+      "name": "贪吃蛇高手",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "4.4",
+      "confidence": "暂定",
+      "evidence": [
+        "njy:4"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U107",
+      "name": "酷炫一族",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "9.1",
+      "confidence": "暂定",
+      "evidence": [
+        "njy:5"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U108",
+      "name": "穷学生",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "4.4",
+      "confidence": "暂定",
+      "evidence": [
+        "njy:6"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U109",
+      "name": "铃声小编",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "10.4",
+      "confidence": "暂定",
+      "evidence": [
+        "njy:7"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U110",
+      "name": "拇指一族",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "3.2",
+      "confidence": "暂定",
+      "evidence": [
+        "njy:8"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U111",
+      "name": "索尼爱立信",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "6.5",
+      "confidence": "暂定",
+      "evidence": [
+        "njy:9"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U112",
+      "name": "安全第一",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "4.1",
+      "confidence": "暂定",
+      "evidence": [
+        "sdrj:1"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U113",
+      "name": "卡巴斯基",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "2.1",
+      "confidence": "暂定",
+      "evidence": [
+        "sdrj:3"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U114",
+      "name": "传奇商贩",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "10.4",
+      "confidence": "暂定",
+      "evidence": [
+        "wg:2"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U115",
+      "name": "道士带狗",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "3.4",
+      "confidence": "暂定",
+      "evidence": [
+        "wg:3"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U116",
+      "name": "祖玛教主",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "2.4",
+      "confidence": "暂定",
+      "evidence": [
+        "wg:4"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U117",
+      "name": "小虾米",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "10.3",
+      "confidence": "暂定",
+      "evidence": [
+        "wg:5"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U118",
+      "name": "网管007",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "5.1",
+      "confidence": "暂定",
+      "evidence": [
+        "wk:2"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U119",
+      "name": "宽带我最快",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "6.4",
+      "confidence": "暂定",
+      "evidence": [
+        "wk:3"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U120",
+      "name": "无言的结局",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "9.4",
+      "confidence": "暂定",
+      "evidence": [
+        "wk:4"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U121",
+      "name": "康师傅",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "9.2",
+      "confidence": "暂定",
+      "evidence": [
+        "wt:1"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U122",
+      "name": "减肥中",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "9.3",
+      "confidence": "暂定",
+      "evidence": [
+        "wt:2"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U123",
+      "name": "饭桶",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "1.4",
+      "confidence": "暂定",
+      "evidence": [
+        "wt:3"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U124",
+      "name": "潜水艇",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "1.5",
+      "confidence": "暂定",
+      "evidence": [
+        "wt:4"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U125",
+      "name": "抢楼专用马甲",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "9.1",
+      "confidence": "暂定",
+      "evidence": [
+        "wt:7"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U126",
+      "name": "穷开心",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "7.2",
+      "confidence": "暂定",
+      "evidence": [
+        "wt:9"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U127",
+      "name": "小白领",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "3.1",
+      "confidence": "暂定",
+      "evidence": [
+        "wt:10"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U128",
+      "name": "夜猫子",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "2.3",
+      "confidence": "暂定",
+      "evidence": [
+        "wt:11"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U129",
+      "name": "路人乙",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "10.1",
+      "confidence": "暂定",
+      "evidence": [
+        "wt:15"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U130",
+      "name": "贪吃猫",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "8.3",
+      "confidence": "暂定",
+      "evidence": [
+        "wt1:2"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U131",
+      "name": "网吧难民",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "10.4",
+      "confidence": "暂定",
+      "evidence": [
+        "wt1:3"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U132",
+      "name": "减肥妹妹",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "9.4",
+      "confidence": "暂定",
+      "evidence": [
+        "wt1:4"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U133",
+      "name": "有钱人",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "1.3",
+      "confidence": "暂定",
+      "evidence": [
+        "wt1:5"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U134",
+      "name": "传奇迷",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "6.2",
+      "confidence": "暂定",
+      "evidence": [
+        "wt1:6"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U135",
+      "name": "狙击手",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "9.2",
+      "confidence": "暂定",
+      "evidence": [
+        "wt2:1"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U136",
+      "name": "乖乖女",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "2.5",
+      "confidence": "暂定",
+      "evidence": [
+        "wt2:2"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U137",
+      "name": "F4后援会",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "8.3",
+      "confidence": "暂定",
+      "evidence": [
+        "wt2:3"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U138",
+      "name": "广东靓仔",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "8.5",
+      "confidence": "暂定",
+      "evidence": [
+        "wt2:4"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U139",
+      "name": "东北大汉",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "8.4",
+      "confidence": "暂定",
+      "evidence": [
+        "wt2:7"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U140",
+      "name": "独孤九剑",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "10.4",
+      "confidence": "暂定",
+      "evidence": [
+        "wtf:2"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U141",
+      "name": "夜行猫",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "5.5",
+      "confidence": "暂定",
+      "evidence": [
+        "wtf:3"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U142",
+      "name": "懂球帝",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "10.4",
+      "confidence": "暂定",
+      "evidence": [
+        "zq:2"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U143",
+      "name": "郁闷的烟",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "7.5",
+      "confidence": "暂定",
+      "evidence": [
+        "zq:4"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U144",
+      "name": "伤心太平洋",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "9.4",
+      "confidence": "暂定",
+      "evidence": [
+        "zq:5"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U145",
+      "name": "沉默的羔羊",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "1.4",
+      "confidence": "暂定",
+      "evidence": [
+        "zq:6"
+      ],
+      "edited": 1
+    },
+    {
+      "id": "U146",
+      "name": "抗韩英雄",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "6.5",
+      "confidence": "暂定",
+      "evidence": [
+        "zq:7"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U147",
+      "name": "谁伴我闯荡",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "10.5",
+      "confidence": "暂定",
+      "evidence": [
+        "zq:8"
+      ],
+      "edited": 0
+    },
+    {
+      "id": "U148",
+      "name": "小陈",
+      "utterance_count": 1,
+      "thread_count": 1,
+      "activity": "偶尔出现",
+      "style": "10.2",
+      "confidence": "暂定",
+      "evidence": [
+        "wanderer:guest-2"
+      ],
+      "edited": 1
+    }
+  ]
+}

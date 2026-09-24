@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
@@ -16,9 +15,8 @@
 
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"mi1li0n.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"mi1li0n.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.21.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":224,"display":"post","padding":18,"offset":24},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
 
     <meta property="og:type" content="website">
 <meta property="og:title" content="Million&#39;blog">
@@ -45,13 +43,19 @@
 
 
 
+<script>
+(()=>{
+  const choices=['rain','storm','sunny','cloudy','night'];
+  document.documentElement.dataset.weather=choices[Math.floor(Math.random()*choices.length)];
+})();
+</script>
 
   <noscript>
     <link rel="stylesheet" href="/css/noscript.css">
   </noscript>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+<body itemscope itemtype="http://schema.org/WebPage">
   <div class="headband"></div>
 
   <main class="main">
@@ -319,7 +323,7 @@
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
-<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
 
   
 
@@ -333,6 +337,62 @@
 
 
 
+<div class="rain-scene" aria-hidden="true">
+  <svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" focusable="false">
+    <defs>
+      <linearGradient id="weather-sky" x2="0" y2="1"><stop class="sky-start"/><stop class="sky-end" offset="1"/></linearGradient>
+      <linearGradient id="weather-water" x2="0" y2="1"><stop class="water-start"/><stop class="water-end" offset="1"/></linearGradient>
+      <pattern id="weather-ripples" width="180" height="38" patternUnits="userSpaceOnUse"><path d="M12 2h48m52 20h24" stroke="#edf3f7" stroke-width="1" opacity=".22"/></pattern>
+      <mask id="moon-shape"><rect width="1600" height="1000" fill="white"/><circle cx="1415" cy="140" r="48" fill="black"/></mask>
+    </defs>
+    <rect width="1600" height="1000" fill="url(#weather-sky)"/>
+    <g class="weather-sun"><circle class="sun-halo" cx="1390" cy="165" r="104" fill="#fff7dc"/><circle cx="1390" cy="165" r="58" fill="#f8edc3"/></g>
+    <circle class="weather-moon" cx="1390" cy="165" r="52" fill="#e0eaf4" mask="url(#moon-shape)"/>
+    <g class="weather-stars" fill="#e6f0fc">
+      <circle cx="100" cy="90" r="1.8"/><circle cx="226" cy="192" r="1.5"/><circle cx="338" cy="55" r="1.5"/><circle cx="440" cy="137" r="1.1"/><circle cx="535" cy="86" r="1.8"/><circle cx="705" cy="155" r="1.5"/><circle cx="801" cy="39" r="1.2"/><circle cx="936" cy="105" r="1.7"/><circle cx="1094" cy="68" r="1.2"/><circle cx="1253" cy="83" r="1.5"/><circle cx="1491" cy="57" r="1.2"/><circle cx="1545" cy="255" r="1.6"/><circle cx="112" cy="372" r="1.2"/><circle cx="285" cy="304" r="1.7"/><circle cx="839" cy="273" r="1.6"/><circle cx="1210" cy="348" r="1.3"/><circle cx="1454" cy="388" r="1.5"/>
+    </g>
+    <g class="weather-clouds clouds-far">
+      <path d="M-120 192Q-90 143-34 159Q-3 103 68 130Q101 162 161 160Q207 161 238 200Q83 226-120 214Z"/>
+      <path d="M802 227Q870 173 931 197Q977 153 1030 186Q1096 171 1165 230Q974 257 802 247Z"/>
+      <path d="M1310 370Q1366 299 1431 325Q1490 260 1570 315Q1631 299 1690 373Q1490 400 1310 394Z"/>
+    </g>
+    <g class="weather-clouds clouds-near">
+      <path d="M60 349Q105 293 159 316Q206 245 293 300Q352 275 416 337Q487 325 515 367Q261 403 60 378Z"/>
+      <path d="M1002 129Q1047 67 1118 91Q1177 27 1252 77Q1312 58 1385 121Q1431 118 1461 151Q1200 174 1002 156Z"/>
+    </g>
+    <path class="hill-one" d="M-80 640Q92 445 270 531T585 465T927 495T1196 433T1690 580V1030H-80Z" opacity=".8"/>
+    <path class="hill-two" d="M-90 770Q108 532 341 657T735 566T1080 630T1417 562T1710 634V1030H-90Z" opacity=".66"/>
+    <path class="hill-three" d="M-60 866Q103 717 334 794T689 756T1104 803T1406 689T1720 795V1030H-60Z" opacity=".75"/>
+    <path class="hill-four" d="M-50 908Q137 843 346 888T737 871T1130 892T1650 841V1030H-50Z" opacity=".74"/>
+    <rect y="914" width="1600" height="100" fill="url(#weather-water)"/>
+    <rect y="914" width="1600" height="100" fill="url(#weather-ripples)"/>
+    <path class="weather-tree" d="M198 918v-100m0 34-29-24m29 45 38-38m-38 67-44-37" stroke-width="3" fill="none" opacity=".6"/>
+    <path class="weather-boat" d="M1340 962q25-14 53 0l-10 7h-32z" opacity=".78"/>
+    <path class="weather-oar" d="M1368 936v26m-10-16 27 20" stroke-width="2" opacity=".78"/>
+    <g class="weather-lightning"><rect width="1600" height="1000" fill="#e4efff" opacity=".15"/><path d="M1485 241l-41 93 28-8-54 105" fill="none" stroke="#dceaff" stroke-width="3" opacity=".72"/></g>
+  </svg>
+  <canvas id="blog-rain"></canvas>
+</div>
+<div class="weather-controls" role="group" aria-label="天气与动效" hidden>
+  <button id="weather-switch" type="button" aria-describedby="weather-help" aria-label="切换天气">
+    <span class="weather-thumb" aria-hidden="true">
+      <svg data-icon="rain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14a4 4 0 1 1 1-7.8A5 5 0 0 1 17 7a3.5 3.5 0 0 1 1 7H6Z"/><path d="m8 17-1 3m5-3-1 3m5-3-1 3"/></svg>
+      <svg data-icon="storm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14a4 4 0 1 1 1-7.8A5 5 0 0 1 17 7a3.5 3.5 0 0 1 1 7"/><path d="m12 12-3 5h4l-2 5 6-7h-4l2-3"/></svg>
+      <svg data-icon="sunny" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
+      <svg data-icon="cloudy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18a4 4 0 1 1 1-7.8A5 5 0 0 1 17 11a3.5 3.5 0 0 1 1 7H6Z"/><path d="M9 6a4.5 4.5 0 0 1 8.5-.5A3.5 3.5 0 0 1 21 9"/></svg>
+      <svg data-icon="night" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M20.5 14.1A8.5 8.5 0 0 1 9.9 3.5a8.5 8.5 0 1 0 10.6 10.6Z"/></svg>
+    </span>
+    <span id="weather-label">天气</span>
+    <svg class="weather-cycle" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 5.5A5 5 0 0 0 3.8 4M3.5 10.5A5 5 0 0 0 12.2 12M12.5 2v3.5H9M3.5 14v-3.5H7"/></svg>
+  </button>
+  <span class="weather-divider" aria-hidden="true"></span>
+  <button id="weather-motion" type="button" aria-label="暂停动效" aria-pressed="false">
+    <svg class="motion-pause" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor"><rect x="4" y="3" width="2" height="10" rx="1"/><rect x="10" y="3" width="2" height="10" rx="1"/></svg>
+    <svg class="motion-play" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor"><path d="M5 3.2v9.6L12 8Z"/></svg>
+  </button>
+  <span id="weather-help" class="weather-help">点击依次切换雨、雷雨、晴天、多云、夜晚，也可使用左右方向键。</span>
+</div>
+<script src="/js/weather.js" defer></script>
 
 </body>
 </html>
