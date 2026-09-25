@@ -232,6 +232,46 @@ header{min-height:54px;padding:8px 14px;background:linear-gradient(180deg,rgba(2
 .shop-modal{width:min(780px,94vw);max-height:88vh;overflow:auto}.shop-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}.shop-head strong{color:var(--gold);font-size:18px}.shop-note{font-size:12px;color:var(--dim);margin-top:4px}.shop-grid{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:9px}.shop-item{position:relative;min-height:92px;padding:10px 8px;border:1px solid #3a405f;border-radius:10px;background:linear-gradient(155deg,#272b46,#191c30);color:var(--text);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:transform .16s,border-color .16s,box-shadow .16s}.shop-item:hover:not(:disabled){transform:translateY(-2px);border-color:var(--gold);box-shadow:0 7px 18px rgba(0,0,0,.3),0 0 13px rgba(255,207,77,.12)}.shop-item:disabled{opacity:.42;cursor:not-allowed}.shop-item.bought{filter:grayscale(.55)}.shop-item .e{font-size:25px}.shop-item .n{font-size:12px}.shop-item .price{font-size:13px;font-weight:700;color:var(--gold)}.shop-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
 @media(max-width:900px){.side{width:260px}.side.left{width:260px}.title small{display:none}.shop-grid{grid-template-columns:repeat(3,minmax(105px,1fr))}}
 @media(max-width:430px){.result-slot{grid-template-columns:repeat(5,46px);grid-template-rows:repeat(3,46px);gap:5px;padding:9px}.result-cell{width:46px;height:46px;font-size:20px}}
+
+/* Compact screens keep the battlefield visible; auxiliary panels open on demand. */
+.mobile-panel-toggle{display:none}
+.btile.selected,.unit.selected{outline:2px solid var(--gold);outline-offset:2px}
+button,.btile{touch-action:manipulation}
+@media(max-width:980px),(max-height:560px){
+ body,.wrap{height:100dvh}
+ header{gap:5px;padding:5px 8px;min-height:44px;flex-shrink:0}
+ .title{display:none}
+ .phase,.stat{font-size:11px;min-height:28px;padding:3px 6px}.stat b{font-size:13px}
+ .mini{padding:8px;min-height:36px;font-size:12px}#almanacBtn{margin-left:0}
+ .mobile-panel-toggle{display:inline-flex;align-items:center;justify-content:center}
+ .main{padding:5px;gap:0}.center{gap:5px}
+ .side.left,.side.right{position:fixed;left:auto;right:5px;top:var(--mobile-header-height,88px);bottom:5px;width:min(340px,calc(100vw - 10px));z-index:25;display:none;filter:none;overflow:auto;transform:none;opacity:1}
+ .side.left::before{display:none}.side.left.mobile-open,.side.right.mobile-open{display:flex}
+ .side.left.hide{display:none}.side .card{min-height:100%;height:auto!important;flex:1;padding:12px}
+ .boardwrap{padding:3px;overflow:hidden;min-height:100px}
+ .board{width:100%;height:auto;aspect-ratio:2;max-height:100%}
+ .center>.ph{font-size:11px;line-height:1.35;margin:0}
+ .bench{height:56px;min-height:56px;max-height:56px;flex-shrink:0;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;padding:5px;align-items:center}
+ .btile{flex:0 0 44px}
+ .bctrl{gap:5px;padding:5px;flex-shrink:0;display:grid;grid-template-columns:1fr 1fr}
+ .bctrl button{padding:9px 6px;min-height:40px;font-size:13px}.bctrl>.small{grid-column:1/-1;font-size:11px}
+ .choices,.almanac,.endscreen{padding:8px}
+ .cmodal,.alm-modal,.end-modal{max-height:calc(100dvh - 16px);max-width:100%;overflow:auto;padding:12px}
+ .cbtns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .choice{min-height:44px}.choice.skip{min-height:44px}
+ .result-slot{grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(3,auto);width:100%;gap:4px;padding:7px}
+ .result-cell{width:100%;height:auto;aspect-ratio:1;min-width:0;font-size:20px}
+ .shop-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.shop-head,.shop-foot{gap:8px;flex-wrap:wrap}
+ .alm-title{position:sticky;top:-12px;background:var(--panel);z-index:2;padding:8px 0}.alm-close{min-height:40px}
+ #endtitle{font-size:28px}
+}
+@media(max-height:440px) and (min-width:600px){
+ .center{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:minmax(0,1fr) 56px;gap:4px}
+ .boardwrap{grid-column:1/-1}.center>.ph{display:none}.bctrl{width:340px;grid-template-columns:auto auto;margin:0;padding:2px 5px;gap:2px 6px}
+ .bctrl button{min-height:32px;padding:5px}.bctrl>.small{font-size:10px;line-height:12px}
+ .board{height:100%;width:auto;max-width:100%;aspect-ratio:2}
+ .shop-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.cbtns{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
 </style>
 </head>
 <body>
@@ -246,6 +286,8 @@ header{min-height:54px;padding:8px 14px;background:linear-gradient(180deg,rgba(2
 <button id="testgold" class="mini">+30💴（测试）</button>
 
 <button id="reset" class="mini">重置</button>
+<button id="slotToggle" class="mini mobile-panel-toggle" aria-controls="slotpanel" aria-expanded="false">羁绊</button>
+<button id="logToggle" class="mini mobile-panel-toggle" aria-controls="logpanel" aria-expanded="false">日志</button>
 </header>
 <div class="main">
 <aside class="side left" id="slotpanel">
@@ -263,7 +305,7 @@ header{min-height:54px;padding:8px 14px;background:linear-gradient(180deg,rgba(2
 </aside>
 <div class="center">
 <div class="boardwrap"><div class="board" id="board" ondragover="over(event)" ondrop="fieldDrop(event)"><div id="terrain"></div><div class="fx" id="fx"></div></div></div>
-<div class="ph"><span>待命区（拖到场地部署） · 紫框=临时 · 金圈高坡(仅远程)</span></div>
+<div class="ph"><span>待命区（点单位，再点场地部署；也可拖动） · 紫框=临时 · 金圈高坡(仅远程)</span></div>
 <div class="bench" id="bench" ondragover="over(event)" ondrop="dropToBench(event)"></div>
 <div class="bctrl">
 <button id="startwave" class="primary">开始波次</button>
@@ -271,7 +313,7 @@ header{min-height:54px;padding:8px 14px;background:linear-gradient(180deg,rgba(2
 <span class="dim small">已部署 <b id="placedcount">0</b>/<span id="popdisp">8</span>　剩余敌人 <b id="enemiesleft">0</b></span>
 </div>
 </div>
-<aside class="side right">
+<aside class="side right" id="logpanel">
 <section class="card"><div class="ph">日志</div><div class="log" id="log"></div></section>
 </aside>
 </div>
@@ -475,6 +517,17 @@ function leaveShop(){document.getElementById('choices').classList.remove('show')
 
 /* ===== 部署 ===== */
 function setDrag(id,from){dragData={id,from};}
+function selectUnit(id,from){
+ if(inBattle)return;
+ dragData=dragData&&dragData.id===id?null:{id,from};
+ renderAll();
+}
+function toggleMobilePanel(id){
+ const panel=document.getElementById(id),open=!panel.classList.contains('mobile-open');
+ ['slotpanel','logpanel'].forEach(key=>document.getElementById(key).classList.toggle('mobile-open',key===id&&open));
+ document.getElementById('slotToggle').setAttribute('aria-expanded',String(id==='slotpanel'&&open));
+ document.getElementById('logToggle').setAttribute('aria-expanded',String(id==='logpanel'&&open));
+}
 function over(ev){ev.preventDefault();}
 function fieldDrop(ev){
  ev.preventDefault(); if(inBattle||!dragData){dragData=null;return;}
@@ -676,8 +729,8 @@ function renderTerrain(){const el=document.getElementById('terrain');if(!el)retu
 function renderPlagueClouds(){const board=document.getElementById('board'),old=new Map([...board.querySelectorAll('.plague-cloud')].map(x=>[x.dataset.id,x]));if(!inBattle){old.forEach(x=>x.remove());return;}const alive=new Set();plagueClouds.forEach(c=>{const id=String(c.id);alive.add(id);let d=old.get(id);if(!d){d=document.createElement('div');d.className='plague-cloud';d.dataset.id=id;board.appendChild(d);}const w=c.r*2*PP();d.style.left=(fX(c.x)-w/2)+'px';d.style.top=(fY(c.y)-w/2)+'px';d.style.width=w+'px';d.style.height=w+'px';});old.forEach((x,id)=>{if(!alive.has(id))x.remove();});}
 function updateDeathAuras(){const board=document.getElementById('board'),old=new Map([...board.querySelectorAll('.death-aura')].map(x=>[x.dataset.id,x]));if(!inBattle){old.forEach(x=>x.remove());return;}const alive=new Set();entities.filter(e=>e.deathKnight&&e.hp>0&&!e.reviving).forEach(e=>{const id=String(e.id);alive.add(id);let d=old.get(id);if(!d){d=document.createElement('div');d.className='death-aura';d.dataset.id=id;board.appendChild(d);}const w=8*PP();d.style.left=(fX(e.x)-w/2)+'px';d.style.top=(fY(e.y)-w/2)+'px';d.style.width=w+'px';d.style.height=w+'px';});old.forEach((x,id)=>{if(!alive.has(id))x.remove();});}
 function updateAimLines(){const fx=document.getElementById('fx');if(!fx)return;fx.querySelectorAll('.aim-line').forEach(x=>x.remove());if(!inBattle||entities.length>65)return;entities.filter(e=>e.side==='player'&&e.type==='musketeer'&&e.hp>0&&!e.stun&&!e.thrown&&!e.casting).forEach(e=>{const t=getTarget(e);if(!t||t.hp<=0||edgeDist(e,t)>e.range)return;const ready=actionReady(e);if(ready)return;const ax=fX(e.x),ay=fY(e.y),tx=fX(t.x),ty=fY(t.y),dx=tx-ax,dy=ty-ay,d=document.createElement('div');d.className='aim-line';d.style.left=ax+'px';d.style.top=ay+'px';d.style.width=Math.hypot(dx,dy)+'px';d.style.transform='rotate('+(Math.atan2(dy,dx)*180/Math.PI)+'deg)';d.style.opacity=String(.3+.55*Math.min(1,e.action/(e.nextCd||e.cdMax)));fx.appendChild(d);});}
-function renderField(){const board=document.getElementById('board');board.classList.toggle('battle',inBattle);renderTerrain();renderRunes();updateDeathAuras();renderPlagueClouds();board.querySelectorAll('.mine').forEach(el=>el.remove());if(inBattle)mines.forEach(m=>{const d=document.createElement('div'),sz=0.4*PP();d.className='mine'+(m.arm>0?' arming':'');d.style.left=(fX(m.x)-sz/2)+'px';d.style.top=(fY(m.y)-sz/2)+'px';d.style.width=sz+'px';d.style.height=sz+'px';board.appendChild(d);});const list=inBattle?entities:roster.concat(temps).filter(u=>u.placed).concat(watchtower&&watchtower.hp>0?[watchtower]:[]);const seen=new Set();list.forEach(u=>{if(u.hp<=0||u.jumping)return;seen.add(u.id);let el=unitEls[u.id];const px=fX(u.x),py=fY(u.y),diam=u.r*2*PP(),fs=Math.max(11,Math.round(diam*0.42));if(!el){el=document.createElement('div');el.innerHTML='<span class="u-emoji"></span><span class="u-hp"></span><div class="u-bar"><i></i></div>';board.appendChild(el);unitEls[u.id]=el;el._init=false;} el.style.transition=(!el._init)?'none':(u.thrown?'left .08s linear,top .08s linear':u.charging?'none':'');let cls='unit '+(u.side==='player'?'pl':'en');if(u.temp)cls+=' temp';if(u.atkFlash>0){cls+=' atk';el.style.setProperty('--lx',((u.lungeDc||0)*5)+'px');el.style.setProperty('--ly',((u.lungeDr||0)*5)+'px');}if(u.hitFlash>0)cls+=' hit';if(u.reviving)cls+=' reviving';if(u.amphibious&&u.submerged)cls+=' submerged';if(u.phaseTicks>0)cls+=' phasing';if(u.backdoor)cls+=' backdoor';if(u.boundSpirit)cls+=' bound-spirit';if(u.stealth)cls+=' stealth';if(u.bloodTime>0)cls+=' blood';if(u.blessTime>0)cls+=' blessed';if(u.chargeGuard>0)cls+=' charge-guard';if(u.charging){cls+=' charging';el.style.setProperty('--charge-angle',(u.chargeAngle||0)+'deg');}if(!inBattle&&u.side==='player'&&!u.temp&&!u.structure){cls+=' drag';el.draggable=true;el.ondragstart=(ev)=>{setDrag(u.id,'board');try{ev.dataTransfer.setData('text','1');}catch(_){}};}else el.draggable=false;el.className=cls;if(u.hitFlash||u.stealth||u.bloodTime>0||u.blessTime>0)el.style.boxShadow='';else if(u.buffs&&u.buffs.length&&!u.temp)el.style.boxShadow='0 0 10px '+BUFFCOL[u.buffs[0]];else if(onHigh(u))el.style.boxShadow='0 0 10px #9fe8ff';else el.style.boxShadow='';el.style.left=(px-diam/2)+'px';el.style.top=(py-diam/2)+'px';el.style.width=diam+'px';el.style.height=diam+'px';const emo=el.querySelector('.u-emoji');emo.textContent=u.e;emo.style.fontSize=fs+'px';el.querySelector('.u-hp').textContent=u.reviving?'重组 '+Math.max(0,(u.reviveTicks*.36).toFixed(1))+'s':Math.ceil(u.hp)+(u.shield>0?'+'+Math.ceil(u.shield):'')+(u.fireShield>0?'🔥'+Math.ceil(u.fireShield):'');const pct=Math.max(0,u.hp/u.maxhp*100),col=u.side==='player'?'var(--accent)':'var(--bad)',bar=el.querySelector('.u-bar i');bar.style.width=pct+'%';bar.style.background=col;if(!el._init){void el.offsetWidth;el._init=true;}});Object.keys(unitEls).forEach(id=>{if(!seen.has(parseInt(id))){if(unitEls[id])unitEls[id].remove();delete unitEls[id];}});updateAimLines();document.getElementById('enemiesleft').textContent=inBattle?entities.filter(e=>e.side==='enemy'&&e.hp>0&&(!e.boundSpirit||entities.some(o=>o.id===e.spiritOwner&&o.hp>0))).length+delayedSpawns.reduce((n,g)=>n+g.items.length,0):0;}
-function renderBench(){const list=roster.concat(temps).filter(u=>!u.placed);document.getElementById('bench').innerHTML=list.map(u=>'<div class="btile'+(u.temp?' temp':'')+'" draggable="true" ondragstart="setDrag('+u.id+',\'bench\')"><div class="e-emoji">'+u.e+'</div></div>').join('')||'<span class="dim small">空</span>';}
+function renderField(){const board=document.getElementById('board');board.classList.toggle('battle',inBattle);renderTerrain();renderRunes();updateDeathAuras();renderPlagueClouds();board.querySelectorAll('.mine').forEach(el=>el.remove());if(inBattle)mines.forEach(m=>{const d=document.createElement('div'),sz=0.4*PP();d.className='mine'+(m.arm>0?' arming':'');d.style.left=(fX(m.x)-sz/2)+'px';d.style.top=(fY(m.y)-sz/2)+'px';d.style.width=sz+'px';d.style.height=sz+'px';board.appendChild(d);});const list=inBattle?entities:roster.concat(temps).filter(u=>u.placed).concat(watchtower&&watchtower.hp>0?[watchtower]:[]);const seen=new Set();list.forEach(u=>{if(u.hp<=0||u.jumping)return;seen.add(u.id);let el=unitEls[u.id];const px=fX(u.x),py=fY(u.y),diam=u.r*2*PP(),fs=Math.max(11,Math.round(diam*0.42));if(!el){el=document.createElement('div');el.innerHTML='<span class="u-emoji"></span><span class="u-hp"></span><div class="u-bar"><i></i></div>';board.appendChild(el);unitEls[u.id]=el;el._init=false;} el.style.transition=(!el._init)?'none':(u.thrown?'left .08s linear,top .08s linear':u.charging?'none':'');let cls='unit '+(u.side==='player'?'pl':'en');if(u.temp)cls+=' temp';if(u.atkFlash>0){cls+=' atk';el.style.setProperty('--lx',((u.lungeDc||0)*5)+'px');el.style.setProperty('--ly',((u.lungeDr||0)*5)+'px');}if(u.hitFlash>0)cls+=' hit';if(u.reviving)cls+=' reviving';if(u.amphibious&&u.submerged)cls+=' submerged';if(u.phaseTicks>0)cls+=' phasing';if(u.backdoor)cls+=' backdoor';if(u.boundSpirit)cls+=' bound-spirit';if(u.stealth)cls+=' stealth';if(u.bloodTime>0)cls+=' blood';if(u.blessTime>0)cls+=' blessed';if(u.chargeGuard>0)cls+=' charge-guard';if(u.charging){cls+=' charging';el.style.setProperty('--charge-angle',(u.chargeAngle||0)+'deg');}if(!inBattle&&u.side==='player'&&!u.temp&&!u.structure){cls+=' drag';el.draggable=true;el.ondragstart=(ev)=>{setDrag(u.id,'board');try{ev.dataTransfer.setData('text','1');}catch(_){}};}else el.draggable=false;if(!inBattle&&dragData&&dragData.id===u.id)cls+=' selected';el.onclick=(!inBattle&&u.side==='player'&&!u.temp&&!u.structure)?ev=>{ev.stopPropagation();selectUnit(u.id,'board');}:null;el.className=cls;if(u.hitFlash||u.stealth||u.bloodTime>0||u.blessTime>0)el.style.boxShadow='';else if(u.buffs&&u.buffs.length&&!u.temp)el.style.boxShadow='0 0 10px '+BUFFCOL[u.buffs[0]];else if(onHigh(u))el.style.boxShadow='0 0 10px #9fe8ff';else el.style.boxShadow='';el.style.left=(px-diam/2)+'px';el.style.top=(py-diam/2)+'px';el.style.width=diam+'px';el.style.height=diam+'px';const emo=el.querySelector('.u-emoji');emo.textContent=u.e;emo.style.fontSize=fs+'px';el.querySelector('.u-hp').textContent=u.reviving?'重组 '+Math.max(0,(u.reviveTicks*.36).toFixed(1))+'s':Math.ceil(u.hp)+(u.shield>0?'+'+Math.ceil(u.shield):'')+(u.fireShield>0?'🔥'+Math.ceil(u.fireShield):'');const pct=Math.max(0,u.hp/u.maxhp*100),col=u.side==='player'?'var(--accent)':'var(--bad)',bar=el.querySelector('.u-bar i');bar.style.width=pct+'%';bar.style.background=col;if(!el._init){void el.offsetWidth;el._init=true;}});Object.keys(unitEls).forEach(id=>{if(!seen.has(parseInt(id))){if(unitEls[id])unitEls[id].remove();delete unitEls[id];}});updateAimLines();document.getElementById('enemiesleft').textContent=inBattle?entities.filter(e=>e.side==='enemy'&&e.hp>0&&(!e.boundSpirit||entities.some(o=>o.id===e.spiritOwner&&o.hp>0))).length+delayedSpawns.reduce((n,g)=>n+g.items.length,0):0;}
+function renderBench(){const list=roster.concat(temps).filter(u=>!u.placed);document.getElementById('bench').innerHTML=list.map(u=>'<button type="button" title="'+u.n+'" aria-label="选择'+u.n+'" aria-pressed="'+!!(dragData&&dragData.id===u.id)+'" class="btile'+(u.temp?' temp':'')+(dragData&&dragData.id===u.id?' selected':'')+'" draggable="true" data-unit-id="'+u.id+'"><span class="e-emoji">'+u.e+'</span></button>').join('')||'<span class="dim small">空（选中场上单位后点此撤回）</span>';document.querySelectorAll('#bench [data-unit-id]').forEach(el=>{el.ondragstart=()=>setDrag(+el.dataset.unitId,'bench');el.onclick=ev=>{ev.stopPropagation();selectUnit(+el.dataset.unitId,'bench');};});}
 function renderNext(){const c=WAVES[waveNum];document.getElementById('nextnum').textContent=c?('第 '+waveNum+' 波 · '+(WAVE_NAMES[waveNum]||'')):'已通关';document.getElementById('nextwave').innerHTML=c?Object.entries(c).map(([k,n])=>chip(ENEMIES[k].e,ENEMIES[k].n,n)).join(''):'<span class="dim small">—</span>';}
 function renderGold(){document.getElementById('gold').textContent=gold;}
 function renderArmy(){document.getElementById('benchcount').textContent=roster.length+temps.length;document.getElementById('placedcount').textContent=placedCount();document.getElementById('wavenum').textContent=waveNum;}
@@ -693,7 +746,7 @@ function openAlmanac(){renderAlmanac();document.getElementById('almanac').classL
 function closeAlmanac(){document.getElementById('almanac').classList.remove('show');}
 function addTestLeader(){if(inBattle||awaiting){log('请在间歇期添加测试领袖');return;}if(roster.concat(temps).some(u=>u.type==='leader')){log('场上已经存在步兵领袖');return;}const u=mkEntity('player','leader');u.temp=true;u.placed=true;const p=freePos();u.x=p.x;u.y=p.y;temps.push(u);log('（测试）添加步兵领袖；降至100 HP时召集援军');renderAll();}
 function init(){
- stopAllChargeAnimations();eid=0;pidc=0;gold=START_GOLD;waveNum=1;popLevel=0;inBattle=false;awaiting=false;choiceQueue=0;shopPending=false;shopStock=[];shopPurchases=0;watchtower=null;towerUp={archer:0,guard:0,fort:0};runeBuffCells=new Map();pendingAddedSymbols=[];delayedSpawns=[];roster=[];temps=[];entities=[];dangers=[];mines=[];mineId=0;plagueClouds=[];plagueCloudId=0;combatCloseNow=false;grid=null;instanceBuffs=new Map();bondSum=[];
+ stopAllChargeAnimations();dragData=null;eid=0;pidc=0;gold=START_GOLD;waveNum=1;popLevel=0;inBattle=false;awaiting=false;choiceQueue=0;shopPending=false;shopStock=[];shopPurchases=0;watchtower=null;towerUp={archer:0,guard:0,fort:0};runeBuffCells=new Map();pendingAddedSymbols=[];delayedSpawns=[];roster=[];temps=[];entities=[];dangers=[];mines=[];mineId=0;plagueClouds=[];plagueCloudId=0;combatCloseNow=false;grid=null;instanceBuffs=new Map();bondSum=[];
  if(timer){clearInterval(timer);timer=null;}
  pool=[];['infantry','infantry','shield','archer','priest'].forEach(s=>pool.push(mkEntry(s)));for(let i=0;i<10;i++)pool.push(mkEntry('empty'));
  document.getElementById('log').innerHTML='';document.getElementById('choices').classList.remove('show');document.getElementById('endscreen').classList.remove('show');document.getElementById('board').innerHTML='<div id="terrain"></div><div class="fx" id="fx"></div>';unitEls={};warnCircles=[];lastForm=[];alertTime=0;meleeAlertTime=0;supportAlertTime=0;
@@ -707,7 +760,13 @@ document.addEventListener('DOMContentLoaded',()=>{
  document.getElementById('startwave').onclick=startWave;
  document.getElementById('uppop').onclick=()=>{if(inBattle||popLevel>=POP_INC.length)return;const c=POP_COST[popLevel];if(gold<c){log('金币不足');return;}gold-=c;const inc=POP_INC[popLevel];popLevel++;log('人口上限 +'+inc+' → '+popCap()+'（'+c+'金）');renderAll();};
  document.getElementById('testgold').onclick=()=>{gold+=30;log('（测试）+30 金币');renderAll();};
- document.getElementById('testleader').onclick=addTestLeader;
+ const leaderButton=document.getElementById('testleader');if(leaderButton)leaderButton.onclick=addTestLeader;
+ document.getElementById('slotToggle').onclick=()=>toggleMobilePanel('slotpanel');
+ document.getElementById('logToggle').onclick=()=>toggleMobilePanel('logpanel');
+ document.getElementById('board').onclick=ev=>{if(dragData)fieldDrop(ev);};
+ document.getElementById('bench').onclick=ev=>{if(dragData)dropToBench(ev);};
+ new ResizeObserver(()=>{document.documentElement.style.setProperty('--mobile-header-height',document.querySelector('header').getBoundingClientRect().bottom+'px');renderField();}).observe(document.getElementById('board'));
+
 });
 </script>
 </body>

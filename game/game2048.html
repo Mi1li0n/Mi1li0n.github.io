@@ -123,6 +123,14 @@
         font-size:18px;
       }
     }
+  
+    html { display: block; }
+    body { width: 100%; min-height: 100%; height: auto; min-height: 100dvh; }
+    .wrapper { box-sizing: border-box; width: 100%; padding: 12px; }
+    .grid { box-sizing: border-box; width: min(330px, calc(100vw - 24px), calc(100dvh - 176px)); aspect-ratio: 1; padding: 8px; gap: 8px; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); touch-action: none; user-select: none; }
+    .cell { width: auto; height: auto; min-width: 0; font-size: clamp(14px, 5vw, 22px); }
+    .tip { line-height: 1.5; }
+    .restart { margin-top: 8px; min-height: 44px; padding: 8px 20px; border: 0; border-radius: 6px; background: #8f7a66; color: #fff; font: inherit; cursor: pointer; touch-action: manipulation; }
   </style>
 </head>
 <body>
@@ -132,6 +140,7 @@
       <div class="score">分数：<span id="score">0</span></div>
     </div>
     <div id="grid" class="grid"></div>
+    <div><button class="restart" id="restart" type="button">重新开始</button></div>
     <div class="tip">方向键 / 滑动屏幕移动方块 | 按 R 重新开始</div>
   </div>
 
@@ -374,7 +383,9 @@
     }
 
     // 键盘控制
+    document.getElementById("restart").addEventListener("click", initGrid);
     window.addEventListener("keydown", e => {
+      if (e.key.startsWith("Arrow")) e.preventDefault();
       if (e.key === "ArrowLeft") move("left");
       else if (e.key === "ArrowUp") move("up");
       else if (e.key === "ArrowRight") move("right");

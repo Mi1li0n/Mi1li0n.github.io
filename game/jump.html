@@ -152,6 +152,27 @@
       color: #9ca3af;
     }
 
+    
+    * { box-sizing: border-box; }
+    html { display: block; }
+    body { width: 100%; height: auto; min-height: 100dvh; }
+    .wrapper { width: 100%; padding: 10px; }
+    .game-inner { width: min(360px, calc(100vw - 44px), calc((100dvh - 236px) * 0.6)); }
+    .touch-btn { min-height: 44px; touch-action: none; user-select: none; -webkit-touch-callout: none; }
+    canvas, .overlay { touch-action: none; }
+    .overlay { overflow: auto; }
+    @media (pointer: coarse) { .touch-controls { display: flex; } }
+    @media (max-height: 480px) and (min-width: 540px) {
+      .wrapper { display: grid; grid-template-columns: 220px auto; justify-content: center; align-items: center; column-gap: 24px; }
+      h1, .stats-row, .tip { grid-column: 1; }
+      h1 { align-self: end; }
+      .game-wrap { grid-column: 2; grid-row: 1 / 4; margin: 0; }
+      .game-inner { width: min(360px, calc((100dvh - 88px) * 0.6)); }
+      .game-card { padding: 6px; }
+      .touch-controls { margin-top: 6px; }
+      .overlay { font-size: 12px; padding: 8px; }
+      .overlay-title { font-size: 15px; }
+    }
     </style>
 </head>
 <body>
@@ -211,11 +232,10 @@
   function resizeCanvasOnly() {
     const rect = innerEl.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
-    cw = rect.width;
-    ch = rect.height || (rect.width * 5 / 3);
-    canvas.width = cw * dpr;
-    canvas.height = ch * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // Keep game coordinates stable when the viewport or orientation changes.
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    ctx.setTransform(canvas.width / cw, 0, 0, canvas.height / ch, 0, 0);
   }
 
   // ========= 音效（简单一点） =========
@@ -857,6 +877,7 @@
 
   // ========= 输入 =========
   function onKeyDown(e) {
+    if (e.key.startsWith("Arrow") || e.key === " ") e.preventDefault();
     if (state === "ready" || state === "gameover") {
       if (state === "gameover") {
         resetGame();
@@ -932,10 +953,11 @@
   bindTouchBtn(btnLeft, "left");
   bindTouchBtn(btnRight, "right");
 
-  // 窗口缩放时：重算画布 + 重开一局
-  window.addEventListener("resize", () => {
-    resizeCanvasOnly();
-    resetGame();
+  // Resize only the rendering surface; preserve the player, platforms and score.
+  window.addEventListener("resize", resizeCanvasOnly);
+  window.addEventListener("blur", () => { keys.left = keys.right = false; });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) keys.left = keys.right = false;
   });
 
   // ========= 启动 =========

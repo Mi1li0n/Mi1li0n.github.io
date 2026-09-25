@@ -101,7 +101,7 @@ dialog[data-kind="loadout"]{width:min(1080px,96vw);height:min(780px,94dvh);max-h
 .exp-card[data-ability-card]{border-color:#bd91d9;background:linear-gradient(140deg,#49405c,#203039)}
 .exp-card[data-ability-card][aria-disabled="true"]{opacity:.58;filter:saturate(.55)}
 
-/* Desktop hand stays over the map; changing position never resizes the scene. */
+/* Card dock position controls; desktop geometry is refined below. */
 #card-dock [data-card-position]{display:none}
 @media(min-width:900px){
  #card-dock [data-card-position]{display:block}
@@ -114,11 +114,52 @@ dialog[data-kind="loadout"]{width:min(1080px,96vw);height:min(780px,94dvh);max-h
 }
 @media(max-height:599px){#card-dock [data-card-position]{display:none}}
 @media(min-width:900px){body.card-dock-open:has(#card-dock[data-position="side"]) #card-tab{right:332px;z-index:25}}
+
+/* Desktop: fixed card column, compact status/task row and unobstructed map. */
+.hand-edge-condition{display:none}
+@media(min-width:900px) and (min-height:600px) and (pointer:fine){
+ .game{max-width:1680px;padding:12px;display:grid!important;grid-template-columns:minmax(0,1fr) 248px;grid-template-rows:38px 48px minmax(0,1fr);gap:10px;position:relative}
+ .mast{grid-column:1/-1;grid-row:1;height:38px;min-height:38px}.brand h1{font-size:20px;letter-spacing:2px}
+ .hud-strip{grid-column:1;grid-row:2;min-width:0;min-height:0;border-top:1px solid #30444b;padding:0 8px;gap:18px;font-size:13px}.hud-strip #ui-conditions{max-width:45%;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ #task-button{grid-column:2;grid-row:2;min-height:0;height:48px;padding:5px 9px;gap:7px;border-radius:7px}
+ #task-arrow{font-size:20px;width:18px}.task-copy{gap:2px}.task-copy strong{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.task-copy small{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.task-more{font-size:10px}
+ .play.game-layout{grid-column:1/-1;grid-row:3;grid-template-areas:none;min-width:0;min-height:0;gap:6px}body.card-layout-side .play.game-layout{grid-column:1}
+ .map-center{min-height:0}#action-feedback{height:24px;padding:3px 6px;line-height:18px}
+ .player-panel{padding:0;border:0;background:transparent}.control-row{margin:0;gap:8px;justify-content:flex-end}.control-row #wait{min-height:38px;padding:6px 12px}.control-row .interact{min-height:38px;flex:0 1 320px;margin-left:0;padding:6px 14px}
+ .player-panel .aim-bar{margin-bottom:6px}.aim-bar button{min-height:38px}
+ #danger-banner{position:absolute;left:20px;right:20px;top:120px;z-index:12;min-height:34px;padding:7px 10px}body.card-layout-side #danger-banner{right:280px}
+ #save-notice{position:absolute;bottom:56px;left:20px;z-index:30;background:#192c32;padding:8px}
+ #card-dock[data-position="side"]{width:248px;right:auto;padding:0 8px;box-shadow:none;border-color:#385459;background:linear-gradient(160deg,#1c3037,#102229)}
+ #card-dock[data-position="side"] .dock-heading{height:68px;padding:7px 2px;gap:4px;align-content:center}
+ #card-dock[data-position="side"] .dock-heading h2{font-size:15px;min-width:82px}
+ #card-dock[data-position="side"] .dock-heading button{padding:3px 6px;min-height:26px;font-size:11px}
+ #card-dock[data-position="side"] [data-card-pin]{display:none}
+ #card-dock[data-position="side"] .hand-row>.exp-card{border-radius:8px;box-shadow:0 2px 6px #0005;transition:border-color .1s;transform:none!important}
+ #card-dock[data-position="side"] .hand-row>.exp-card:hover,#card-dock[data-position="side"] .hand-row>.exp-card.previewing,#card-dock[data-position="side"] .hand-row>.exp-card:focus-visible{z-index:var(--card-stack-index)!important;transform:none!important}
+ #card-dock[data-position="side"] .exp-card[data-hand-compressed="true"]>:not(.hand-edge-label){visibility:hidden!important}
+ #card-dock[data-position="side"] .exp-card[data-hand-compressed="true"]>.hand-edge-label{visibility:visible!important;display:flex;gap:8px;align-items:center;justify-content:space-between;writing-mode:horizontal-tb;left:9px;right:9px;top:4px;line-height:17px;letter-spacing:0;text-align:left;font-size:12px}
+ #card-dock[data-position="side"] .hand-edge-name{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+ #card-dock[data-position="side"] .hand-edge-condition{display:block;max-width:92px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;color:#b9c9bd}
+ #card-dock[data-position="side"] .card-art{height:58px}#card-dock[data-position="side"] .card-caption{-webkit-line-clamp:3}
+ body.card-dock-open:has(#card-dock[data-position="side"]) #card-tab{display:none}
+ #card-popover{box-shadow:0 8px 24px #0008}
+}
+
+/* Explicit next steps replace directional task arrows. */
+#task-arrow,#compass,#mobile-arrow{display:none!important}
+#task-button{text-align:left}.task-copy{flex:1;min-width:0}#task-requirement,#task-hint{display:block;font-size:11px;line-height:1.45;white-space:normal;color:#d8c8a5}#task-hint{color:#a9bebb}#task-requirement:empty,#task-hint:empty{display:none}
+@media(min-width:900px) and (min-height:600px) and (pointer:fine){
+ .game{grid-template-rows:38px 98px minmax(0,1fr)}.hud-strip{grid-column:2;align-content:center;flex-wrap:wrap;gap:8px;padding:8px}.hud-strip #ui-conditions{max-width:100%;width:100%;text-align:left}
+ #task-button{grid-column:1;height:98px;padding:8px 12px}.task-copy strong{font-size:14px}.task-copy small{font-size:10px}#task-hint{font-size:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}#task-requirement{font-size:12px}#danger-banner{top:170px}
+}
+@media(max-width:899px),(pointer:coarse){#task-button{min-height:84px;height:auto;padding:6px 9px;flex:none}.task-copy strong{font-size:13px}.task-copy small{font-size:10px}#task-hint{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
+@media(max-height:599px){#task-button{min-height:66px;padding:4px 8px}#task-progress{display:none}#task-hint{font-size:10px;line-height:1.3;-webkit-line-clamp:1}}
+@media(min-width:900px) and (min-height:600px) and (max-height:760px) and (pointer:fine){#card-dock[data-position="side"] .dock-heading{height:58px}#card-dock[data-position="side"] .exp-card[data-hand-compressed="true"]>.hand-edge-label{top:2px;line-height:14px;font-size:11px}}
 </style></head>
 <body><main class="game">
 <header class="mast"><div class="brand"><span class="brand-icon">✧</span><h1>深处有光</h1></div><nav aria-label="工具"><button id="bag-button">背包 <kbd>I</kbd></button><button id="equipment-button">装备 <kbd>E</kbd></button><button id="journal-button">手记 <kbd>J</kbd></button><button id="more-button" aria-expanded="false" aria-controls="more-tools">更多</button><div id="more-tools" hidden><button id="map-button">地图 <kbd>M</kbd></button><button id="run-button">本局情况</button><button id="zoom-button">视野</button><button id="help-button">玩法说明</button><button id="restart-button">重新开始</button></div></nav></header>
 <section class="hud-strip" aria-label="生存状态"><span id="ui-health"></span><span id="ui-armor"></span><button id="offhand-button" aria-label="切换副手">副手</button><span id="ui-conditions"></span></section>
-<button id="task-button" aria-label="当前目标，点击查看章节详情"><span id="task-arrow" aria-hidden="true"></span><span class="task-copy"><strong id="task-title"></strong><small id="task-progress"></small></span><span class="task-more">详情 ›</span></button>
+<button id="task-button" aria-label="当前目标，点击查看章节详情"><span id="task-arrow" aria-hidden="true"></span><span class="task-copy"><strong id="task-title"></strong><small id="task-progress"></small><span id="task-requirement"></span><span id="task-hint"></span></span><span class="task-more">详情 ›</span></button>
 <button id="danger-banner" hidden aria-label="当前危险，点击查看详情" role="status"></button>
 <p id="save-notice" role="alert" hidden></p>
 <section class="mobile-summary" aria-label="状态与当前目标"><div class="mobile-vitals"><span class="hearts" id="mobile-health"></span><span id="mobile-armor"></span><span id="mobile-light"></span><span id="mobile-turn"></span></div><div class="mobile-mission"><span id="mobile-arrow"></span><span id="mobile-objective"></span></div><p id="mobile-danger" class="mobile-danger" role="status"></p></section>
@@ -127,7 +168,7 @@ dialog[data-kind="loadout"]{width:min(1080px,96vw);height:min(780px,94dvh);max-h
 <aside class="bag-panel" aria-label="随身背包"><div class="panel-heading"><h2>背包</h2><span id="bag-status"></span></div><div id="bag-content"></div><div class="bag-panel-foot"><span id="ore"></span><button id="pickup">脚下物资 <kbd>G</kbd></button></div></aside>
 <section class="map-center" aria-label="地图"><div class="map-frame"><canvas id="world" width="960" height="720" tabindex="0" aria-label="周围矿洞；方向键移动，空格互动"></canvas><div class="map-top"><span id="depth"></span><button id="discovery-button" hidden>新线索</button></div><div class="map-bottom"><span id="location"></span><span id="facing"></span></div><div id="mobile-feedback" class="mobile-feedback"></div></div><div id="action-feedback" role="status" aria-live="polite"></div></section>
 <aside class="info-panel" aria-label="目标、线索与事件"><section class="goal-block"><span class="overall-goal">总目标 · 探索更深处</span><div class="panel-heading"><h2>眼下要做</h2></div><div class="mission"><strong id="objective"></strong><span id="compass"></span></div></section><section class="critical-block" aria-label="当前危险"><p id="collapse"></p><p id="equipment-note"></p><p id="key-info"></p></section><section id="context-panel" hidden aria-label="附近物资"></section><section class="adventure-block" aria-label="本章玩法与同伴"><h2 class="panel-label" id="chapter-play-title"></h2><p id="chapter-play-tip"></p><p id="chapter-condition"></p><p id="risk-status"></p><p id="crew-status"></p><button id="assist-button">呼叫同伴援助</button></section><section class="clue-block"><h2 class="panel-label">线索</h2><div id="clue-content"></div></section><section class="event-block"><h2 class="panel-label">刚刚发生</h2><div id="feedback" class="feedback"></div><div id="event-log"></div></section></aside>
-<section class="player-panel" aria-label="道具与行动"><div class="vitals"><div><span class="stat-label">生命</span><span class="hearts" id="health"></span></div><div><span class="stat-label">护甲</span><span id="armor"></span></div><div class="tool-status"><span id="pick"></span><span id="light"></span></div></div><div class="equipment-strip"><span id="equipment-summary"></span><span>E 查看装备 · Q 换副手</span></div><div id="aim-bar" class="aim-bar" hidden><p id="aim-hint" role="status"></p><button id="confirm-aim">确认使用</button><button id="cancel-aim">取消</button></div><div id="hand-options" hidden></div><div class="control-row"><div class="dpad" aria-label="移动方向"><button data-move="0,-1" aria-label="向上">↑</button><button data-move="-1,0" aria-label="向左">←</button><button data-move="0,1" aria-label="向下">↓</button><button data-move="1,0" aria-label="向右">→</button><button id="wait-touch" aria-label="原地等待1回合">等待</button></div><button id="wait" class="wait-desktop" title="前进1回合">等待 <kbd>.</kbd></button><button id="interact" class="interact"><span id="interact-label"></span><kbd>空格</kbd></button></div></section>
+<section class="player-panel" aria-label="道具与行动"><div class="vitals"><div><span class="stat-label">生命</span><span class="hearts" id="health"></span></div><div><span class="stat-label">护甲</span><span id="armor"></span></div><div class="tool-status"><span id="pick"></span><span id="light"></span></div></div><div class="equipment-strip"><span id="equipment-summary"></span><span>E 查看装备 · Q 换副手</span></div><div id="aim-bar" class="aim-bar" hidden><p id="aim-hint" role="status"></p><button id="cancel-aim">取消</button></div><div id="hand-options" hidden></div><div class="control-row"><div class="dpad" aria-label="移动方向"><button data-move="0,-1" aria-label="向上">↑</button><button data-move="-1,0" aria-label="向左">←</button><button data-move="0,1" aria-label="向下">↓</button><button data-move="1,0" aria-label="向右">→</button><button id="wait-touch" aria-label="原地等待1回合">等待</button></div><button id="wait" class="wait-desktop" title="前进1回合">等待 <kbd>.</kbd></button><button id="interact" class="interact"><span id="interact-label"></span><kbd>空格</kbd></button></div></section>
 </section></main><button id="card-tab" aria-controls="card-dock" aria-expanded="false">卡包 <span></span></button><aside id="card-dock" hidden aria-label="卡包"></aside><aside id="card-popover" hidden aria-label="卡片详情"></aside><dialog id="dialog"><div id="dialog-content"></div></dialog>
 <script>(function(root){
 'use strict';
@@ -437,8 +478,8 @@ function layoutChapter(seed,n,mods){
  const rotation=rl.int(4),mirror=rl.next()<.5;
  const orient=([x,y])=>{if(mirror)x=SIZE-1-x;for(let i=0;i<rotation;i++)[x,y]=[SIZE-1-y,x];return [x,y]};
  const variant=rng(stream(seed,'chapter-blueprint',n)).int(3),mapStyle=['rail-mine','ring-city','braided-river'][n];
- // Stratified jitter keeps scenes separated; shuffled roles let the camp occupy the interior too.
- const slots=rl.shuffle(Array.from({length:25},(_,i)=>({x:18+(i%5)*36+rl.int(11)-5,y:18+Math.floor(i/5)*36+rl.int(11)-5}))).slice(0,22);
+ // Best-candidate points spread landmarks without exposing rows or equal-sized room slots.
+ const slots=[];for(let i=0;i<22;i++){let best=null;for(let j=0;j<32;j++){const p={x:17+rl.int(SIZE-34),y:17+rl.int(SIZE-34)},gap=slots.length?Math.min(...slots.map(a=>Math.hypot(a.x-p.x,a.y-p.y))):1,score=gap*(.78+rl.next()*.44);if(!best||score>best.score)best={...p,score};}slots.push({x:best.x,y:best.y});}
  const camp=slots[0],nearSlots=slots.slice(1).sort((a,b)=>Math.hypot(a.x-camp.x,a.y-camp.y)-Math.hypot(b.x-camp.x,b.y-camp.y));
  const workshopSlot=nearSlots[rl.int(2)],workshopIndex=slots.indexOf(workshopSlot);[slots[2],slots[workshopIndex]]=[slots[workshopIndex],slots[2]];
  const roles=['camp','rescue','workshop','shaft','lake','pump','shrine','crossing','quay'];
@@ -450,7 +491,7 @@ function layoutChapter(seed,n,mods){
  ][n];
  const extras=[['crystal-fold','晶簇褶洞','crystal'],['mushroom-garden','菌光花圃','garden'],['kiln-vault','冷灰窑室','kiln'],['switchback-mine','折返采坑','switchback'],['ossuary-steps','白骨阶庭','ossuary'],['cistern-ring','环形蓄水庭','cistern'],['fallen-observatory','倾倒观星台','observatory'],['quartz-fan','石英扇洞','quartz'],['root-hollow','古根空洞','roots'],['forge-spur','支线锻炉','forge'],['reed-delta','芦苇三角洲','delta'],['silent-archive','无声藏书廊','archive'],['echo-chasm','双声裂谷','chasm']];
  const scaled=v=>Math.round(v*SCALE);
- const bases=slots.map((p,i)=>({id:i<9?regionIds[i]:extras[i-9][0],name:i<9?names[i]:extras[i-9][1],role:i<9?roles[i]:extras[i-9][2],x:p.x,y:p.y,rx:8+rl.int(4),ry:7+rl.int(5),shape:i}));
+ const bases=slots.map((p,i)=>({id:i<9?regionIds[i]:extras[i-9][0],name:i<9?names[i]:extras[i-9][1],role:i<9?roles[i]:extras[i-9][2],x:p.x,y:p.y,rx:i<4?7+rl.int(7):i%4===0?18+rl.int(6):7+rl.int(12),ry:i<4?6+rl.int(6):i%4===0?14+rl.int(7):6+rl.int(11),shape:i}));
  const regions=bases.map((b,index)=>{const [cx,cy]=orient([b.x,b.y]);return {...b,index,cx,cy,terrain:n===1?'ruin':n===2?'river':['lake','pump','quay','cistern','delta'].includes(b.role)?'river':['camp','workshop','shaft','forge'].includes(b.role)?'mine':'cave',rx:rotation%2?b.ry:b.rx,ry:rotation%2?b.rx:b.ry,x0:SIZE-1,y0:SIZE-1,x1:0,y1:0,doors:{}}});
  const center=i=>[regions[i].cx,regions[i].cy];
  const floor=(x,y,protect=false)=>{const t=at(x,y);if(!t||t.kind==='wall')return;t.kind='floor';if(protect)protectedFloor.add(key(x,y))};
@@ -460,74 +501,51 @@ function layoutChapter(seed,n,mods){
   if(nx*nx+ny*ny<=edge*edge)floor(x,y);
  }};
  for(const r of regions){
-  const phase=rl.next()*Math.PI*2;
-  // Each named location has its own footprint rather than repeating a room stamp.
-  for(let dy=-r.ry-2;dy<=r.ry+2;dy++)for(let dx=-r.rx-2;dx<=r.rx+2;dx++){
-   const x=r.cx+dx,y=r.cy+dy,u=dx/r.rx,v=dy/r.ry,a=Math.atan2(v,u),rad=u*u+v*v;let inside=false;
-   switch(r.shape){
-    case 0:inside=Math.abs(u)<.9&&Math.abs(v)<.72||rad<.44;break;
-    case 1:inside=Math.abs(u)<.4&&Math.abs(v)<1||Math.abs(v)<.38&&Math.abs(u)<.85;break;
-    case 2:inside=Math.abs(u)<1&&Math.abs(v)<.62||u>.3&&Math.abs(v)<1;break;
-    case 3:inside=Math.abs(u)<.45&&Math.abs(v)<1||rad<.46;break;
-    case 4:inside=rad<1.1&&!(u>.12&&v<.12&&rad>.22);break;
-    case 5:inside=Math.abs(u)<.9&&Math.abs(v)<.9&&!(u<-.2&&v<-.2);break;
-    case 6:inside=Math.abs(u)+Math.abs(v)<1.15;break;
-    case 7:inside=Math.abs(u)<.32||Math.abs(v)<.32||rad<.48;inside=inside&&rad<1.2;break;
-    case 8:inside=Math.abs(v)<.34&&Math.abs(u)<1||u<-.36&&Math.abs(v)<1;break;
-    case 9:inside=rad<Math.pow(.84+.2*Math.sin(a*5+phase),2);break;
-    case 10:inside=((u+.36)**2+v*v<.57)||((u-.36)**2+(v+.22)**2<.57);break;
-    case 11:inside=Math.abs(u)<.96&&Math.abs(v)<.96&&(rad>.25||Math.abs(u)<.16||Math.abs(v)<.16);break;
-    case 12:inside=Math.abs(v)<.23||Math.abs(v-.65)<.18||Math.abs(v+.65)<.18||u>.65&&v>-.8&&v<.8;inside=inside&&Math.abs(u)<1;break;
-    case 13:inside=Math.abs(u)<1-Math.floor(Math.abs(v)*3)*.22&&Math.abs(v)<1;break;
-    case 14:inside=rad<1&&(rad>.4||Math.abs(v)<.2);break;
-    case 15:inside=rad<.65||Math.abs(u)<.3&&v>.1&&v<1.18;break;
-    case 16:inside=Math.abs(v)<.92&&u>-.9&&u<.8-Math.abs(v)*.7;break;
-    case 17:inside=rad<.35||Math.abs(v-Math.sin(u*4)*.43)<.27&&Math.abs(u)<1;break;
-    case 18:inside=Math.abs(u)<1&&Math.abs(v)<.42||Math.abs(u+.56)<.24&&Math.abs(v)<1;break;
-    case 19:inside=Math.abs(u)<1&&Math.abs(v)<.18||Math.abs(v-u*.65)<.2&&Math.abs(u)<1||Math.abs(v+u*.65)<.2&&Math.abs(u)<1;break;
-    case 20:inside=Math.abs(u)<1&&Math.abs(v)<.88&&(Math.abs(v)<.22||Math.abs(u)<.2||Math.abs(u)>.7);break;
-    case 21:inside=Math.abs(v-u*.55)<.24&&Math.abs(u)<1||(u+.55)**2+(v-.2)**2<.25||(u-.55)**2+(v+.2)**2<.25;break;
-   }
+  const phase=rl.next()*Math.PI*2,human=[0,2,3].includes(r.index),lobes=Array.from({length:2+rl.int(3)},()=>({x:(rl.next()-.5)*r.rx*1.05,y:(rl.next()-.5)*r.ry*1.05,rx:r.rx*(.36+rl.next()*.28),ry:r.ry*(.35+rl.next()*.3)}));
+  // Unequal overlapping lobes leave coves, necks and rock islands rather than a room stamp.
+  for(let dy=-r.ry-4;dy<=r.ry+4;dy++)for(let dx=-r.rx-4;dx<=r.rx+4;dx++){
+   const x=r.cx+dx,y=r.cy+dy,u=dx/r.rx,v=dy/r.ry,a=Math.atan2(v,u),rad=u*u+v*v,edge=.79+.17*Math.sin(a*3+phase)+.11*Math.sin(a*5-phase)+.06*Math.sin(a*9+phase);
+   let inside=rad<edge*edge||lobes.some(l=>((dx-l.x)/l.rx)**2+((dy-l.y)/l.ry)**2<1);
+   if(human)inside=inside||Math.abs(u)<.7&&Math.abs(v)<.48;
    const t=at(x,y);if(!t||t.kind==='wall')continue;
-   if(n===2&&rad<1.7)t.kind='rock';
-   if(inside){floor(x,y);if(r.index>=9&&Math.abs(dx*3+dy*5+r.index)%11===0)t.sceneDetail=r.role;if(n===1)t.paving=true;if(r.role==='crossing'&&Math.abs(dx)<2&&Math.abs(dy)<2)t.mosaic=true;}
+   if(n===2&&rad<1.45&&t.kind==='water')t.kind='rock';
+   if(inside){floor(x,y);if(r.index>=9&&Math.abs(dx*3+dy*5+r.index)%11===0)t.sceneDetail=r.role;if(n===1&&(human||r.role==='crossing')&&Math.abs(u)<.68&&Math.abs(v)<.58)t.paving=true;if(r.role==='crossing'&&Math.abs(dx)<2&&Math.abs(dy)<2)t.mosaic=true;}
   }
   brush(r.cx,r.cy,2);floor(r.cx,r.cy,true);
  } // Centerlines are rasterized into four-way walkable steps.
  const curve=points=>{const out=[],seen=new Set();let last=null;
   const add=(x,y)=>{if(x<=1||y<=1||x>=SIZE-2||y>=SIZE-2)return;if(!seen.has(key(x,y))){seen.add(key(x,y));out.push([x,y])}last=[x,y]};
   const connect=(x,y)=>{if(!last){add(x,y);return}let [lx,ly]=last;while(lx!==x||ly!==y){if(Math.abs(x-lx)>=Math.abs(y-ly)&&lx!==x)lx+=Math.sign(x-lx);else ly+=Math.sign(y-ly);add(lx,ly)}};
-  if(n===1){for(const [x,y]of points)connect(x,y);return out;}
   for(let i=0;i<points.length-1;i++){const p0=points[Math.max(0,i-1)],p1=points[i],p2=points[i+1],p3=points[Math.min(points.length-1,i+2)],steps=Math.max(4,Math.ceil(Math.hypot(p2[0]-p1[0],p2[1]-p1[1])*3));
    for(let j=0;j<=steps;j++){const t=j/steps,t2=t*t,t3=t2*t;const coord=k=>Math.round(.5*((2*p1[k])+(-p0[k]+p2[k])*t+(2*p0[k]-5*p1[k]+4*p2[k]-p3[k])*t2+(-p0[k]+3*p1[k]-3*p2[k]+p3[k])*t3));connect(coord(0),coord(1));}
   }return out;
  };
  const makePath=(a,b,bends,width=0,rail=false)=>{const cells=curve([center(a),...bends.map(orient),center(b)]);
-  cells.forEach(([x,y],i)=>{floor(x,y,true);const radius=width+(i%13<4&&width===0?1:0);brush(x,y,radius);if(rail){const prev=cells[Math.max(0,i-1)],next=cells[Math.min(cells.length-1,i+1)];at(x,y).rail=Math.abs(next[0]-prev[0])>=Math.abs(next[1]-prev[1])?'horizontal':'vertical';}if(i>4&&i<cells.length-4&&i%9===0)hazardSpots.push([x,y]);});
+  cells.forEach(([x,y],i)=>{floor(x,y,true);const radius=rail?width:Math.max(0,Math.round(width+.6+Math.sin(i*.17+a)*.8+Math.sin(i*.061+b)*.65));brush(x,y,radius);if(rail){const prev=cells[Math.max(0,i-1)],next=cells[Math.min(cells.length-1,i+1)];at(x,y).rail=Math.abs(next[0]-prev[0])>=Math.abs(next[1]-prev[1])?'horizontal':'vertical';}if(i>4&&i<cells.length-4&&i%9===0)hazardSpots.push([x,y]);});
   const middle=cells[Math.floor(cells.length/2)];links.push({a,b,pair:[a,b].sort((x,y)=>x-y).join('-'),doorA:cells[0],doorB:cells.at(-1),cells,mid:middle});return cells;
  };
  const canonical=i=>[bases[i].x,bases[i].y];
- const connection=(a,b,width=0,rail=false)=>{const A=canonical(a),B=canonical(b);let bends;
-  if(n===1){bends=[[A[0],B[1]]];}
-  else if(n===0){const mx=Math.round((A[0]+B[0])/2);bends=[[mx,A[1]],[mx,B[1]]];}
-  else{const mx=Math.round((A[0]+B[0])/2),my=Math.round((A[1]+B[1])/2);bends=[[mx+(variant-1)*2,my+(a%2?3:-3)]];}
+ const connection=(a,b,width=0,rail=false)=>{const A=canonical(a),B=canonical(b),dx=B[0]-A[0],dy=B[1]-A[1],length=Math.max(1,Math.hypot(dx,dy)),sway=(rl.next()<.5?-1:1)*(4+rl.int(10)),clamp=v=>Math.max(4,Math.min(SIZE-5,Math.round(v)));let bends;
+  if(rail){const mx=Math.round((A[0]+B[0])/2);bends=[[mx,A[1]],[mx,B[1]]];}
+  else bends=[.32,.68].map((t,i)=>[clamp(A[0]+dx*t-dy/length*sway*(i?-.6:1)),clamp(A[1]+dy*t+dx/length*sway*(i?-.6:1))]);
   return makePath(a,b,bends,width,rail);
  };
  const tidalCells=[],tidalGroups=[];
  // A minimum spanning network keeps corridors local; nearby extra links create loops.
- const joined=new Set([0]);while(joined.size<regions.length){let best=null;for(const a of joined)for(let b=0;b<regions.length;b++){if(joined.has(b))continue;const A=canonical(a),B=canonical(b),distance=Math.hypot(A[0]-B[0],A[1]-B[1]);if(!best||distance<best.distance)best={a,b,distance};}connection(best.a,best.b,n===1?1:0,n===0);joined.add(best.b);}
+ const joined=new Set([0]);while(joined.size<regions.length){let best=null;for(const a of joined)for(let b=0;b<regions.length;b++){if(joined.has(b))continue;const A=canonical(a),B=canonical(b),distance=Math.hypot(A[0]-B[0],A[1]-B[1]);if(!best||distance<best.distance)best={a,b,distance};}connection(best.a,best.b,rl.next()<.27?1:0,n===0&&([0,2,3].includes(best.a)||[0,2,3].includes(best.b)));joined.add(best.b);}
  const pairs=[];for(let a=0;a<regions.length;a++)for(let b=a+1;b<regions.length;b++){const A=canonical(a),B=canonical(b),distance=Math.hypot(A[0]-B[0],A[1]-B[1]);if(distance<62&&!links.some(l=>l.pair===a+'-'+b))pairs.push({a,b,distance});}
- for(const p of rl.shuffle(pairs).slice(0,12))connection(p.a,p.b,n===1?1:0,n===0&&rl.next()<.45);
+ for(const p of rl.shuffle(pairs).slice(0,9))connection(p.a,p.b,rl.next()<.3?1:0,n===0&&rl.next()<.22);
  // Branch alcoves along long routes hold light or small supplies, not repeated scenes.
  for(const link of links)for(let i=12;i<link.cells.length-10;i+=18){const [x,y]=link.cells[i];brush(x,y,2);const t=at(x,y);if(rl.next()<.32)t.torch=true;else t.items={ore:1};}
  if(n===2){
   // Temporary shoals are side routes; the spanning network remains dry at high tide.
   for(const r of regions.slice(9,12)){const cells=[];for(let dx=-2;dx<=2;dx++){const x=r.cx+dx,y=r.cy+3,t=at(x,y);if(t&&!protectedFloor.has(key(x,y))){floor(x,y);t.tidal=true;t.damp=true;cells.push([x,y]);}}if(cells.length){tidalGroups.push(cells);tidalCells.push(...cells);}}
   for(const link of links)for(const [x,y]of link.cells){const t=at(x,y);if(DIRS.filter(([dx,dy])=>at(x+dx,y+dy)?.kind==='water').length>=2){t.kind='bridge';t.permanentCauseway=true;}}
- } // 岩柱只收紧洞腔，不侵占已经绘出的通道中心线。
- for(const index of [4,7]){const r=regions[index];for(const [dx,dy]of [[-2,-1],[2,2]])for(let y=r.cy+dy-1;y<=r.cy+dy+1;y++)for(let x=r.cx+dx-1;x<=r.cx+dx+1;x++){
-  if(!protectedFloor.has(key(x,y))&&at(x,y)?.kind==='floor'&&Math.abs(x-r.cx)+Math.abs(y-r.cy)>1)at(x,y).kind='rock';
- }}
+ } // Natural stone pillars stay outside protected route centerlines and site landing areas.
+ for(const r of regions.filter(r=>r.index>=4)){const count=2+Math.floor(r.rx*r.ry/100);for(let i=0;i<count;i++){const px=r.cx+Math.round((rl.next()-.5)*r.rx*1.35),py=r.cy+Math.round((rl.next()-.5)*r.ry*1.35),rx=1+rl.int(3),ry=1+rl.int(2);for(let y=py-ry;y<=py+ry;y++)for(let x=px-rx;x<=px+rx;x++){
+  const t=at(x,y);if(!t||t.kind!=='floor'||t.rail||t.tidal||protectedFloor.has(key(x,y))||regions.some(a=>Math.abs(x-a.cx)+Math.abs(y-a.cy)<4))continue;
+  if(((x-px)/rx)**2+((y-py)/ry)**2<=1){t.kind='wall';t.pillar=true;}
+ }}}
  // 水体沿岩岸延展，先保留连续岸路；排水是可选近路，不是出口通行证。
  for(const [index,dx,dy,rx,ry]of [[4,1,-1,4,2],[8,2,0,2,4],...(n===2?[[5,-2,1,2,3]]:[])]){const r=regions[index];for(let y=r.cy+dy-ry;y<=r.cy+dy+ry;y++)for(let x=r.cx+dx-rx;x<=r.cx+dx+rx;x++){
   const t=at(x,y);if(!t||t.kind==='wall'||protectedFloor.has(key(x,y)))continue;if(((x-r.cx-dx)/rx)**2+((y-r.cy-dy)/ry)**2<=1.05)t.kind='water';
@@ -543,7 +561,7 @@ function layoutChapter(seed,n,mods){
  for(const [x,y]of shrinePath){const t=at(x,y);protectedFloor.add(key(x,y));if(['rock','ore','hard'].includes(t.kind)){t.kind='hard';t.shortcut=true;shrineCells.push([x,y])}}
  // 起点背后的旧路确已塌死；它是眼前地形，不是一个导航到不了的任务。
  const homeSlot={x:regions[0].cx,y:regions[0].cy};const oldEnd=orient([bases[0].x,Math.max(3,bases[0].y-7)]),oldRoad=curve([center(0),orient([bases[0].x,bases[0].y-3]),oldEnd]);
- oldRoad.forEach(([x,y],i)=>{if(i<oldRoad.length-4)floor(x,y,true);else{const t=at(x,y);if(!protectedFloor.has(key(x,y)))t.kind='rubble';}});
+ oldRoad.forEach(([x,y],i)=>{if(i<oldRoad.length-4)floor(x,y,true);else{const t=at(x,y);if(t.kind!=='wall'&&!protectedFloor.has(key(x,y)))t.kind='rubble';}});
  // 区域标签用邻近地名分配，没有阻挡移动或挖掘的功能。
  for(let y=1;y<SIZE-1;y++)for(let x=1;x<SIZE-1;x++){let closest=0,distance=Infinity;for(const r of regions){const d=(x-r.cx)**2+(y-r.cy)**2;if(d<distance){distance=d;closest=r.index}}
   const r=regions[closest];at(x,y).region=closest;r.x0=Math.min(r.x0,x);r.x1=Math.max(r.x1,x);r.y0=Math.min(r.y0,y);r.y1=Math.max(r.y1,y);
@@ -572,15 +590,22 @@ function layoutChapter(seed,n,mods){
  addChest('river-cache',4,'漂到石滩的木箱',{bread:1,rope:1,ore:2},['helmet'],[-3,1]);
  addChest('shrine-cache',6,'旅人的祭品',{rune:1,torch:1},[],[1,2]);
  addChest('deep-cache',8,['检修口封存箱','南城门军械柜','河口漂来的浮箱'][n],{bread:1,bomb:1},['pack'],[-2,1]);
- for(const r of regions.slice(9))addChest('scene-cache-'+r.id,r.index,r.name+'遗留物资',[{bread:1,torch:1},{ore:3,bomb:1},{rope:1,rune:1}][r.index%3],[],[1,1]);
+ // Only some side chambers contain supplies; edge finds blend into rock, debris or old workings.
+ const cacheForms=['debris','corpse','machine','crevice'],cacheNames={debris:'碎石下的油布包',corpse:'旧骸身边的行囊',machine:'废机腹内的工具匣',crevice:'岩缝深处的遗物'};
+ const sceneCacheRegions=rl.shuffle(regions.slice(9)).slice(0,5+rl.int(3));
+ for(const r of sceneCacheRegions){const candidates=[];for(let y=Math.max(2,r.cy-r.ry-3);y<=Math.min(SIZE-3,r.cy+r.ry+3);y++)for(let x=Math.max(2,r.cx-r.rx-3);x<=Math.min(SIZE-3,r.cx+r.rx+3);x++){
+  const t=at(x,y),distance=Math.abs(x-r.cx)+Math.abs(y-r.cy);if(t?.kind!=='floor'||t.region!==r.index||distance<5||!siteMain.has(key(x,y))||protectedFloor.has(key(x,y))||sites.some(a=>Math.abs(a.x-x)+Math.abs(a.y-y)<3))continue;
+  const walls=DIRS.filter(([dx,dy])=>!passableKind(at(x+dx,y+dy)?.kind)).length;if(walls)candidates.push({x,y,walls});
+ }if(!candidates.length)continue;const best=rl.shuffle(candidates).sort((a,b)=>b.walls-a.walls)[0],cacheForm=cacheForms[r.index%cacheForms.length],a=addChest('scene-cache-'+r.id,r.index,cacheNames[cacheForm],[{bread:1,torch:1},{ore:3,bomb:1},{rope:1,rune:1}][r.index%3],[],[best.x-r.cx,best.y-r.cy]);a.cacheForm=cacheForm;a.description='沿岩边细看，'+cacheNames[cacheForm]+'中还留着可用的物资。';at(a.x,a.y).sceneDetail=cacheForm;
+ }
  // One flood fill determines exit roles by actual walking distance, independent of scenery.
  const distances=new Int32Array(SIZE*SIZE).fill(-1),exitQueue=[homeSlot.y*SIZE+homeSlot.x];distances[exitQueue[0]]=0;
  for(let i=0;i<exitQueue.length;i++){const id=exitQueue[i],x=id%SIZE,y=Math.floor(id/SIZE);for(const [dx,dy]of DIRS){const nx=x+dx,ny=y+dy,t=at(nx,ny),next=ny*SIZE+nx;if(t&&passableKind(t.kind)&&!t.tidal&&distances[next]<0){distances[next]=distances[id]+1;exitQueue.push(next);}}}
  const exitRng=rng(stream(seed,'exit-placement',n)),isExit=a=>['mechanical','water','random-exit'].includes(a.id),workshop=sites.find(a=>a.id==='workshop');
  const eligible=exitQueue.filter(id=>{const x=id%SIZE,y=Math.floor(id/SIZE);return !at(x,y).tidal&&sites.every(a=>isExit(a)||Math.abs(a.x-x)+Math.abs(a.y-y)>2);});
  const placeExit=(id,role,spot)=>{let a=sites.find(a=>a.id===id);if(a)occupied.delete(key(a.x,a.y));else {a={id,kind:'exit',name:'隐秘下行裂隙',description:'这道岩隙通往更深的地牢，可以直接下行。',hint:'沿裂隙下行',done:false,discovered:false};sites.push(a);}a.x=spot%SIZE;a.y=Math.floor(spot/SIZE);a.region=at(a.x,a.y).region;a.exitRole=role;a.walkDistance=distances[spot];floor(a.x,a.y,true);at(a.x,a.y).challengeSafe=true;occupied.add(key(a.x,a.y));return a;};
- const nearPool=eligible.filter(id=>distances[id]>=12&&distances[id]<=30&&Math.abs(id%SIZE-workshop.x)+Math.abs(Math.floor(id/SIZE)-workshop.y)>=8);
- if(!nearPool.length)throw Error('没有12–30步内的任务出口');const nearExit=placeExit('mechanical','near',exitRng.pick(nearPool));
+ const nearPool=eligible.filter(id=>distances[id]>=45&&distances[id]<=75&&Math.abs(id%SIZE-workshop.x)+Math.abs(Math.floor(id/SIZE)-workshop.y)>=8);
+ if(!nearPool.length)throw Error('没有45–75步内的任务出口');const nearExit=placeExit('mechanical','near',exitRng.pick(nearPool));
  if(n===0){const parents=new Int32Array(SIZE*SIZE).fill(-1),start=workshop.y*SIZE+workshop.x,end=nearExit.y*SIZE+nearExit.x,q=[start];parents[start]=start;for(let i=0;i<q.length&&parents[end]<0;i++)for(const next of [q[i]-1,q[i]+1,q[i]-SIZE,q[i]+SIZE])if(next>=0&&next<map.length&&parents[next]<0&&passableKind(map[next].kind)){parents[next]=q[i];q.push(next);}if(parents[end]<0)throw Error('任务出口没有工坊轨道');for(let id=end;id!==start;id=parents[id]){map[id].rail=Math.abs(id-parents[id])===1?'horizontal':'vertical';protectedFloor.add(key(id%SIZE,Math.floor(id/SIZE)));}map[start].rail='horizontal';}
  const apart=(id,a)=>Math.abs(id%SIZE-a.x)+Math.abs(Math.floor(id/SIZE)-a.y)>=12,maxDistance=exitQueue.reduce((max,id)=>Math.max(max,distances[id]),0);
  const farPool=eligible.filter(id=>distances[id]>=maxDistance*.75&&apart(id,nearExit));if(!farPool.length)throw Error('没有远端出口');const farExit=placeExit('water','far',exitRng.pick(farPool));
@@ -1562,7 +1587,7 @@ Object.assign(P,{
  ensureDepartureSupplies(){const stock=this.campaign.stock;if(!stock.some(c=>c.id==='kit'||c.id==='normal'||c.id==='light'||c.id==='heavy'||c.id==='magic'))stock.push(this.makeCard('kit'));if(!stock.some(c=>c.id==='bread'))stock.push(this.makeCard('bread'));},
  startExpedition(ids,region=0,ore=0){if(!this.cardMode()||this.state.expedition.phase!=='prepare'||!Array.isArray(ids)||ids.length>5||new Set(ids).size!==ids.length||!Number.isInteger(region)||region<0||region>2||!Number.isInteger(ore)||ore<0||ore>this.campaign.ore)return false;const selected=ids.map(id=>this.campaign.stock.find(c=>c.uid===id));if(selected.some(c=>!c))return false;const gears=selected.filter(c=>c.type==='gear').map(c=>c.id);if(new Set(gears).size!==gears.length){this.log('同一次探险不能携带重复装备。','warn');return false;}
   const profile=this.campaign,seed=(this.seed+Math.imul(profile.runs,2654435761))>>>0;Object.assign(this,new this.constructor(seed));this.campaign=profile;profile.runs++;profile.preparedIds=[];profile.ore-=ore;profile.stock=profile.stock.filter(c=>!ids.includes(c.uid));
-  const s=this.state,p=s.player;s.expedition={phase:'active',cards:selected,torchHand:0,settled:false,region};s.bag={};s.ore=ore;p.equipped={body:null,head:null,main:null,off:null};p.inventoryGear={};p.swordDur=0;s.claimedGear={};s.claimedParts={};for(const c of selected)if(c.type==='gear'){p.inventoryGear[c.id]=c.data;s.claimedGear[c.id]=true;}p.swordDur=p.inventoryGear.sword?.dur||0;this.load(region);this.syncEquipment();for(const [site,id]of [['camp-supplies','quiet'],['shrine-cache','glow']]){const a=s.sites.find(a=>a.id===site);if(a)a.cards=[this.makeCard(id)];}this.log('已带上'+selected.length+'张卡。整备好后从矿道出口下地牢。','good');return true;
+  const s=this.state,p=s.player;s.expedition={phase:'active',cards:selected,torchHand:0,settled:false,region};s.bag={};s.ore=ore;p.equipped={body:null,head:null,main:null,off:null};p.inventoryGear={};p.swordDur=0;s.claimedGear={};s.claimedParts={};for(const c of selected)if(c.type==='gear'){p.inventoryGear[c.id]=c.data;s.claimedGear[c.id]=true;}p.swordDur=p.inventoryGear.sword?.dur||0;this.load(region);this.syncEquipment();this.log('已带上'+selected.length+'张卡。整备好后从矿道出口下地牢。','good');return true;
  },
  carriedCards(e=this.state.player.equipped){return (this.state.expedition?.cards||[]).filter(c=>c.type!=='gear'||!Object.values(e).includes(c.id));},
  cardBuff(id){return this.state.expedition?.phase==='active'&&this.state.expedition.cards.some(c=>c.type==='buff'&&c.id===id);},
@@ -1737,9 +1762,38 @@ const supplies=Object.keys(C).filter(id=>C[id].type==='supply'),distance=(a,b)=>
 Object.assign(P,{
  commonEffects(){return this.state.commonEffects??={haste:0,hardeningUntil:0,bandage:0,lures:[]};},
  enableCards(profile){const out=prior.enableCards.call(this,profile);if(!profile){const p=this.campaign,prepared=new Set(p.preparedIds),base=p.stock.filter(c=>prepared.has(c.uid)),rng=this.rngFor('common-starter',0),pool=[...supplies,'bread','bomb','rope','rune','torch','hunterCharm','wickCharm','quiet','glow',...Object.keys(E.EQUIPMENT).filter(id=>!id.startsWith('elite_')&&!['normal','helmet','clothes','torch'].includes(id))],unique=new Set();p.stock=base;for(let i=0;i<8;i++){const options=pool.filter(id=>!E.EQUIPMENT[id]||!unique.has(id)),id=rng.pick(options);if(E.EQUIPMENT[id])unique.add(id);p.stock.push(this.makeCard(id,rng.int(3)+1));}}return out;},
- seedCommonSupplies(){if(!this.cardMode()||this.state.expedition.phase!=='active'||this.state.commonSuppliesSeeded)return;const s=this.state,rng=this.rngFor('common-exploration',s.level),sites=rng.shuffle(s.sites.filter(a=>a.container&&a.id!=='risk-cache')),ids=rng.shuffle(Object.keys(C));for(let i=0;i<Math.min(6,sites.length);i++){const a=sites[i],id=ids[i];(a.cards??=[]).push(this.makeCard(id,C[id].type==='supply'?1+rng.int(2):1));}s.commonSuppliesSeeded=true;},
+ seedCommonSupplies(){
+  if(!this.cardMode()||this.state.expedition.phase!=='active'||this.state.commonSuppliesSeeded)return;
+  const s=this.state,rng=this.rngFor('chest-loot-v2',s.level),sites=s.sites.filter(a=>a.container),reserved=new Set(sites.flatMap(a=>a.equipment||[]));
+  const gear=rng.shuffle(Object.keys(E.EQUIPMENT).filter(id=>!id.startsWith('elite_')&&!['normal','clothes','torch','anchor','eye','magic'].includes(id)&&!reserved.has(id)&&this.equipmentAvailable(id)));
+  const buffs=rng.shuffle(['quiet','glow','hunterCharm','wickCharm'].filter(id=>!this.cardBuff(id)));
+  const pools={supplies:['bread','bandage','torch'],tools:['repairKit','lampOil','rope','surveyStone'],combat:['bomb','rune','shockBomb','hardeningPotion'],travel:['smokeBottle','hastePotion','lureBell','clearingPowder']};
+  const queues={};const supply=(a,kind)=>{if(!queues[kind]?.length)queues[kind]=rng.shuffle(pools[kind]);const id=queues[kind].pop();a.cards.push(this.makeCard(id,rng.next()<.2?2:1));};
+  const themes={supplies:['补给箱','bread','存放着少量食物或照明补给。'],tools:['工具箱','tools','留着矿工使用的工具。'],combat:['战备箱','bomb','存放着应付危险的物资。'],travel:['行囊','rope','留着探索与脱身用的物品。'],ore:['矿石匣','ore','装着可用于交易和修理的银矿。'],buff:['护符藏匣','rune','匣内留着一枚护符。'],gear:['装备箱','tools','留着一件可用的装备。']};
+  const mix=['supplies','tools','combat','travel','ore','ore','buff','gear'];let order=[],index=0;
+  for(const a of rng.shuffle(sites)){
+   // Replace the old layered rewards as one budget; quest and unique gear get first claim.
+   a.container={};a.cards=[];a.equipment=(a.equipment||[]).filter(id=>this.equipmentAvailable(id));
+   let kind;if(a.id==='risk-cache'){a.container.ore=3;continue;}
+   if(a.equipment.length||a.quest){kind='gear';const used=a.equipment.length+Number(!!a.quest);if(used<2){const support={ 'camp-supplies':'supplies',workshop:'tools','rescue-kit':'combat','river-cache':'travel',storage:'travel','shrine-cache':'combat','deep-cache':'tools'}[a.id]||'tools';if(rng.next()<.45)supply(a,support);}}
+   else{
+    if(index>=order.length){order=rng.shuffle(mix);index=0;}kind=order[index++];
+    if(a.id==='camp-supplies')kind='supplies';else if(a.id==='workshop')kind='tools';else if(a.id==='shrine-cache')kind='buff';
+    if(kind==='gear'){const id=gear.pop();if(id)a.equipment.push(id);else kind='ore';}
+    if(kind==='buff'){const id=buffs.pop();if(id)a.cards.push(this.makeCard(id));else kind='ore';}
+    if(kind==='ore')a.container.ore=3+rng.int(4);else if(pools[kind])supply(a,kind);
+    if(kind!=='ore'&&rng.next()<.2)a.container.ore=1+rng.int(2);
+   }
+   const [label,mark,description]=themes[kind];a.lootTheme=kind;a.lootMark=a.quest?'tools':mark;a.preview=a.quest?'柜门外露着扳手柄':description;
+   if(a.id.startsWith('scene-cache-')){a.name=a.name.replace(/遗留物资$/,label);a.description=description;}
+   else a.description=a.description.replace(/ (箱缝透出微弱符光|袋口粘着面包屑|盖边露出一截引线|边缘挂着绳索纤维|布面浸着灯油|缝隙里闪着矿石光泽|柜门外露着扳手柄)。/g,'')+' '+a.preview;
+  }
+  // Fewer hidden caches must not remove the floor's non-consumable find altogether.
+  if(!sites.some(a=>(a.cards||[]).some(c=>c.type==='buff'))&&buffs.length){const options=sites.filter(a=>a.id!=='risk-cache'&&!a.quest&&!a.equipment.length);if(options.length){const a=rng.pick(options);a.cards=[this.makeCard(buffs.pop())];a.container={};a.lootTheme='buff';a.lootMark='rune';a.preview='匣内留着一枚护符。';a.description=a.preview;}}
+  s.commonSuppliesSeeded=true;
+ },
  load(...args){const out=prior.load.apply(this,args);if(out){this.state.commonSuppliesSeeded=false;this.state.commonEffects={haste:0,hardeningUntil:0,bandage:0,lures:[]};this.seedCommonSupplies();}return out;},
- startExpedition(...args){const out=prior.startExpedition.apply(this,args);if(out){this.state.commonSuppliesSeeded=false;for(const a of this.state.sites)a.cards=(a.cards||[]).filter(c=>!C[c.id]);this.seedCommonSupplies();}return out;},
+ startExpedition(...args){const out=prior.startExpedition.apply(this,args);if(out)this.seedCommonSupplies();return out;},
  commonLightTargets(){const p=this.state.player;return Object.values(p.equipped).filter(id=>E.LIGHTS[id]&&this.lightDurability(id)<E.LIGHTS[id].max);},
  itemTargets(id){if(!C[id]||C[id].type!=='supply')return prior.itemTargets.call(this,id);const s=this.state,p=s.player,d=C[id];if(s.mode!=='playing'||!this.amount(id))return [];if(!d.range)return this.itemUse(id).ok?[{x:p.x,y:p.y,kind:id,cells:[[p.x,p.y]],label:d.action}]:[];const out=[],v=this.visible();for(let y=p.y-d.range;y<=p.y+d.range;y++)for(let x=p.x-d.range;x<=p.x+d.range;x++){if(Math.abs(x-p.x)+Math.abs(y-p.y)>d.range||!this.passable(x,y)||!v.has(x+','+y)||!this.bombThrowClear(x,y))continue;const r=id==='smokeBottle'?2:id==='shockBomb'?1:0,cells=[];for(let yy=y-r;yy<=y+r;yy++)for(let xx=x-r;xx<=x+r;xx++)if(this.tile(xx,yy))cells.push([xx,yy]);out.push({x,y,kind:id,cells,label:d.action});}return out;},
  itemUse(id){if(!C[id]||C[id].type!=='supply')return prior.itemUse.call(this,id);const s=this.state,p=s.player,d=C[id],result={ok:false,reason:'',bridge:[]};if(s.mode!=='playing')result.reason='进入矿区后使用';else if(!this.amount(id))result.reason='已经用完';else if(id==='repairKit'&&(!p.equipped.main||p.dur>=p.maxDur))result.reason='没有需要维修的已装备矿镐';else if(id==='lampOil'&&!this.commonLightTargets().length)result.reason='已装备光源不缺燃料';else if(id==='bandage'&&(p.hp>=p.maxHp||this.commonEffects().bandage>0))result.reason=p.hp>=p.maxHp?'生命已满':'包扎仍在恢复';else if(d.range){const t=s.itemTarget;result.target=t&&this.itemTargets(id).find(v=>v.x===t.x&&v.y===t.y);result.ok=!!result.target;if(!result.ok)result.reason='选择'+d.range+'格内可见且无遮挡的地面';}else result.ok=true;return result;},
@@ -2031,7 +2085,207 @@ P.prepareNextMonsterPlan=function(m){const s=this.state,p=s.player;if(s.mode!=='
 };
 P.monsterTurn=function(){const s=this.state,frozen=new Set(s.monsters.filter(m=>m.freeze>0));const out=prior.call(this);if(s.mode==='playing')for(const m of [...s.monsters])if(!frozen.has(m))this.prepareNextMonsterPlan(m);return out;};
 })(globalThis);
-</script><script>(function(){
+</script><script>(function(root){
+'use strict';
+const E=root.EscapeEngine,P=E.prototype,act=P.act;
+P.siteExhausted=function(a){
+ if(!a)return false;
+ if(a.container)return !!a.searched&&!a.quest&&!Object.values(a.container).some(n=>n>0)&&!(a.cards||[]).length&&!(a.equipment||[]).some(id=>this.equipmentAvailable(id))&&!(a.questItems||[]).length;
+ if(a.id==='risk-sign')return !!(this.state.adventure?.risk?.secured||this.state.adventure?.risk?.collapsed);
+ if(a.id==='miner')return !!a.rescueRewarded;
+ if(a.npcKind||['home','stone-switch','city-inscription','mechanical','water','random-exit'].includes(a.id))return false;
+ return !!a.done;
+};
+P.archiveResolvedClues=function(){
+ const s=this.state;if(!s.notes)return;const byId=new Map(s.sites.map(a=>[a.id,a]));
+ for(const n of s.notes){if(n.useless||n.keepActive)continue;const a=byId.get(n.target);let resolved=this.siteExhausted(a);
+  if(/^(heard-|trace-)/.test(n.id)&&a?.discovered)resolved=true;
+  if(['chapter-challenge','rune-order','chapter-play'].includes(n.id)&&s.challenge?.complete)resolved=true;
+  if(n.id==='part'&&s.challenge?.started)resolved=true;
+  if(n.id.startsWith('task-taken-')&&byId.get(n.id.slice(11))?.done)resolved=true;
+  if(resolved){n.useless=true;n.autoArchived=true;if(s.focus===n.id){s.focus=null;s.focusPinned=false;}}
+ }
+};
+P.act=function(a){const out=act.call(this,a);this.archiveResolvedClues();return out;};
+})(globalThis);</script>
+<script>(function(root){
+'use strict';
+// TASK_ITEMS_V3: physical, recoverable task supplies live outside the card bag.
+const E=root.EscapeEngine,P=E.prototype,prior={};
+for(const name of ['load','restoreCampaign','chapterPlay','chapterStatus','chapterActionCheck','choose','chapterTaskModel','rescueInfo','rescueCheck','rescueNpc','exitCheck','actionTiming'])prior[name]=P[name];
+const distance=(a,b)=>Math.abs(a.x-b.x)+Math.abs(a.y-b.y);
+const sealNames={hammer:'锤纹印石',lamp:'灯纹印石',wave:'水纹印石'};
+const sealItems={hammer:'sealHammer',lamp:'sealLamp',wave:'sealWave'};
+const itemNames={pumpWheel:'排水阀轮',repairKit:'动力机维修包',railFastener:'轨道紧固件',rope:'锚定绳索',sluiceCrank:'浮闸摇柄',sluicePin:'导流锁销',sealHammer:'锤纹印石',sealLamp:'灯纹印石',sealWave:'水纹印石',rescueRope:'救援绳索',rescueHarness:'救援支护架'};
+const rescueKinds=['rescue','rescue-dig','rescue-bandage','rescue-walk'];
+Object.assign(P,{
+ taskAmount(id){return this.state.local?.questItems?.[id]||0;},
+ taskAvailable(id){return this.taskAmount(id)+(['rope','repairKit'].includes(id)?this.amount(id):0);},
+ spendTaskItem(id){const items=this.state.local.questItems;if(items[id]>0){items[id]--;return true;}if(['rope','repairKit'].includes(id)&&this.amount(id)>0){this.setAmount(id,this.amount(id)-1);return true;}return false;},
+ taskInventoryText(){const s=this.state,items=Object.entries(s.local?.questItems||{}).filter(([,n])=>n>0).map(([id,n])=>(itemNames[id]||id)+' ×'+n);if(s.local?.part)items.unshift(this.level.part+'（工坊传动零件）');return items.length?items.join('、')+' · 任务专用，不占卡位':'暂未携带任务物品';},
+ taskSourceHint(id){const a=this.state.sites.find(a=>a.id===id);if(!a)return '沿已发现的地标寻找任务物品。';const region=this.regionName(a.region),place=region===a.name?a.name:region+'的'+a.name,evidence=id==='workshop'?(a.discovered?'搜索工具柜，取出备用传动零件。':'从营地外的旧轨道寻找工坊，路上的油痕指向工具柜。'):id==='cart-control'?'启动台就在工坊附近的动力车旁。':id.startsWith('track-service-')?'沿动力车通往井架的轨道寻找接头旁的检修台。':a.taskEvidence||a.description||'';return (a.discovered?'已发现：':'寻找：')+place+'。'+evidence;},
+ initItemTasks(){
+  const s=this.state,c=s.challenge;if(!c||c.itemTaskVersion===3)return;
+  c.itemTaskVersion=3;s.local.questItems??={};
+  const byId=id=>s.sites.find(a=>a.id===id),home=byId('home')||s.layout.start;
+  // All caches use the permanent dry route, with every tidal cell treated as blocked.
+  const blocked=new Set();for(let y=0;y<s.map.h;y++)for(let x=0;x<s.map.w;x++)if(this.tile(x,y).tidal)blocked.add(x+','+y);
+  const reach=this.reachSet(home.x,home.y,{blocked});
+  const supply=(id,name,anchor,items,evidence)=>{let a=byId(id);if(a)return a;a=this.addTaskDevice(id,name,'物',evidence,byId(anchor)||home,reach);a.taskSupply={...items};a.taskEvidence=evidence;a.cacheForm='debris';a.description=evidence+' 可取：'+Object.entries(items).map(([key,n])=>itemNames[key]+' ×'+n).join('、')+'。收进任务袋，不占卡位。';a.hint='搜寻'+name;return a;};
+  if(c.kind==='escort'){
+   supply('task-workshop-supply','维修班遗留工具卷','workshop',{repairKit:1,railFastener:2},'地上散落两对轨道夹板，油布卷露出扳手与螺栓。');
+   byId('cart-control').description='装入工坊传动零件，使用维修包整修动力机；两处轨道接头各安装一份紧固件。启动后贴近车身护送到井架。';
+   for(const r of c.trackRepairs)byId(r.siteId).description='接头的夹板和螺栓缺失，需要轨道紧固件 ×1。安装后永久修复，不磨损矿镐。';
+  }else if(c.kind==='sequence'){
+   c.order=[...new Set(c.order)].slice(0,3);c.progress=c.complete?3:Math.min(c.progress||0,3);c.effectsApplied??=[];
+   for(const [id,anchor,evidence]of [['hammer','rescue-kit','碎石旁的凿槽留下锤纹，石匠的布包压在断柱下。'],['lamp','camp-supplies','旧营火边有一片灯焰纹石角，从灰烬中露出。'],['wave','river-cache','湖岸干燥石台上留有波纹拓印，缺角的石盒就在旁边。']]){
+    const installed=c.order.indexOf(id)<c.progress,a=byId('rune-'+id);a.done=installed;a.description='凹槽与'+sealNames[id]+'吻合。按城心碑文次序嵌入对应实物，机关只需安装一次。';
+    const cache=supply('task-seal-'+id,sealNames[id]+'遗存',anchor,{[sealItems[id]]:1},evidence);if(installed){cache.taskSupply={};cache.done=true;}
+   }
+   c.complete=c.progress===3;byId('city-inscription').done=false;byId('city-inscription').description='碑文记载三块印石的安装次序，旁边刻着各自藏处的地标。必须找回对应印石，单凭触摸机关无法开门。';
+  }else if(c.kind==='tide'){
+   supply('task-river-rigging','岸边绳具残架','river-cache',{rope:2},'缆柱上挂着两束完好的绳索，木牌写着上下游锚各用一束。');
+   supply('task-sluice-parts','废弃闸工工具袋','workshop',{sluiceCrank:1,sluicePin:1},'油布袋上画着摇柄与锁销，两件铜制零件被绑在一起。');
+   for(const key of ['a','b'])byId('river-anchor-'+key).description='把绳索 ×1 系牢在固定锚与岸边缆柱之间；金属矿料不能代替绳索。';
+   byId('sluice-high').description='先固定上游锚，再装入浮闸摇柄并转动绞盘抬闸。不必等待涨水。';
+   byId('sluice-low').description='浮闸抬起且下游锚固定后，把导流锁销嵌入卡槽，稳定近出口航道。不必等待退水。';
+  }
+  if(!s.local.drained)supply('task-pump-wheel','旧泵站拆卸台','workshop',{pumpWheel:1},'木台上留着圆形阀轮，边缘的缺口与排水闸阀轴吻合。');
+  const pump=byId('pump');if(pump)pump.description='阀轴缺少轮盘；先找回排水阀轮，装上后转动排水。河岸原有绕路保持畅通。';
+  const miner=byId('miner');
+  if(miner&&!miner.done){
+   supply('task-rescue-supply','救援队遗留背架','rescue-kit',{rescueRope:1,rescueHarness:1},'断支柱边留有带固定扣的绳索和折叠支护架，专供接应被困者。');
+   if(miner.rescueGuardId===undefined){
+    const spots=[...reach].map(key=>{const [x,y]=key.split(',').map(Number);return{x,y};}).filter(p=>{const t=this.tile(p.x,p.y);return distance(p,miner)>=2&&t.kind==='floor'&&!t.challengeSafe&&!t.rail&&!t.gate&&!t.riskPassage&&!t.collapseAt&&s.sites.every(a=>distance(a,p)>1)&&s.monsters.every(m=>distance(m,p)>1);}).sort((a,b)=>distance(a,miner)-distance(b,miner));
+    if(!spots.length)throw Error('救援障碍生物无安全落脚点');
+    const pos=spots[0],m=this.createMonster(['beetle','sentinel','eel'][s.level],pos.x,pos.y,Math.max(0,...s.monsters.map(m=>m.id))+1);m.rescueGuard=true;m.home={...pos};m.encounter=true;s.monsters.push(m);miner.rescueGuardId=m.id;
+   }
+   miner.description='碎石边有受困者的呼救；附近的守障生物尚未清除。先找到救援绳索与支护架，清除守障生物后才能安全接应。';
+  }
+  const play=this.chapterPlay();this.note('chapter-challenge',play.title,play.tip,c.kind==='escort'?'workshop':c.kind==='sequence'?'city-inscription':'task-river-rigging');
+  s.visionCache=null;this.reveal();
+ },
+ load(...args){const out=prior.load.apply(this,args);if(out)this.initItemTasks();return out;},
+ restoreCampaign(save){const copy=save?JSON.parse(JSON.stringify(save)):save,out=prior.restoreCampaign.call(this,copy);if(out)this.initItemTasks();return out;},
+ chapterPlay(){const out=prior.chapterPlay.call(this);return {...out,title:['断脉矿区 · 修路护送','矮人遗城 · 寻石启印','无光之河 · 系锚修闸'][this.state.level],tip:['工坊取传动零件，寻找维修班工具卷取得维修包和轨道紧固件；整修动力机、安装两处轨道接头，再贴近动力车护送到井架。','读城心碑文，从石匠布包、旧营火灰烬和湖岸石盒找回三块实物印石，按碑文次序嵌入对应神龛。','从岸边绳具残架取绳索，固定上下游锚；从闸工工具袋取摇柄与锁销，抬起浮闸后锁定导流槽。'][this.state.level]+' 远出口和随机出口无需完成本层任务。'};},
+ chapterStatus(){const c=this.state.challenge;if(c?.itemTaskVersion!==3)return prior.chapterStatus.call(this);if(c.complete)return '近出口已开启';if(c.kind==='escort')return '传动零件'+(this.state.local.part?'已取得':'待寻找')+' · 动力机'+(c.overhauled?'已修复':'待修复')+' · 轨道接头'+c.trackRepairs.filter(r=>r.fixed).length+'/2'+(c.started?' · '+(c.paused||'正在护送'):'');if(c.kind==='sequence')return c.read?'印石已嵌入 '+c.progress+'/3 · 下一块'+sealNames[c.order[c.progress]]:'先读城心碑文，辨认印石与藏处';return '锚点'+Object.values(c.anchors).filter(Boolean).length+'/2 · 浮闸'+(c.high?'已抬起':'待装摇柄')+' · 导流槽'+(c.low?'已锁定':'待装锁销');},
+ taskDeviceOptions(a){
+  if(!a)return [];if(a.taskSupply)return a.done?[]:[['chapter:take:'+a.id,'取出'+Object.entries(a.taskSupply).map(([id,n])=>itemNames[id]+' ×'+n).join('、')]];
+  const c=this.state.challenge;if(a.id==='cart-control')return [...(!c.overhauled?[['chapter:cart:repair-kit','维修包 ×1 · 整修动力机']]:[]),...(!c.started?[['chapter:start','装入工坊零件 · 启动动力车']]:[])];
+  if(a.id.startsWith('track-service-'))return a.done?[]:[['chapter:track:'+a.id,'轨道紧固件 ×1 · 安装接头']];
+  if(a.id==='city-inscription')return [['chapter:read',c.read?'重读碑文与印石藏处':'阅读碑文与印石藏处']];
+  if(a.id.startsWith('rune-'))return a.done?[]:[['chapter:rune:'+a.id.slice(5),'嵌入'+sealNames[a.id.slice(5)]]];
+  if(a.id.startsWith('river-anchor-'))return a.done?[]:[['chapter:anchor:'+a.id.slice(-1)+':rope','绳索 ×1 · 系牢固定锚']];
+  if(a.id.startsWith('sluice-'))return a.done?[]:[['chapter:sluice:'+a.id.slice(7),a.id==='sluice-high'?'装入浮闸摇柄 · 转动抬闸':'装入导流锁销 · 锁定航道']];return [];
+ },
+ chapterActionCheck(kind){
+  const s=this.state,c=s.challenge,a=this.nearby();if(c?.itemTaskVersion!==3)return prior.chapterActionCheck.call(this,kind);
+  const out=(ok,reason,extra={})=>({ok:!!ok,reason:ok?'':reason,...extra});
+  if(s.mode!=='playing'||!a?.chapterDevice)return out(false,'先靠近对应地点');
+  if(kind.startsWith('chapter:take:'))return out(a.id===kind.slice(13)&&a.taskSupply&&!a.done&&Object.values(a.taskSupply).some(n=>n>0),'这里的任务物品已经取走');
+  if(kind==='chapter:read')return out(a.id==='city-inscription','先靠近城心启门碑');
+  if(kind==='chapter:cart:repair-kit')return out(c.kind==='escort'&&a.id==='cart-control'&&!c.overhauled&&this.taskAvailable('repairKit')>0,c.overhauled?'动力机已整修':'缺少维修包 ×1；寻找维修班遗留工具卷');
+  if(kind==='chapter:start')return out(c.kind==='escort'&&a.id==='cart-control'&&!c.started&&s.local.part&&c.overhauled,c.started?'动力车已启动':!s.local.part?'缺少工坊传动零件；搜寻工坊工具柜':'先用维修包整修动力机');
+  if(kind.startsWith('chapter:track:')){const repair=c.trackRepairs?.find(r=>r.siteId===kind.slice(14));return out(c.kind==='escort'&&repair&&a.id===repair.siteId&&!repair.fixed&&this.taskAmount('railFastener')>0,repair?.fixed?'接头已经修复':'缺少轨道紧固件 ×1；寻找维修班遗留工具卷',{repair});}
+  if(kind.startsWith('chapter:rune:')){const id=kind.slice(13);return out(c.kind==='sequence'&&a.id==='rune-'+id&&c.read&&!c.complete&&!a.done&&c.order[c.progress]===id&&this.taskAmount(sealItems[id])>0,!c.read?'先阅读城心碑文':c.complete||a.done?'这块印石已经安装':c.order[c.progress]!==id?'碑文要求下一块为'+sealNames[c.order[c.progress]]:'缺少'+sealNames[id]+'；按碑文地标寻找实物',{id});}
+  if(kind.startsWith('chapter:anchor:')){const parts=kind.split(':'),key=parts[2];return out(c.kind==='tide'&&a.id==='river-anchor-'+key&&parts[3]==='rope'&&!c.anchors[key]&&this.taskAvailable('rope')>0,c.anchors?.[key]?'固定锚已系牢':'需要绳索 ×1；岸边绳具残架有两束，银矿不能替代',{key});}
+  if(kind.startsWith('chapter:sluice:')){const phase=kind.slice(15),resource=phase==='high'?'sluiceCrank':'sluicePin';if(c.kind!=='tide'||!['high','low'].includes(phase)||a.id!=='sluice-'+phase)return out(false,'先靠近对应水闸');if(c[phase])return out(false,'水闸已经固定');if(phase==='high'&&!c.anchors.a)return out(false,'先用绳索固定上游锚');if(phase==='low'&&(!c.high||!c.anchors.b))return out(false,!c.high?'先装入摇柄并抬起浮闸':'先用绳索固定下游锚');return out(this.taskAmount(resource)>0,'缺少'+itemNames[resource]+'；寻找废弃闸工工具袋',{phase,resource});}
+  return out(false,'此装置需要对应实物，矿石和矿镐耐久不能替代');
+ },
+ pumpActionCheck(){const s=this.state,a=this.nearby();return s.mode!=='playing'||a?.id!=='pump'?{ok:false,reason:'先靠近排水闸'}:s.local.drained?{ok:false,reason:'排水闸已经开启'}:this.taskAmount('pumpWheel')<1?{ok:false,reason:'缺少排水阀轮；寻找旧泵站拆卸台'}:{ok:true,reason:''};},
+ actionTiming(a){if(this.state.challenge?.itemTaskVersion===3&&a?.type==='choose'&&a.kind==='drain')return {advance:this.pumpActionCheck().ok,attack:false};return prior.actionTiming.call(this,a);},
+ choose(kind){
+  if(kind==='drain'&&this.state.challenge?.itemTaskVersion===3){const q=this.pumpActionCheck();if(!q.ok){this.log(q.reason+'。','warn');return false;}const out=prior.choose.call(this,kind);if(out)this.spendTaskItem('pumpWheel');return out;}
+  if(this.state.challenge?.itemTaskVersion!==3||typeof kind!=='string'||!kind.startsWith('chapter:'))return prior.choose.call(this,kind);
+  const q=this.chapterActionCheck(kind);if(!q.ok){this.log(q.reason+'。','warn');return false;}
+  const s=this.state,c=s.challenge,a=this.nearby();
+  if(kind==='chapter:read'){c.read=true;this.note('rune-order','碑文：寻石与安装次序',c.order.map(id=>sealNames[id]).join(' → ')+'。'+['hammer','lamp','wave'].map(id=>this.taskSourceHint('task-seal-'+id)).join(' '),'city-inscription');this.log('已记下印石次序与藏处。');return true;}
+  if(kind.startsWith('chapter:take:')){for(const [id,n]of Object.entries(a.taskSupply))s.local.questItems[id]=(s.local.questItems[id]||0)+n;a.taskSupply={};a.done=true;this.note('task-taken-'+a.id,'已搜寻'+a.name,this.taskInventoryText());}
+  else if(kind==='chapter:cart:repair-kit'){this.spendTaskItem('repairKit');c.overhauled=true;}
+  else if(kind==='chapter:start'){c.started=true;a.done=true;this.emitNoise(a.x,a.y,12,'cart');}
+  else if(kind.startsWith('chapter:track:')){this.spendTaskItem('railFastener');q.repair.fixed=true;a.done=true;this.emitNoise(a.x,a.y,8,'mechanism');}
+  else if(kind.startsWith('chapter:rune:')){this.spendTaskItem(sealItems[q.id]);c.progress++;a.done=true;if(!c.effectsApplied.includes(q.id)){this.applyRuneEffect(q.id,a);c.effectsApplied.push(q.id);}c.complete=c.progress===3;this.emitNoise(a.x,a.y,10,'mechanism');}
+  else if(kind.startsWith('chapter:anchor:')){this.spendTaskItem('rope');c.anchors[q.key]=true;a.done=true;}
+  else if(kind.startsWith('chapter:sluice:')){this.spendTaskItem(q.resource);c[q.phase]=true;a.done=true;c.complete=c.high&&c.low;this.emitNoise(a.x,a.y,10,'water');}
+  this.log(a.name+'：'+(a.taskSupply?'任务物品已收好':c.complete?'近出口开启':a.done?'操作完成':this.chapterStatus())+'。','good');
+  if(c.complete)this.note('chapter-complete','近出口已经开启','实物装置全部就位，可以从近出口前往下一层。','mechanical');
+  s.panel=null;this.tick();return true;
+ },
+ chapterTaskModel(){
+  const s=this.state,c=s.challenge;if(c?.itemTaskVersion!==3)return prior.chapterTaskModel.call(this);
+  let title='',requirement='',hint='',targetId=null;
+  const need=(id,source,device,action)=>{if(this.taskAvailable(id)<1){title='寻找'+itemNames[id];requirement='缺少 '+itemNames[id]+' ×1';targetId=source;hint=this.taskSourceHint(source);}else{title=action;requirement='已携带 '+itemNames[id]+' ×1；靠近装置安装';targetId=device;}};
+  if(c.complete){title='近出口已开，前往下一层';requirement='靠近已发现的出口并选择下层';targetId='mechanical';}
+  else if(c.kind==='escort'){
+   if(!s.local.part){title='取得工坊传动零件';requirement='缺少 工坊传动零件 ×1；打开工坊工具柜取出';targetId='workshop';}
+   else if(!c.overhauled)need('repairKit','task-workshop-supply','cart-control','用维修包整修动力机');
+   else{const repair=c.trackRepairs.find(r=>!r.fixed);if(repair)need('railFastener','task-workshop-supply',repair.siteId,'安装'+(c.trackRepairs.indexOf(repair)+1)+'号轨道接头');else if(!c.started){title='启动动力车';requirement='零件和轨道已备齐，前往启动台';targetId='cart-control';}else{title='护送动力车到井架';requirement=c.paused||'保持在车身3格以内，清理轨道旁的敌人';hint='沿旧铁轨跟随车身；动力车会在障碍前停下。';}}
+  }else if(c.kind==='sequence'){
+   if(!c.read){title='阅读城心碑文';requirement='先确认三种纹样、藏处与安装次序';targetId='city-inscription';}else{const id=c.order[c.progress];need(sealItems[id],'task-seal-'+id,'rune-'+id,'依碑文嵌入'+sealNames[id]);}
+  }else if(!c.anchors.a)need('rope','task-river-rigging','river-anchor-a','固定上游锚');
+  else if(!c.high)need('sluiceCrank','task-sluice-parts','sluice-high','装摇柄并转动浮闸绞盘');
+  else if(!c.anchors.b)need('rope','task-river-rigging','river-anchor-b','固定下游锚');
+  else need('sluicePin','task-sluice-parts','sluice-low','安装锁销，固定导流槽');
+  const a=s.sites.find(a=>a.id===targetId);if(!hint)hint=a?this.taskSourceHint(targetId):'按已发现的地标探索通路。';
+  const changes=s.notes.filter(n=>['seal-hammer','seal-lamp','seal-wave'].includes(n.id));if(changes.length)hint+=' 已见变化：'+changes.map(n=>n.title).join('、')+'。';
+  if(s.sites.some(a=>['water','random-exit'].includes(a.id)&&a.discovered)&&!c.complete)hint+=' 已发现免任务出口，也可直接下层。';
+  return {overall:'探索更深处',title,text:title,progress:'第'+(s.depth||1)+'层 · '+this.chapterStatus(),requirement,hint,targetId,x:a?.discovered?a.x:null,y:a?.discovered?a.y:null,name:a?.name||'动力车',distance:a?.discovered?distance(a,s.player):null};
+ },
+ rescueInfo(){const r=prior.rescueInfo.call(this);if(!r||this.state.challenge?.itemTaskVersion!==3)return r;const guard=this.state.monsters.find(m=>m.rescueGuard&&m.id===r.site.rescueGuardId&&m.hp>0);return {...r,guard,line:'先用救援支护架稳住碎石，再系救援绳接应。'+(guard?'守障生物仍在附近，必须先清除。':'守障生物已清除。')+' '+this.taskSourceHint('task-rescue-supply')};},
+ rescueCheck(kind){if(this.state.challenge?.itemTaskVersion!==3)return prior.rescueCheck.call(this,kind);const r=this.rescueInfo(),s=this.state;if(s.mode!=='playing'||!r||!rescueKinds.includes(kind))return {ok:false,reason:'先靠近遇险者'};if(r.site.done||s.companion)return {ok:false,reason:r.site.done?'已经接应':'已有同行者'};if(r.guard)return {ok:false,reason:'先清除受困者附近的守障生物'};if(!this.taskAmount('rescueRope')||!this.taskAmount('rescueHarness'))return {ok:false,reason:'缺少'+[!this.taskAmount('rescueRope')?'救援绳索 ×1':'',!this.taskAmount('rescueHarness')?'救援支护架 ×1':''].filter(Boolean).join('、')+'；寻找救援队遗留背架'};return {ok:true,reason:'',r,turns:1};},
+ rescueNpc(kind){if(this.state.challenge?.itemTaskVersion!==3)return prior.rescueNpc.call(this,kind);const q=this.rescueCheck(kind);if(!q.ok){this.log(q.reason+'。','warn');return false;}const s=this.state,a=q.r.site;this.spendTaskItem('rescueRope');this.spendTaskItem('rescueHarness');a.done=true;s.stats.secrets++;s.companion={x:a.x,y:a.y,name:a.name,role:s.level,rescueCase:q.r.kind,npcReward:q.r.ore?{ore:q.r.ore}:{id:q.r.reward,qty:q.r.qty}};this.note('escort','接应'+a.name,'绳索和支护架已固定。护送至营地或一起下层后领取谢礼。','home');this.tick();s.panel=null;return true;},
+ exitCheck(id=this.state.routeChoice){const s=this.state,c=s.challenge;if(c?.itemTaskVersion!==3||c.kind!=='tide'||id!=='mechanical'||!c.complete)return prior.exitCheck.call(this,id);const a=s.sites.find(a=>a.id===id);if(s.mode!=='playing'||s.routeChoice!==id||!a?.discovered||this.nearby()?.id!==id)return {ok:false,reason:'先靠近并操作近出口'};if(s.bombs.length)return {ok:false,reason:'先等炸药引爆后下层'};if(s.companion&&distance(s.companion,s.player)>3)return {ok:false,reason:'先接应同伴到3格以内'};return {ok:true,reason:'导流槽已固定，近出口航道稳定，可前往下一层'};}
+});
+})(globalThis);
+</script>
+<script>(function(root){
+'use strict';
+// ENCOUNTERS_V3: bounded terrain reactions and a persistent, telegraphed cache guardian.
+const E=root.EscapeEngine,P=E.prototype;if(P.encountersV3Installed)return;P.encountersV3Installed=true;
+const prior={},D=[[1,0],[0,1],[-1,0],[0,-1]],dist=(a,b)=>Math.abs(a.x-b.x)+Math.abs(a.y-b.y),key=p=>p.x+','+p.y;
+for(const name of ['load','restoreCampaign','adventureTurn','dungeonTurn','prepareNextMonsterPlan','killMonster','interact','actionTiming','loot','lootAll','lootCard','explode','act','resolveDungeonPlan','eliteActive'])prior[name]=P[name];
+P.reactionProtected=function(x,y,own){const s=this.state,t=this.tile(x,y);return !t||t.kind==='wall'||!!(t.gate||t.challengeSafe||t.riskPassage||t.rail||t.tidal||t.quest||t.questSource||t.questItems?.length||t.collapseAt)||s.sites.some(a=>a!==own&&a.x===x&&a.y===y);};
+P.seedGuardedCache=function(){const s=this.state,r=s.adventure?.risk;if(!r||r.guardState)return;const a=s.sites.find(a=>a.id==='risk-cache'),sign=s.sites.find(a=>a.id==='risk-sign');if(!a)return;if(r.collapsed||a.searched&&!a.quest&&!Object.values(a.container||{}).some(n=>n>0)&&!(a.equipment||[]).length&&!(a.cards||[]).length){r.guardState={guardId:null,awakened:false,resolved:true};r.due=null;a.done=true;if(sign){sign.done=true;sign.description=r.collapsed?'旧支洞已经坍塌，原物资无法取回。':'支洞中的物资已经取空。';}return;}r.due=null;r.collapsed=false;const pos=r.cells[Math.max(1,r.cells.length-2)],m=this.createMonster('beetle',pos[0],pos[1],Math.max(0,...s.monsters.map(m=>m.id))+1,[Math.sign(r.entry.x-pos[0]),Math.sign(r.entry.y-pos[1])]);m.hp=m.maxHp=6;m.guardSiteKey=a.id;m.encounter=true;m.state='rest';m.guardDormant=true;r.guardState={guardId:m.id,awakened:false,resolved:!!r.secured};if(!r.secured)s.monsters.push(m);a.guardedBy=m.id;a.name='镜甲守卫的封存箱';a.description='厚壳镜甲守卫看守'+this.chapterPlay().rewardName+'。击败它后解开箱扣；撤退不会失去奖励，装不下的仍留在箱内。';a.preview='守卫生命6 · 正面硬壳；前刺预告后露腹';if(sign){sign.name='带有深爪痕的旧铭牌';sign.description='墙后传来厚甲摩擦声：生命6的镜甲守卫守着'+this.chapterPlay().rewardName+'。破壁后它先苏醒；避开标记前刺，趁露腹攻击，炸药每次伤害3。击败它才能开箱，奖励不会倒计时消失。';sign.hint='阅读墙后守卫警示';} };
+P.guardForCache=function(id='risk-cache'){const r=this.state.adventure?.risk;return id==='risk-cache'&&r?.guardState&&!r.guardState.resolved?r.guardState:null;};
+P.riskEncounterStatus=function(){const r=this.state.adventure?.risk;if(!r?.spotted)return '';if(r.collapsed)return '旧支洞已坍塌，原物资无法取回';if(this.siteExhausted?.(this.state.sites.find(a=>a.id==='risk-cache')))return '支洞物资已取空';if(r.secured)return '支路装备已取出；余物留在原处';const q=r.guardState;if(!q)return '';if(q.resolved)return '支洞守卫已击败 · 封存箱可搜取';const m=this.state.monsters.find(m=>m.id===q.guardId);return q.awakened?'支洞镜甲守卫 · '+(m?.hp??0)+'/6生命；躲开前刺后反击':'墙后有厚甲守卫 · 破壁前准备好武器与退路';};
+P.updateGuardedCache=function(){const s=this.state,r=s.adventure?.risk,q=r?.guardState;if(!q||q.resolved)return;r.due=null;r.collapsed=false;const m=s.monsters.find(m=>m.id===q.guardId);if(!m){q.resolved=true;return;}if(!q.awakened&&this.passable(r.neck.x,r.neck.y)){q.awakened=true;m.guardDormant=false;m.recoverUntil=s.turn+1;m.plan=null;m.state='recover';m.alert=8;this.log('破壁惊醒了厚壳镜甲守卫！它先抖落尘土，下一次行动仍可撤开。正面硬壳，躲前刺后趁露腹攻击；击败后开箱，奖励一直保留。','warn');this.note('risk-guardian','墙后的镜甲守卫','先避开前刺，再趁露腹或用炸药破甲；击败后回封存箱领取奖励。','risk-cache');}};
+P.seedReactions=function(){const s=this.state;if(s.reactions?.version===3)return;s.reactions={version:3,sites:[],pending:[],water:[]};const rng=this.rngFor('terrain-reactions-v3'),start=s.layout.start,reach=this.reachSet(start.x,start.y),points=rng.shuffle([...reach].map(k=>{const [x,y]=k.split(',').map(Number);return{x,y};})),used=[];
+ const clear=(p,range=4)=>dist(p,start)>=14&&!this.reactionProtected(p.x,p.y)&&s.sites.every(a=>dist(a,p)>range)&&used.every(a=>dist(a,p)>10)&&s.monsters.every(m=>dist(m,p)>2);
+ const add=(kind,p,extra={})=>{const labels={gas:['可燃气囊','气','淡黄气泡不断冒出：炸药或火焰会点燃；闪亮菱形范围在下一回合闪燃一次，先撤离。'],fungus:['封路菌膜','菌','菌膜封着一处旧物资龛。贴近放置火把或用火焰烧开；会释放4回合孢子雾，也可以挖开。'],reservoir:['渗水薄壁','水','薄壁后积着水。挖穿或爆破后，沿地面箭头涌出浅水，把普通散物与怪物向下游推一格；浅水不阻路。'],support:['开裂侧梁','梁','侧梁后露出另一段矿道。冲撞或爆破能撞开两格侧岩，新增绕行空间；原有道路保留。']},[name,glyph,description]=labels[kind],a={id:'reaction-'+kind,...p,kind:'tablet',name,glyph,description,hint:'查看'+name,reactor:kind,reactorState:'armed',discovered:false,done:false,region:this.tile(p.x,p.y).region,...extra};s.sites.push(a);s.reactions.sites.push(a.id);this.tile(p.x,p.y).reactor=kind;used.push(p);return a;};
+ const gas=points.find(p=>clear(p));if(gas)add('gas',gas);
+ for(const kind of ['fungus','reservoir','support']){let choice=null;for(const entry of points){if(!clear(entry))continue;for(const [dx,dy]of D){const p={x:entry.x+dx,y:entry.y+dy},back={x:entry.x+dx*2,y:entry.y+dy*2},t=this.tile(p.x,p.y),b=this.tile(back.x,back.y);if(!t||!b||!clear(p)||!clear(back)||!['rock','hard'].includes(t.kind)||!['floor','rock','hard'].includes(b.kind)||t.blastSeam||b.blastSeam)continue;if(kind==='reservoir'&&!this.passable(entry.x-dx,entry.y-dy))continue;choice={entry,p,back,dx,dy};break;}if(choice)break;}if(!choice)continue;const {entry,p,back,dx,dy}=choice,t=this.tile(p.x,p.y);t.kind=kind==='support'?'rock':'hard';const flowCells=[];for(let n=0;n<4;n++){const q={x:entry.x-dx*n,y:entry.y-dy*n};if(!this.passable(q.x,q.y)||this.reactionProtected(q.x,q.y))break;flowCells.push([q.x,q.y]);}
+ const a=add(kind,p,{direction:[-dx,-dy],openCells:[[p.x,p.y],...(kind==='support'?[[back.x,back.y]]:[])],flowCells});
+ if(kind==='fungus'){const bt=this.tile(back.x,back.y);bt.kind='floor';bt.cracks=0;bt.worked='dug';const cache={id:'hidden-fungus-cache',...back,kind:'chest',name:'菌膜后的旧行囊',description:'隔着菌膜保存下来的补给，未取走的仍留在这里。',hint:'搜取旧行囊',container:{bread:2,ore:2},equipment:[],searched:false,done:false,discovered:false,region:bt.region};s.sites.push(cache);a.hiddenCache=cache.id;}
+ }
+ // A rare, noncombat letter links two existing NPCs without adding another dialogue system.
+ if(rng.int(4)===0){const p=points.find(p=>clear(p,3));if(p){const names=s.sites.filter(a=>a.npcKind).slice(0,2).map(a=>a.name),who=names.length===2?names.join('和'):'点灯人与测绘员';s.sites.push({id:'cross-npc-letter',...p,kind:'chest',name:'两位旅人的留信',description:who+'竟把各自的路标画在同一张餐巾上：一人添灯，一人添出口，背面还写着“下回别把糖当盐”。留给后来者的补给仍封着。',hint:'读留信并查看小礼物',container:{bread:1,ore:1},equipment:[],searched:false,done:false,discovered:false,region:this.tile(p.x,p.y).region,easterEgg:true});}}
+ s.visionCache=null;};
+P.reactionSites=function(){const s=this.state,ids=new Set(s.reactions?.sites||[]);return s.sites.filter(a=>ids.has(a.id));};
+P.triggerReaction=function(a,source){if(!a||a.reactorState!=='armed'||this.reactionProtected(a.x,a.y,a))return false;const allowed={gas:['blast','fire'],fungus:['fire','blast','breach'],reservoir:['blast','breach','charge'],support:['charge','blast','breach']};if(!allowed[a.reactor]?.includes(source))return false;const s=this.state;s.reactions??={version:3,sites:[],pending:[],water:[]};a.reactorState='triggered';a.done=true;delete this.tile(a.x,a.y).reactor;
+ const open=()=>{for(const [x,y]of (a.openCells||[[a.x,a.y]]).slice(0,2)){const t=this.tile(x,y);if(this.reactionProtected(x,y,a)||!['rock','hard','rubble','floor'].includes(t.kind))continue;t.kind='floor';t.cracks=0;t.worked='dug';}};
+ if(a.reactor==='gas'){const cells=[];for(let y=a.y-2;y<=a.y+2;y++)for(let x=a.x-2;x<=a.x+2;x++)if(dist(a,{x,y})<=2&&this.passable(x,y)&&!this.reactionProtected(x,y,a))cells.push([x,y]);s.reactions.pending.push({kind:'gas',x:a.x,y:a.y,cells,due:s.turn+1});const visible=this.visible();if(cells.some(([x,y])=>visible.has(x+','+y)))this.log('燃气被点燃！亮起的菱形区域将在下一次行动后闪燃，撤离两格范围。','warn');}
+ if(a.reactor==='fungus'){open();this.addFog(a.x,a.y,2,4,'spores');this.log(source==='fire'?'火焰烧穿菌膜，旧行囊露了出来，孢子随热气散开。':'菌膜破裂，旧行囊露了出来，孢子飘入矿道。','story');}
+ if(a.reactor==='support'){open();this.emitNoise(a.x,a.y,10,'impact');this.log('开裂侧梁折断，两格侧岩松开，出现新的绕行空间。','good');}
+ if(a.reactor==='reservoir'){open();const [dx,dy]=a.direction||[1,0],cells=(a.flowCells||[]).slice(0,4).filter(([x,y])=>this.passable(x,y)&&!this.reactionProtected(x,y,a));for(const [x,y]of cells){Object.assign(this.tile(x,y),{damp:true,reactionWaterUntil:s.turn+3,reactionFlow:[dx,dy]});s.reactions.water.push({x,y,until:s.turn+3});}const moved=new Set();for(const [x,y]of [...cells].sort((u,v)=>(v[0]*dx+v[1]*dy)-(u[0]*dx+u[1]*dy))){const tx=x+dx,ty=y+dy,t=this.tile(x,y),next=this.tile(tx,ty);if(!next||!this.passable(tx,ty)||this.reactionProtected(tx,ty,a))continue;for(const id of ['ore','copper','iron','gold','crystal','bread','bomb','rope','rune','torch'])if(t.items[id]>0){next.items[id]=(next.items[id]||0)+t.items[id];delete t.items[id];if(t.dropped?.[id]){(next.dropped??={})[id]=true;delete t.dropped[id];}}const floating=(t.cards||[]).filter(c=>c.type==='supply'&&!c.quest&&!c.questItem&&(E.ITEMS[c.id]||E.COMMON_ITEMS?.[c.id]));if(floating.length){(next.cards??=[]).push(...floating);t.cards=t.cards.filter(c=>!floating.includes(c));}const m=s.monsters.find(m=>m.x===x&&m.y===y&&!moved.has(m.id));if(m&&!m.guardSiteKey&&this.stepAllowed(m,tx,ty)&&!(s.player.x===tx&&s.player.y===ty)&&!(s.companion?.x===tx&&s.companion?.y===ty)){m.plan=null;this.moveMonster(m,tx,ty,'drift');moved.add(m.id);}}this.log('蓄水涌出！浅水将怪物和普通散物向下游推了一格；水很快流尽，道路仍可通行。','story');}
+ s.visionCache=null;s.lightCache=null;return true;};
+P.reactionHits=function(source,cells){const hit=new Set(cells.map(c=>Array.isArray(c)?c.join(','):key(c)));for(const a of this.reactionSites())if(hit.has(key(a)))this.triggerReaction(a,source);};
+P.reactionTurn=function(){const s=this.state,r=s.reactions;if(!r)return;for(const a of this.reactionSites())if(a.reactor!=='gas'&&a.reactorState==='armed'&&this.passable(a.x,a.y))this.triggerReaction(a,'breach');const ready=r.pending.filter(a=>a.due<=s.turn);r.pending=r.pending.filter(a=>a.due>s.turn);for(const burst of ready){const cells=new Set(burst.cells.filter(([x,y])=>!this.reactionProtected(x,y,this.reactionSites().find(a=>a.x===burst.x&&a.y===burst.y))).map(c=>c.join(',')));for(const m of [...s.monsters])if(cells.has(key(m)))this.eliteDamage(m,2,true);if(s.mode==='playing'&&cells.has(key(s.player)))this.hurt(1);this.emitNoise(burst.x,burst.y,14,'blast');this.visual('gas','blast',burst,burst);const visible=this.visible();if([...cells].some(k=>visible.has(k)))this.log('气囊闪燃后耗尽，附近怪物也被火焰灼伤。','warn');}for(const w of r.water)if(w.until<=s.turn){const t=this.tile(w.x,w.y);if(t?.reactionWaterUntil<=s.turn){delete t.reactionWaterUntil;delete t.reactionFlow;}}r.water=r.water.filter(w=>w.until>s.turn);};
+P.load=function(...args){const out=prior.load.apply(this,args);if(out){this.state.reactions=null;this.seedGuardedCache();this.seedReactions();this.reveal();}return out;};
+P.restoreCampaign=function(...args){const out=prior.restoreCampaign.apply(this,args);if(out){this.seedGuardedCache();this.seedReactions();}return out;};
+P.adventureTurn=function(){const ad=this.state.adventure,risk=ad?.risk;if(ad)ad.risk=null;let out;try{out=prior.adventureTurn.call(this);}finally{if(ad)ad.risk=risk;}this.updateGuardedCache();this.reactionTurn();return out;};
+P.dungeonTurn=function(m){if(m.guardSiteKey&&m.guardDormant)return true;return prior.dungeonTurn.call(this,m);};
+P.prepareNextMonsterPlan=function(m){if(m.guardSiteKey&&(m.guardDormant||m.recoverUntil>=this.state.turn))return false;return prior.prepareNextMonsterPlan.call(this,m);};
+P.killMonster=function(m,loot=true){const s=this.state,existed=s.monsters.includes(m);if(existed&&m.guardSiteKey&&s.eliteBomb&&m.hp>0){m.hp=Math.max(0,m.hp-3);m.plan=null;m.recoverUntil=s.turn+1;if(m.hp){this.visual('m:'+m.id,'hurt',m,m,{type:m.type,damage:3});return;}}const out=prior.killMonster.call(this,m,loot);if(existed&&m.guardSiteKey&&!s.monsters.includes(m)){const q=s.adventure?.risk?.guardState;if(q){q.resolved=true;s.adventure.risk.due=null;}this.log('厚壳镜甲守卫倒下，封存箱的锁扣松开了。奖励留在箱内，随时回来整理。','good');}return out;};
+P.interact=function(){const a=this.state.mode==='playing'?this.nearby():null;if(a?.id==='risk-cache'&&this.guardForCache()){this.log('镜甲守卫还守着锁扣。必须先击败它，物资会一直留在箱内。','warn');return false;}if(a?.reactor){this.note(a.id,a.name,a.description,a.id);this.log(a.description,'story');return true;}const out=prior.interact.call(this);if(out&&a?.easterEgg)this.note(a.id,a.name,a.description,a.id);return out;};
+P.actionTiming=function(action){const a=this.state.mode==='playing'&&action?.type==='interact'?this.nearby():null;if(a?.reactor||a?.id==='risk-cache'&&this.guardForCache())return {advance:false,attack:false};return prior.actionTiming.call(this,action);};
+for(const method of ['loot','lootAll','lootCard'])P[method]=function(...args){if(this.guardForCache(this.state.lootId)){this.log('先击败厚壳镜甲守卫，再解开封存箱。','warn');return false;}const out=prior[method].apply(this,args);if(out&&this.state.lootId==='risk-cache'){const a=this.state.sites.find(a=>a.id==='risk-cache');if(!a.equipment?.length)this.state.adventure.risk.secured=true;}return out;};
+P.explode=function(b){const cells=[];for(let y=b.y-1;y<=b.y+1;y++)for(let x=b.x-1;x<=b.x+1;x++)cells.push([x,y]);this.reactionHits('blast',cells);return prior.explode.call(this,b);};
+P.resolveDungeonPlan=function(m,plan,turn){if(plan.kind==='elite_charge')this.reactionHits('charge',plan.cells);if(plan.kind==='elite_fire')this.reactionHits('fire',plan.cells);return prior.resolveDungeonPlan.call(this,m,plan,turn);};
+P.eliteActive=function(id,direction,target){const p={...this.state.player},dir=direction||p.facing,out=prior.eliteActive.call(this,id,direction,target);if(out&&['elite_lantern','elite_pick'].includes(id)){const cells=[];for(const a of this.reactionSites()){const dx=a.x-p.x,dy=a.y-p.y,dot=dx*dir[0]+dy*dir[1],cross=Math.abs(dx*dir[1]-dy*dir[0]);if(dot>0&&dot<=2&&(id==='elite_pick'?cross===0:cross<=dot)&&this.ray(p.x,p.y,a.x,a.y))cells.push(a);}this.reactionHits(id==='elite_lantern'?'fire':'charge',cells);}return out;};
+P.act=function(action){const p={x:this.state.player.x,y:this.state.player.y},out=prior.act.call(this,action);if(out&&(action?.type==='use'&&action.item==='torch'||action?.type==='light-place'&&['torch','elite_lantern'].includes(action.item)))this.reactionHits('fire',[p,...D.map(([dx,dy])=>({x:p.x+dx,y:p.y+dy}))]);return out;};
+})(globalThis);
+</script>
+<script>(function(){
 'use strict';
 const $=s=>document.querySelector(s),canvas=$('#world'),ctx=canvas.getContext('2d'),dialog=$('#dialog'),content=$('#dialog-content');
 let game=new EscapeEngine(),modal='',fxUntil=0,lastMove=0,motion={events:[],end:0},queuedMove=null,queuedAction=null,zoom=1,mapZoom='full',holdBlocked=false,hoverCell=null,overlayCache=null,bagSelection=null,bagHand=null,elapsedMs=0,lastClockAt=performance.now(),displayedSecond=-1;
@@ -2195,9 +2449,16 @@ function npcPortrait(a,x,y,time){const role=a.npcKind||'rescue-'+a.rescueCase,d=
  text(a.name,x+40,y+76,a.done?'#94afa4':'#ead7af',10);}
 function npcDialog(){const a=game.currentNpc();if(!a){close();return;}const d=EscapeEngine.NPCS[a.npcKind],offers=game.npcOptions(a),stock=offers.map(o=>{const q=game.npcCheck(o.action),cost=o.cost?' · '+o.cost+'银矿':' · 免费';return '<article class="npc-offer">'+(o.card?cardFace(o.card,'disabled')+'<p>'+esc(cardText(o.card))+'</p>':'')+'<button data-choice="npc:'+o.action+'" '+(q.ok?'':'disabled')+'>'+esc(o.label)+(o.input?'':cost)+(q.ok?'':' · '+esc(q.reason))+'</button></article>';}).join('');let sale='',minerals='';if(a.npcKind==='merchant'){sale='<h3>出售 · 行商余银 '+a.purse+'</h3><div class="stock-repairs">'+game.carriedCards().filter(c=>c.type!=='gear').map(c=>{const q=game.npcCheck('sell:'+c.uid);return '<button data-choice="npc:sell:'+c.uid+'" '+(q.ok?'':'disabled')+'>出售 '+esc(game.cardName(c))+' ×'+(c.qty||1)+'（整张） · 获得'+game.npcSalePrice(c)+'银矿</button>';}).join('')+'</div>';if(EscapeEngine.MINERALS&&game.mineralAmount)minerals='<h3>矿物兑换</h3><div class="stock-repairs">'+Object.entries(EscapeEngine.MINERALS).filter(([id])=>id!=='ore').map(([id,d])=>{const n=game.mineralAmount(id);return '<div><span>'+esc(d.name)+' ×'+n+' · 每份'+d.value+'银矿</span> <button data-choice="npc:exchange:'+id+':1" '+(n?'':'disabled')+'>兑换1份</button> <button data-choice="npc:exchange:'+id+':all" '+(n?'':'disabled')+'>全部兑换 · '+n*d.value+'银矿</button></div>';}).join('')+'</div>';}
  open('npc','<div class="dialog-kicker">'+esc(d.attitude)+' · 银矿 '+game.amount('ore')+'</div><h2 class="dialog-title">'+esc(a.name)+'</h2><p>'+esc(d.line)+'</p><div class="exp-card-grid">'+stock+'</div>'+minerals+sale+'<div class="dialog-actions">'+button('离开','close')+'</div>');}
-function rescueNpcDialog(){const r=game.rescueInfo();if(!r){close();return;}const a=r.site,options=r.kind==='injured'?[['rescue','面包 ×1 · 接应 · 1回合'],['rescue-bandage','绷带 ×1 · 接应 · 1回合']]:r.kind==='trapped'?[['rescue-dig','矿镐耐久 −8 · 清障 · 2回合']]:[['rescue-walk','带路接应 · 1回合']],reward=r.ore?r.ore+'银矿':EscapeEngine.ITEMS[r.reward].name+' ×'+r.qty;open('rescue','<div class="dialog-kicker">'+esc(r.name)+'</div><h2 class="dialog-title">'+esc(a.name)+'</h2><p>'+esc(r.line)+'</p><p>护送至营地或一起下层：'+esc(reward)+'；加入同行队伍。</p><div class="dialog-actions">'+(a.done?'<p>已经接应。</p>':options.map(([id,label])=>{const q=game.rescueCheck(id);return '<button data-choice="'+id+'" '+(q.ok?'':'disabled')+'>'+esc(label)+(q.ok?'':' · '+esc(q.reason))+'</button>';}).join(''))+button('离开','close')+'</div>');}
+function rescueNpcDialog(){const r=game.rescueInfo();if(!r){close();return;}const a=r.site,q=game.rescueCheck('rescue'),reward=r.ore?r.ore+'银矿':EscapeEngine.ITEMS[r.reward].name+' ×'+r.qty;open('rescue','<div class="dialog-kicker">'+esc(r.name)+'</div><h2 class="dialog-title">'+esc(a.name)+'</h2><p>'+esc(r.line)+'</p><p>护送至营地或一起下层：'+esc(reward)+'；加入同行队伍。</p><p class="notice">'+esc(game.taskInventoryText())+'</p><div class="dialog-actions">'+(a.done?'<p>已经接应。</p>':'<button data-choice="rescue" '+(q.ok?'':'disabled')+'>救援绳索与支护架 · 接应'+(q.ok?'':' · '+esc(q.reason))+'</button>')+button('离开','close')+'</div>');}
 
-function site(a,x,y,time){if(a.npcKind||a.kind==='miner'&&a.rescueCase){npcPortrait(a,x,y,time);return;}
+function site(a,x,y,time){if(a.reactor){
+ ctx.save();if(a.reactorState==='triggered')ctx.globalAlpha=.45;
+ if(a.reactor==='gas'){for(let j=0;j<3;j++){ctx.strokeStyle='#a8ae6377';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x+16+j*17,y+66);ctx.bezierCurveTo(x+5+j*17,y+45,x+29+j*17,y+37,x+17+j*17,y+17);ctx.stroke();}poly([[x+18,y+71],[x+28,y+59],[x+56,y+57],[x+66,y+70]],'#536346');}
+ else if(a.reactor==='fungus'){for(let j=0;j<5;j++){const px=x+17+j*11,py=y+53-j%2*17;line([[px,py],[px-3,py+18]],'#889170',4);poly([[px-10,py],[px-5,py-8],[px+5,py-7],[px+10,py]],'#a7ae70');}line([[x+17,y+57],[x+43,y+31],[x+66,y+55]],'#778669',3);}
+ else if(a.reactor==='reservoir'){poly([[x+12,y+69],[x+9,y+19],[x+35,y+10],[x+67,y+25],[x+70,y+70]],'#4f6064');line([[x+38,y+14],[x+31,y+32],[x+44,y+43],[x+39,y+66]],'#8bbdc1',3);line([[x+20,y+72],[x+46,y+68],[x+66,y+73]],'#457b87',3);}
+ else{line([[x+17,y+69],[x+19,y+16],[x+63,y+16],[x+65,y+70]],'#9b805b',7);line([[x+23,y+18],[x+43,y+41],[x+58,y+62]],'#776547',4);line([[x+61,y+25],[x+55,y+33],[x+67,y+38]],'#d6b187',2);}
+ ctx.restore();return;
+ }if(a.npcKind||a.kind==='miner'&&a.rescueCase){npcPortrait(a,x,y,time);return;}
  if(a.chapterDevice){rect(x+18,y+24,44,43,a.done?'#35574e':'#6f6754');line([[x+22,y+23],[x+57,y+23]],'#cbbb8e',4);text(a.glyph,x+40,y+43,a.done?'#a5dbac':'#efddb1',24);text(a.name,x+40,y+75,'#d8c6a4',10);return;}
 
  if(a.kind==='home'){rect(x+17,y+12,46,58,'#14242b');line([[x+18,y+65],[x+18,y+15],[x+62,y+15],[x+62,y+65]],'#9a8967',5);for(let j=0;j<4;j++)rect(x+28,y+28+j*10,25,4,'#bfaa7e');text('↑',x+40,y+9,'#d5c494',21);
@@ -2205,6 +2466,12 @@ function site(a,x,y,time){if(a.npcKind||a.kind==='miner'&&a.rescueCase){npcPortr
   rect(x+17,y+18,46,51,'#0c151c');for(let j=0;j<5;j++)rect(x+23+j*3,y+29+j*7,34-j*6,3,'#667981');line([[x+15,y+16],[x+65,y+16],[x+65,y+70]],'#789298',4);text('↓',x+40,y+14,'#a5d6cc',20);
  }else if(a.kind==='gate'){
   glow(x+40,y+40,60,'#e4dc8d66');rect(x+13,y+12,54,59,'#49615b');rect(x+22,y+22,36,49,'#d4dab0');poly([[x+22,y+22],[x+40,y+13],[x+58,y+22]],'#c4d3ac');line([[x+40,y+24],[x+40,y+71]],'#718e79',3);text('风',x+40,y+44,'#486456',18);
+ }else if(a.cacheForm){
+  const worn=a.done?'#4d5550':'#899082';
+  if(a.cacheForm==='debris'){for(let i=0;i<4;i++)poly([[x+14+i*12,y+57-i%2*9],[x+23+i*12,y+33+i%3*6],[x+34+i*10,y+61]],i%2?worn:'#655d4d');line([[x+15,y+65],[x+67,y+27]],'#8c7353',5);}
+  else if(a.cacheForm==='corpse'){rect(x+23,y+36,34,17,'#696957');rect(x+15,y+38,12,12,worn);line([[x+48,y+49],[x+64,y+61],[x+70,y+60]],worn,5);line([[x+42,y+43],[x+51,y+59],[x+45,y+65]],worn,4);}
+  else if(a.cacheForm==='machine'){rect(x+18,y+27,44,39,'#3b5054');rect(x+22,y+31,36,5,worn);ctx.strokeStyle=worn;ctx.lineWidth=5;ctx.beginPath();ctx.arc(x+42,y+49,13,0,Math.PI*2);ctx.stroke();line([[x+9,y+66],[x+67,y+66]],'#605d4e',4);}
+  else{poly([[x+13,y+66],[x+9,y+23],[x+35,y+13],[x+43,y+51],[x+57,y+20],[x+73,y+31],[x+67,y+70]],'#425350');line([[x+37,y+19],[x+42,y+52],[x+50,y+63]],'#172629',5);if(!a.done)rect(x+42,y+52,6,4,'#b6a982');}
  }else if(a.kind==='chest'){
   if(!a.done&&a.lootMark)text(({rune:'◇',bread:'▰',bomb:'✹',rope:'⌁',torch:'♨',ore:'◆',tools:'⚒'})[a.lootMark]||'',x+40,y+15,'#d2c08a',14);
   rect(x+16,y+29,48,34,a.done?'#4a4038':'#8c6144');rect(x+16,y+26,48,10,a.done?'#645645':'#bd8f58');rect(x+17,y+37,46,4,'#48372d');rect(x+23,y+27,5,37,'#c4a572');rect(x+53,y+27,5,37,'#c4a572');rect(x+36,y+38,8,12,'#e9c17c');
@@ -2216,7 +2483,7 @@ function site(a,x,y,time){if(a.npcKind||a.kind==='miner'&&a.rescueCase){npcPortr
   rect(x+19,y+58,44,10,'#687b83');rect(x+27,y+45,28,16,'#4f606f');
   if(!a.done){const c=a.kind==='crystal'?'#d1bee9':'#87d6ee';glow(x+40,y+30,43,a.kind==='crystal'?'#bda2e05a':'#63bada4a');diamond(x+40,y+29+(reduced?0:Math.sin(time/550)*2),24,c);diamond(x+36,y+26,12,'#e9eef6')}else text('·',x+40,y+35,'#648d9c',27);
  }
- if(!a.done&&a.id!=='exit'){ctx.strokeStyle='#d5c18e55';ctx.lineWidth=1;ctx.strokeRect(x+8,y+8,64,64)}
+ if(!a.done&&a.id!=='exit'&&!a.cacheForm&&!a.reactor){ctx.strokeStyle='#d5c18e55';ctx.lineWidth=1;ctx.strokeRect(x+8,y+8,64,64)}
 }
 function campAction(){
  const s=game.state,p=s.player,a=game.homeNearby();
@@ -2289,6 +2556,7 @@ function draw(time){updateClock(time);
    rect(x,y,S,S,'#132c3c');for(let j=0;j<4;j++){const offset=reduced?0:Math.sin(time/700+j+wy)*7;line([[x+7+offset,y+14+j*17],[x+24+offset,y+11+j*17],[x+47+offset,y+15+j*17],[x+66+offset,y+12+j*17]],'#376074',2)}
    if(t.kind==='bridge'){rect(x+13,y,54,80,'#596976');for(let j=0;j<4;j++)rect(x+17,y+j*20+1,46,17,'#74848b');rect(x+8,y,6,80,'#a0a79a');rect(x+67,y,6,80,'#a0a79a')}
   }else floor(x,y,wx,wy);
+  if(t.pillar){poly([[x+11,y+69],[x+8,y+20],[x+26,y+6],[x+56,y+7],[x+71,y+23],[x+66,y+70]],'#536264');poly([[x+26,y+7],[x+55,y+8],[x+58,y+62],[x+27,y+70]],'#697678');line([[x+28,y+15],[x+31,y+55]],'#87918a',3);if(detailAt(wx,wy))text('基岩柱',x+40,y+66,'#c3ccc2',10);}
   if(t.paving&&t.kind==='floor'){line([[x,y+39],[x+80,y+39]],'#8e88732b',2);line([[x+39,y],[x+39,y+80]],'#8e88732b',2);}if(t.mosaic&&t.kind==='floor')diamond(x+40,y+40,23,'#b6a97044');
   if(seen&&t.kind==='floor'&&t.sceneDetail)sceneDetail(x,y,t.sceneDetail);
   {const fk=game.fogKind(wx,wy);if(fk){const fc=EscapeEngine.FOG[fk].color;ctx.save();ctx.globalAlpha=.16;rect(x,y,S,S,fc);ctx.globalAlpha=.24;ctx.strokeStyle=fc;ctx.lineWidth=7;for(let j=0;j<2;j++){const drift=reduced?Math.sin(wx+wy+j)*4:Math.sin(time/1500+wx*.7+wy+j)*7;ctx.beginPath();ctx.moveTo(x+7,y+24+j*30+drift);ctx.bezierCurveTo(x+24,y+9+j*30+drift,x+49,y+41+j*30-drift,x+73,y+20+j*30);ctx.stroke();}if(fk==='spores'){ctx.globalAlpha=.48;for(let j=0;j<3;j++)rect(x+15+(j*21+wx*7)%53,y+14+(j*27+wy*9)%54,3,3,fc);}ctx.restore();}}
@@ -2313,6 +2581,8 @@ function draw(time){updateClock(time);
   if(!seen)continue;
   if(t.shortcut&&t.kind==='hard'){const [dx,dy]=t.seam||[1,0];line([[x+40-dx*23,y+40-dy*23],[x+40+dx*23,y+40+dy*23]],'#b9c9b4',2);if(detailAt(wx,wy))text('可凿通',x+40,y+64,'#d2d5ad',11)}
   if(t.kind==='rubble'&&detailAt(wx,wy)){text(t.cracks?'清理 '+t.cracks+'/'+game.digHits(t):'可清理',x+40,y+65,'#dcc1a0',12)}
+  if(t.reactionWaterUntil>s.turn){line([[x+7,y+28],[x+27,y+24],[x+48,y+29],[x+72,y+25]],'#6598ad',3);line([[x+9,y+51],[x+32,y+46],[x+57,y+52],[x+74,y+48]],'#456e85',2);}
+  if((s.reactions?.pending||[]).some(a=>a.due>s.turn&&a.cells.some(c=>c[0]===wx&&c[1]===wy))){poly([[x+40,y+4],[x+76,y+40],[x+40,y+76],[x+4,y+40]],'#e9ad493b');line([[x+40,y+5],[x+75,y+40],[x+40,y+75],[x+5,y+40],[x+40,y+5]],'#e7b460',2);if(detailAt(wx,wy))text('闪燃',x+40,y+50,'#f4d18c',13);}
   if(t.collapseAt){rect(x,y,S,S,'#db73552c');line([[x+6,y+3],[x+37,y+23],[x+27,y+44],[x+54,y+65],[x+49,y+79]],'#e79577',3)}
 
  }
@@ -2363,7 +2633,7 @@ function statusMessage(){return ''}
 const ITEM_UI={
  ore:{text:'可用于修理；点击使用后选高亮落点，可向最多4格外抛出1块，制造响声引怪。墙会挡住投掷，落地后还能捡回。',action:'抛出1块引怪',key:''},
  bread:{text:'吃掉1块，最多恢复2点生命。也可以留到床上休息，或分给受困矿工。',action:'吃面包',key:'B'},
- torch:{text:'装备到副手时照明。选择使用并确认脚下位置，会消耗1支插在原地。',action:'插在脚下',key:'T'},
+ torch:{text:'装备到副手时照明。点击使用，会消耗1支插在原地。',action:'插在脚下',key:'T'},
  rope:{text:'面向最多3格宽的水面或冰桥，使用后搭成永久通路，涨水和融冰都不会破坏。对岸要有落脚处。',action:'搭桥过水',key:'R'},
  bomb:{text:'抛向最多5格内的可见地面。落地声引怪，再行动2次后爆炸，别进入橙框。',action:'选择投掷落点',key:'F'},
  rune:{text:'冻结眼前怪物；面向1–3格水面时同时冻出冰桥，使用后还能行动8次。可再用绳索固定。可在普通怪近战结算前冻结；迅捷怪会先手。',action:'冻结怪物 / 水面',key:''}
@@ -2402,7 +2672,7 @@ function shop(){
 }
 function decision(kind){if(kind==='rescue'&&game.rescueInfo()?.site.rescueCase){rescueNpcDialog();return;}const s=game.state,a=game.nearby();if(!a){close();return}
  if(kind==='rescue'){const bread=game.amount('bread');open('rescue',`<div class="dialog-kicker">石块后的回应</div><h2 class="dialog-title">${esc(a.name)}</h2><p class="dialog-copy">${a.done?'他已经获救。':'挪开碎石后，他会跟随你；可以护送回营地，也可以一起撤离。'}</p><p class="notice">${['矿工能稳住支架，延缓塌落8回合。','石匠能打开封岩近路，省下符石。','渡工能免费搭起最多5格的永久渡绳。'][s.level]}每章一次。</p>${a.done?finish():`<p class="notice">给面包只需1回合；自己挖需要4回合。附近怪物会趁机行动。</p><div class="dialog-actions"><button class="primary" data-choice="rescue" ${bread?'':'disabled'}>给1块面包 · 1回合</button><button data-choice="rescue-dig">自己挖 · 4回合</button>${button('先观察周围','close')}</div>`}`);return;}
- if(kind==='pump')open(kind,`<div class="dialog-kicker">排水闸</div><h2 class="dialog-title">水下有一条旧路。</h2><p class="dialog-copy">${s.local.drained?'浅水退去，新的近路已经露出地面。':'开闸会露出一条连接旧矿道的近路，也能搜查被淹的补给。沿原来的河岸仍然可以绕行。'}</p>${s.local.drained?finish():`<p class="notice">你会停下来转闸，水声可能引来附近的怪物。</p><div class="dialog-actions">${button('暂时不动','close')}<button class="primary" data-choice="drain">转动水闸</button></div>`}`);
+ if(kind==='pump'){const q=game.pumpActionCheck();open(kind,'<div class="dialog-kicker">排水闸</div><h2 class="dialog-title">找回阀轮，打开旧水路。</h2><p class="dialog-copy">'+(s.local.drained?'浅水退去，新的近路已经露出地面。':'阀轴空着，必须找回排水阀轮才能开闸。原有河岸绕路仍可通行。')+'</p><p>'+esc(game.taskSourceHint('task-pump-wheel'))+'</p>'+(s.local.drained?finish():'<p class="notice">'+esc(game.taskInventoryText())+'</p><div class="dialog-actions">'+button('暂时不动','close')+'<button class="primary" data-choice="drain" '+(q.ok?'':'disabled')+'>装入排水阀轮 · 转闸'+(q.ok?'':' · '+esc(q.reason))+'</button></div>'));}
  if(kind==='shrine')open(kind,`<div class="dialog-kicker">回声祭坛</div><h2 class="dialog-title">石壁后面，还有路。</h2><p class="dialog-copy">${s.local.ward?'封印已解除，石壁间的近路已经打开。':'献出1枚寒霜符石，驱散本区幽灵并打开石壁后的近路。也可以把符石留给战斗。'}</p>${s.local.ward?finish():`<p class="notice">${game.hasHand('rune')?'会消耗背包里的1枚符石。':game.amount('rune')?'供奉会消耗1枚符石。':'你还没有寒霜符石，可以继续探索寻找。'}</p><div class="dialog-actions">${button('留待以后','close')}<button class="primary" data-choice="bless" ${game.hasHand('rune')?'':'disabled'}>${game.hasHand('rune')?'放上符石，驱散幽灵':game.amount('rune')?'缺少符石':'缺少寒霜符石'}</button></div>`}`);
 }
 function journal(tab='chapter'){
@@ -2410,13 +2680,13 @@ function journal(tab='chapter'){
  const s=game.state,c=s.challenge,d=game.danger(),task=taskModel();let body='';
  if(tab==='chapter'){
   const order=c?.kind==='sequence'&&c.read?'<div class="rune-order">'+c.order.map((id,i)=>`<span class="${i===c.progress?'next':''}">${i<c.progress?'✓ ':''}${i+1} · ${runeName(id)}</span>`).join('')+'</div>':'';
-  body=`<div class="interaction-state"><strong>${esc(task.title)}</strong><br>${esc(task.progress)}</div><p>${esc(game.chapterPlay().tip)}</p>${order}${s.focusPinned?'<button data-main-goal="1">重新追踪本章目标</button>':''}<h3>已知变化</h3><p class="notice">${esc($('#chapter-condition').textContent)}</p>${$('#risk-status').textContent?`<p class="notice">${esc($('#risk-status').textContent)}</p>`:''}<p class="notice">任务物品：${s.local.part?esc(game.level.part)+'（单独保管，不占背包）':'暂无'}${s.local.part?'<br>已安装到动力车，降低行车噪声。':''}</p>`;
+  body=`<div class="interaction-state"><strong>${esc(task.title)}</strong><br>${esc(task.progress)}</div><p class="dialog-copy">${esc(task.requirement||'')}</p><p class="dialog-copy">${esc(task.hint||'')}</p><p>${esc(game.chapterPlay().tip)}</p>${order}${s.focusPinned?'<button data-main-goal="1">重新追踪本章目标</button>':''}<h3>已知变化</h3><p class="notice">${esc($('#chapter-condition').textContent)}</p>${$('#risk-status').textContent?`<p class="notice">${esc($('#risk-status').textContent)}</p>`:''}<p class="notice">${esc(game.taskInventoryText())}</p>`;
  }else if(tab==='clues'){
  const unread=new Set(discoveryState.unread);readDiscoveries();
   const groups=[];for(const n of s.notes.filter(n=>!n.useless)){const key=n.region??-1;let group=groups.find(g=>g.key===key);if(!group)groups.push(group={key,items:[]});group.items.push(n);}
   groups.sort((a,b)=>Number(b.items.some(n=>unread.has(n.id)))-Number(a.items.some(n=>unread.has(n.id))));for(const group of groups)group.items.sort((a,b)=>Number(unread.has(b.id))-Number(unread.has(a.id)));
   body=groups.map(g=>`<h3>${g.key>=0?esc(game.regionName(g.key)):'营地与旅途'}</h3><div class="clue-list">${g.items.map(n=>{const target=s.sites.find(a=>a.id===n.target&&a.discovered);return `<div class="clue-row"><button data-focus="${esc(n.id)}" class="clue ${s.focus===n.id?'selected':''}"><strong>${unread.has(n.id)?'新 · ':''}${esc(n.title)}</strong><span>${esc(n.text)}</span><small>${target?'地点已发现':'地点尚未发现'}${s.focus===n.id?' · 正在追踪':' · 追踪这条线索'}</small></button><button class="clue-manage" data-clue-useless="${esc(n.id)}" aria-label="标记为无用：${esc(n.title)}">无用</button></div>`;}).join('')}</div>`).join('');
-  const useless=s.notes.filter(n=>n.useless);if(useless.length)body+=`<details class="clue-archive"><summary>无用线索 · ${useless.length}</summary><div class="clue-list">${useless.map(n=>`<div class="clue-row"><article class="clue"><strong>${esc(n.title)}</strong><span>${esc(n.text)}</span></article><button class="clue-manage" data-clue-restore="${esc(n.id)}" aria-label="恢复线索：${esc(n.title)}">恢复</button></div>`).join('')}</div></details>`;
+  const useless=s.notes.filter(n=>n.useless);if(useless.length)body+=`<details class="clue-archive"><summary>已完成 / 无用 · ${useless.length}</summary><div class="clue-list">${useless.map(n=>`<div class="clue-row"><article class="clue"><strong>${esc(n.title)}</strong><span>${esc(n.text)}</span></article><button class="clue-manage" data-clue-restore="${esc(n.id)}" aria-label="恢复线索：${esc(n.title)}">恢复</button></div>`).join('')}</div></details>`;
  }else if(tab==='crew'){
   const crew=[...(s.allies||[]),...(s.companion?[s.companion]:[])],skills=['矿工稳住支架，延缓塌落8回合。','石匠凿开封岩近路，省下符石。','渡工搭起最多5格的永久渡绳。'];
   const check=game.assistCheck();body=`<div class="interaction-state">${esc($('#crew-status').textContent)}</div>${crew.length?crew.map(a=>'<p><strong>'+esc(a.name)+'</strong> · '+esc(skills[a.role??s.level]||'暂无专长记录。')+(a.used?' <span class="muted">本章已援助</span>':'')+'</p>').join(''):'<p>还没有同行者。</p>'}<p class="notice">每位同伴每章援助一次，消耗1回合。</p><button class="context-all" data-choice="companion-assist" ${check.ok&&s.mode==='playing'?'':'disabled'}>${esc(check.ok?check.label:check.reason)}</button>${s.companion?`<p class="notice">${esc(s.companion.name)}正在同行。撤离时需要接应到3格以内。</p><button data-action="abandon-confirm">决定独自走</button>`:''}`;
@@ -2436,7 +2706,7 @@ function showMap(){const s=game.state,o=presentedObjective(),full=mapZoom==='ful
  for(let y=oy;y<oy+span;y++)for(let x=ox;x<ox+span;x++){const t=game.tile(x,y);if(!t||!t.seen)continue;const [sx,sy]=px(x,y);
   c.fillStyle=t.collapseAt?'#d58572':t.worked&&['floor','bridge'].includes(t.kind)?'#91b6a0':t.shortcut&&t.kind==='hard'?'#a3ad8b':({floor:'#617781',rock:'#293b47',hard:'#645869',ore:'#82bad0',rubble:'#715047',water:'#285d7b',bridge:'#a5bca7'})[t.kind]||'#273844';
   c.fillRect(sx+(cell>3?1:0),sy+(cell>3?1:0),Math.max(1,cell-(cell>3?1:0)),Math.max(1,cell-(cell>3?1:0)))}
- for(const a of s.sites)if(a.discovered&&game.tile(a.x,a.y).kind!=='rubble'){const [sx,sy]=px(a.x,a.y);c.fillStyle=a.id==='home'?(s.campClosed?'#b36b61':'#a7d3a1'):a.done?'#597d71':'#c4a774';c.fillRect(sx+2,sy+2,Math.max(2,cell-3),Math.max(2,cell-3));if(cell>=9){c.fillStyle='#d8cba6';c.font='10px "Microsoft YaHei",sans-serif';c.textAlign='left';c.fillText(a.name,sx+cell+1,sy+cell-2)}}
+ for(const a of s.sites)if(a.discovered&&game.tile(a.x,a.y).kind!=='rubble'){const [sx,sy]=px(a.x,a.y);c.fillStyle=a.id==='home'?(s.campClosed?'#b36b61':'#a7d3a1'):game.siteExhausted(a)?'#43514e':'#c4a774';c.fillRect(sx+2,sy+2,Math.max(2,cell-3),Math.max(2,cell-3));if(cell>=9){c.fillStyle=game.siteExhausted(a)?'#687570':'#d8cba6';c.font='10px "Microsoft YaHei",sans-serif';c.textAlign='left';c.fillText(a.name,sx+cell+1,sy+cell-2)}}
  if(o.x!==null&&o.x>=ox&&o.x<ox+span&&o.y>=oy&&o.y<oy+span){const [sx,sy]=px(o.x,o.y);c.strokeStyle='#9ed6e9';c.lineWidth=2;c.strokeRect(sx-1,sy-1,cell+2,cell+2)}
  if(s.companion&&game.tile(s.companion.x,s.companion.y).seen){const [sx,sy]=px(s.companion.x,s.companion.y);c.fillStyle='#b5dabd';c.fillRect(sx+2,sy+2,Math.max(2,cell-3),Math.max(2,cell-3))}
  const [pxs,pys]=px(s.player.x,s.player.y);c.fillStyle='#f2c777';c.fillRect(pxs+1,pys+1,Math.max(2,cell-1),Math.max(2,cell-1));
@@ -2446,12 +2716,12 @@ function ending(){const s=game.state,won=s.mode==='won';const walkable=s.map.til
 function LEVEL_NAME(n){return EscapeEngine.LEVELS[n].name}
 function renderPanel(kind){if(kind==='npc'){npcDialog();return;}if(kind==='loadout')loadout();else if(kind==='departure')departure();else if(kind==='camp-bench')campBench();else if(kind==='chapter-device')chapterDeviceDialog();else if(kind==='adventure')adventureDialog();else if(kind==='bench')shop();else if(kind==='loot')loot();else if(kind==='ground')ground();else if(kind==='route')route();else if(['rescue','pump','shrine'].includes(kind))decision(kind)}
 function adventureDialog(){const s=game.state,id=s.adventureSite,r=s.adventure.risk;
- if(id==='risk-sign'){const meta=game.chapterPlay();open('adventure',`<div class="dialog-kicker">可选支路 · 先看清，再决定</div><h2 class="dialog-title">裂缝里有一件好东西。</h2><div class="adventure-summary"><strong>确定奖励：${esc(meta.rewardName)}</strong><br>${esc(meta.rewardNote)}</div><p class="dialog-copy">${r.collapsed?'支架已垮，未取出的物资已经被掩埋。':r.secured?'装备已经取出，空箱暂时顶住了支架。':'凿开入口硬岩，或把炸药抛到入口旁。打开入口才开始倒计时，16回合后未取走的物资会被埋住。怪物可能被声音引来。'}</p><p class="notice">可以放弃支洞，继续本章挑战。取得装备后会顺手稳住物资龛；站在这里阅读不消耗回合。</p>${finish('记住了，回到矿道')}`);return;}
+ if(id==='risk-sign'&&game.riskEncounterStatus){const a=s.sites.find(a=>a.id===id);open('adventure',`<h2 class="dialog-title">${esc(a.name)}</h2><p class="dialog-copy">${esc(a.description)}</p><div class="interaction-state">${esc(game.riskEncounterStatus())}</div>${finish('返回矿道')}`);return;}if(id==='risk-sign'){const meta=game.chapterPlay();open('adventure',`<div class="dialog-kicker">可选支路 · 先看清，再决定</div><h2 class="dialog-title">裂缝里有一件好东西。</h2><div class="adventure-summary"><strong>确定奖励：${esc(meta.rewardName)}</strong><br>${esc(meta.rewardNote)}</div><p class="dialog-copy">${r.collapsed?'支架已垮，未取出的物资已经被掩埋。':r.secured?'装备已经取出，空箱暂时顶住了支架。':'凿开入口硬岩，或把炸药抛到入口旁。打开入口才开始倒计时，16回合后未取走的物资会被埋住。怪物可能被声音引来。'}</p><p class="notice">可以放弃支洞，继续本章挑战。取得装备后会顺手稳住物资龛；站在这里阅读不消耗回合。</p>${finish('记住了，回到矿道')}`);return;}
  const check=game.gateCheck(),a=s.sites.find(a=>a.id==='stone-switch');open('adventure',`<div class="dialog-kicker">第二章 · 让古城为你让路</div><h2 class="dialog-title">${esc(a.name)}</h2><p class="dialog-copy">每转动一次绞盘，开启下一道近路石门，同时关闭另一道。声音会吸引附近能听见的怪物；石门处有人时无法关闭。</p><div class="adventure-summary">${s.adventure.gates.map((g,i)=>'石门 '+(i+1)+'：'+(game.tile(g.x,g.y).kind==='floor'?'已开启':'关闭')+' · '+(g.y<a.y?'北':'南')+(g.x<a.x?'西':'东')+'侧').join('<br>')}</div><p class="notice">${check.ok?'操作消耗1回合。原来的绕行道路一直可走。':esc(check.reason)}</p><div class="dialog-actions">${button('暂时不动','close')}<button class="primary" data-choice="stone-switch" ${check.ok?'':'disabled'}>转动绞盘</button></div>`);
 }
 function syncAdventure(){const s=game.state,ad=s.adventure,meta=game.chapterPlay();$('#chapter-play-title').textContent=meta.title;$('#chapter-play-tip').textContent=meta.tip;
  const tide=ad.tide,phase=s.turn%16,ice=ad.ice.filter(i=>i.due>s.turn);$('#chapter-condition').textContent=game.chapterStatus()+' · '+(tide?((tide.high?'水位高':'水位低')+' · '+((tide.high?16:8)-phase)+'回合后'+(tide.high?'退水':'涨水')):ad.gates.length?'石门：'+ad.gates.map((g,i)=>(i+1)+'号'+(game.tile(g.x,g.y).kind==='floor'?'开':'关')).join(' / '):'探索支路获取装备');if(ice.length)$('#chapter-condition').textContent+=' · 冰桥剩'+Math.min(...ice.map(i=>i.due-s.turn))+'回合';
- const risk=ad.risk;$('#risk-status').textContent=!risk?.spotted?'':risk.secured?'支路装备已取出':risk.collapsed?'支路物资已被掩埋':risk.due===null?'附近支洞：'+meta.rewardName+' · 打开入口才计时':'支洞物资将在 '+Math.max(0,risk.due-s.turn)+' 回合后被埋';
+ const risk=ad.risk;$('#risk-status').textContent=game.riskEncounterStatus?game.riskEncounterStatus():!risk?.spotted?'':risk.secured?'支路装备已取出':risk.collapsed?'支路物资已被掩埋':risk.due===null?'附近支洞：'+meta.rewardName+' · 打开入口才计时':'支洞物资将在 '+Math.max(0,risk.due-s.turn)+' 回合后被埋';
  const crew=[...(s.allies||[]),...(s.companion?[s.companion]:[])];$('#crew-status').textContent=crew.length?'同路人：'+crew.map(a=>a.name+(a.used?'（本章已援助）':'')).join('、'):'救出同伴，可获得一次专长援助';
  const check=game.assistCheck();$('#assist-button').disabled=s.mode!=='playing'||!check.ok||animBusy();$('#assist-button').textContent=check.ok?check.label:'同伴援助';$('#assist-button').title=check.ok?'消耗1回合，本章每位同伴可援助一次':check.reason;
 }
@@ -2501,7 +2771,7 @@ function inspectNearest(){const s=game.state,p=s.player,v=game.visible();
 function fresh(){close();cancelAim(false);game=new EscapeEngine();fxUntil=0;motion={events:[],end:0};queuedMove=null;queuedAction=null;holdBlocked=false;hoverCell=null;overlayCache=null;bagSelection=null;bagHand=null;elapsedMs=0;lastClockAt=performance.now();displayedSecond=-1;soundCueId=null;zoom=1;mapZoom='full';sync();intro()}
 function restartPrompt(){open('restart',`<div class="dialog-kicker">重新开始 · 本局 ${game.state.code}</div><h2 class="dialog-title">重新开始一局？</h2><p class="dialog-copy">当前进度不会保存。重新开始会改变矿洞地形、遇到的怪物和地下环境。</p><div class="dialog-actions">${button('继续当前旅途','close')}${button('重新开始','retry',true)}</div>`)}
 function move(dx,dy){if(aim){stepAim(dx,dy);return;}holdBlocked=false;act({type:'move',dx,dy})}
-canvas.addEventListener('pointermove',e=>{const b=canvas.getBoundingClientRect(),p=game.state.player,pv=pose('player',p,performance.now()),step=S*zoom;hoverCell={x:Math.floor((e.clientX-b.left)*CW/b.width/step+pv.x-(CW/(2*zoom)-40)/S),y:Math.floor((e.clientY-b.top)*CH/b.height/step+pv.y-(CH/(2*zoom)-40)/S)};});
+canvas.addEventListener('pointermove',e=>{const b=canvas.getBoundingClientRect(),p=game.state.player,pv=pose('player',p,performance.now()),step=S*zoom;hoverCell={x:Math.floor((e.clientX-b.left)*CW/b.width/step+pv.x-(CW/(2*zoom)-40)/S),y:Math.floor((e.clientY-b.top)*CH/b.height/step+pv.y-(CH/(2*zoom)-40)/S)};if(aim){const target=aim.targets.find(t=>t.x===hoverCell.x&&t.y===hoverCell.y);if(target&&target!==aim.selected){aim.selected=target;renderAim();}}});
 canvas.addEventListener('pointerleave',()=>{hoverCell=null});
 $('#assist-button').addEventListener('click',()=>timedAction({type:'choose',kind:'companion-assist'}));
 $('#help-button').addEventListener('click',help);$('#map-button').addEventListener('click',showMap);$('#pickup').addEventListener('click',()=>act({type:'pickup'}));$('#journal-button').addEventListener('click',journal);$('#run-button').addEventListener('click',runInfo);
@@ -2538,7 +2808,7 @@ function panelClick(e){const b=e.target.closest('button');if(!b||b.disabled)retu
  if(b.dataset.groundSite){if(animBusy())return;if(game.state.mode==='playing'&&game.nearby()?.id===b.dataset.groundSite){closeContext();act({type:'interact'});}return;}if(b.dataset.eliteActive){if(animBusy())return;close();act({type:'elite-active',item:b.dataset.eliteActive,direction:b.dataset.eliteDirection.split(',').map(Number)});return;}if(handleCardClick(b))return;if(animBusy()&&(b.dataset.bulk||b.dataset.ground||b.dataset.loot||b.dataset.transfer||b.dataset.deposit))return;
  if(b.dataset.drawer){if(b.dataset.drawer==='equipment')equipment();else bag();return;}
  if(b.dataset.journalTab){journal(b.dataset.journalTab);return;}
- if(b.dataset.clueUseless||b.dataset.clueRestore){const s=game.state,n=s.notes.find(n=>n.id===(b.dataset.clueUseless||b.dataset.clueRestore));if(!n)return;const scroll=content.scrollTop;n.useless=!!b.dataset.clueUseless;if(n.useless&&s.focus===n.id){s.focus=null;s.focusPinned=false;}readDiscoveries([n.id]);sync();saveCampaign();journal('clues');content.scrollTop=scroll;return;}
+ if(b.dataset.clueUseless||b.dataset.clueRestore){const s=game.state,n=s.notes.find(n=>n.id===(b.dataset.clueUseless||b.dataset.clueRestore));if(!n)return;const scroll=content.scrollTop;n.useless=!!b.dataset.clueUseless;n.keepActive=!!b.dataset.clueRestore;if(n.useless&&s.focus===n.id){s.focus=null;s.focusPinned=false;}readDiscoveries([n.id]);sync();saveCampaign();journal('clues');content.scrollTop=scroll;return;}
  if(b.dataset.mainGoal){game.state.focusPinned=false;game.state.focus=null;sync();journal('chapter');return;}
  if(b.dataset.manageTorch){bagSelection='torch';renderBag();return;}
  if(b.dataset.equipmentSlot){gearSlot=b.dataset.equipmentSlot;gearSelection=null;bagSelection=null;renderBag();return;}
@@ -2610,20 +2880,20 @@ window.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;c
 Object.assign(ITEM_UI,{
  ore:{text:'也可用于修理。点使用，再点最多4格内的高亮落点，投出1银矿引怪；落地的银矿能捡回。',action:'选择引怪落点',key:''},
  bread:{text:'直接吃1块，恢复最多2点生命。营地的床可用1块面包休息，也可留给受困者。',action:'吃面包',key:'B'},
- bomb:{text:'抛到最多5格内的可见地面，墙壁挡住投掷。预览落点九宫格；落地声引怪，再行动2次后爆炸。',action:'选择投掷落点',key:'F'},
+ bomb:{text:'抛到最多5格内的可见地面，墙壁挡住投掷。点击落点直接抛出；落地声引怪，再行动2次后爆炸。',action:'选择投掷落点',key:'F'},
  rune:{text:'点高亮水面冻出冰桥，或点可见怪物冻结视野内敌人。冰桥使用后还能行动8次，可再用绳索固定。',action:'选择冻结目标',key:''},
  rope:{text:'直接点高亮水面或冰桥，架起最多3格的永久通路。对岸必须能落脚，搭好后不怕涨水或融冰。',action:'选择搭桥位置',key:'R'},
- torch:{text:'携带时自动照明。点使用，再确认脚下位置，会消耗1支插在原地。其余火把继续随身照明。',action:'插下火把',key:'T'}
+ torch:{text:'携带时自动照明。点击使用，会消耗1支插在原地。其余火把继续随身照明。',action:'插下火把',key:'T'}
 });
 function showContext(kind,html){open(kind,html);}
 function closeContext(){game.state.panel=null;const pane=$('#context-panel');pane.hidden=true;pane.innerHTML='';pane.dataset.kind='';if(dialog.open&&['loot','ground'].includes(modal)){dialog.close();modal='';}renderBag();}
 function cancelAim(refresh=true){aim=null;$('#aim-bar').hidden=true;canvas.parentElement.classList.remove('aiming');if(refresh)sync();}
 function beginEliteUse(item){if(animBusy())return;const q=game.eliteActiveCheck(item);if(!q.ok){game.log(q.reason,'warn');sync();return;}if(dialog.open)close();cardSelection=null;cardHover=null;if(!cardDockPinned)cardDockOpen=false;const targets=game.eliteTargets(item);aim={item,elite:true,targets,selected:targets[0]||null};sync();canvas.focus({preventScroll:true});}
 function aimTargets(){return aim.elite?game.eliteTargets(aim.item):game.itemTargets(aim.item);}
-function beginUse(item){if(animBusy()||!['playing','home'].includes(game.state.mode))return;if(aim?.item===item){cancelAim();return;}if(dialog.open)close();$('#more-tools').hidden=true;if(item==='bread'||item==='elite_tide'){cancelAim(false);act({type:'use',item});return;}const targets=game.itemTargets(item);aim={item,targets,selected:targets[0]||null};sync();canvas.focus({preventScroll:true});}
-function renderAim(){const pane=$('#aim-bar');pane.hidden=!aim;canvas.parentElement.classList.toggle('aiming',!!aim);if(!aim)return;const words={bomb:'点落点预览，再确认抛出。最多5格；落地声引怪，2次行动后爆炸。',rope:'选择高亮水面搭桥，对岸必须有落脚处。',rune:'选择水面冻桥，或点怪物冻结视野内敌人。',ore:'选择高亮格，抛出1银矿引开怪物。',torch:'消耗1支火把，插在脚下成为固定光源。'},labels={bomb:'抛出炸药',rope:'搭设绳桥',rune:'释放寒霜',ore:'抛出银矿',torch:'插下火把'};$('#aim-hint').textContent=aim.targets.length?(aim.elite?(aim.selected?.label||EscapeEngine.ELITE_GEAR[aim.item].effect):(ITEM_UI[aim.item]?.text||words[aim.item]||'选择目标')):'没有可用目标，请取消后换个位置。';$('#confirm-aim').disabled=!aim.selected;$('#confirm-aim').textContent=aim.selected?(aim.elite?'确认'+EscapeEngine.ELITE_GEAR[aim.item].role:(ITEM_UI[aim.item]?.action||labels[aim.item]||'确认使用')):'无法使用';$('#confirm-aim').title=aim.selected?.label||'没有可用目标';}
+function beginUse(item,cardUid){if(animBusy()||!['playing','home'].includes(game.state.mode))return;if(aim?.item===item){cancelAim();return;}if(dialog.open)close();$('#more-tools').hidden=true;const def=EscapeEngine.COMMON_ITEMS[item];if(['bread','elite_tide','torch','lamp'].includes(item)||def?.type==='supply'&&!def.range){cancelAim(false);act({type:'use',item,cardUid});return;}const targets=game.itemTargets(item);aim={item,cardUid,targets,selected:targets[0]||null};sync();canvas.focus({preventScroll:true});}
+function renderAim(){const pane=$('#aim-bar');pane.hidden=!aim;canvas.parentElement.classList.toggle('aiming',!!aim);if(!aim)return;$('#aim-hint').textContent=aim.targets.length?(aim.elite?(aim.selected?.label||EscapeEngine.ELITE_GEAR[aim.item].effect):(ITEM_UI[aim.item]?.text||'选择目标')):'没有可用目标，请取消后换个位置。';}
 function commitAim(target=aim?.selected){if(!aim||!target||animBusy())return;const item=aim.item,cardUid=aim.cardUid,elite=aim.elite;cancelAim(false);act({type:elite?'elite-active':'use',item,cardUid,direction:target.direction,target:{x:target.x,y:target.y}});}
-function aimAt(x,y){if(!aim)return false;const target=aim.targets.find(t=>t.x===x&&t.y===y);if(target){if(aim.item==='bomb'||aim.elite){aim.selected=target;renderAim();}else commitAim(target);}else{$('#aim-hint').textContent='请点高亮目标；取消不会消耗回合。';}return true;}
+function aimAt(x,y){if(!aim)return false;const target=aim.targets.find(t=>t.x===x&&t.y===y);if(target)commitAim(target);else{$('#aim-hint').textContent='请点高亮目标；取消不会消耗回合。';}return true;}
 function stepAim(dx,dy){if(!aim)return;const p=game.state.player,list=aim.targets.filter(t=>(t.x-p.x)*dx+(t.y-p.y)*dy>0).sort((a,b)=>Math.abs(a.x-p.x)+Math.abs(a.y-p.y)-Math.abs(b.x-p.x)-Math.abs(b.y-p.y));if(list.length){const at=list.indexOf(aim.selected);aim.selected=list[(at+1)%list.length];renderAim();}}
 function syncControls(){const s=game.state,p=s.player,d=game.danger();syncQuickbar();$('#equipment-summary').textContent=PICKS[p.pickKind].name+' · '+(GEAR[p.equipped.off]?.name||'副手空置')+' · '+game.lightLabel();$('#mobile-health').textContent='♥ '+p.hp+'/'+p.maxHp;$('#mobile-armor').textContent='甲 '+p.armor;$('#mobile-light').textContent=s.mode==='home'?'营地':game.lightRadius()+'格光';$('#mobile-turn').textContent=s.total+'回合';$('#mobile-objective').textContent=presentedObjective().text;$('#mobile-objective').title=presentedObjective().text;$('#mobile-arrow').textContent=$('#compass').textContent;
  const risk=s.adventure.risk,bomb=s.bombs[0],tide=s.adventure.tide,ice=s.adventure.ice.filter(i=>i.due>s.turn);let warning=bomb?'炸药还有 '+Math.max(0,bomb.due-s.turn)+' 次行动引爆，离开橙色范围！':d.warning?'脚下裂缝：'+d.safeTurns+'回合后塌落':d.worldLeft!==null?'撤离还剩 '+d.worldLeft+' 回合':risk?.due&&!risk.secured&&!risk.collapsed?'支洞奖励还剩 '+Math.max(0,risk.due-s.turn)+' 回合':ice.length?'冰桥还剩 '+Math.min(...ice.map(i=>i.due-s.turn))+' 回合':tide?'水位'+(tide.high?'高':'低')+' · '+((tide.high?16:8)-s.turn%16)+'回合后'+(tide.high?'退水':'涨水'):'';$('#mobile-danger').textContent=warning;
@@ -2632,14 +2902,14 @@ function syncControls(){const s=game.state,p=s.player,d=game.danger();syncQuickb
  if(aim)$('#interact').disabled=true;$('#wait-touch').disabled=s.mode!=='playing'||!!aim||animBusy();$('#wait').disabled=s.mode!=='playing'||!!aim||animBusy();if(aim){const old=aim.selected;aim.targets=aimTargets();aim.selected=aim.targets.find(t=>t.x===old?.x&&t.y===old?.y)||aim.targets[0]||null;renderAim();}
 }
 function drawItemAim(ox,oy){if(!aim||dialog.open)return;const chosen=aim.selected,drawn=new Set();for(const t of aim.targets){const k=t.x+','+t.y;if(drawn.has(k))continue;drawn.add(k);const x=(t.x-ox)*S,y=(t.y-oy)*S;rect(x+4,y+4,72,72,'#99dcb927');ctx.strokeStyle='#b5d9b2';ctx.lineWidth=2;ctx.strokeRect(x+6,y+6,68,68);}
- if(!chosen)return;if(aim.item==='bomb'){const p=game.state.player;ctx.save();ctx.setLineDash([7,5]);line([[(p.x-ox)*S+40,(p.y-oy)*S+40],[(chosen.x-ox)*S+40,(chosen.y-oy)*S+40]],'#e9ca8c',2);ctx.restore();}for(const [x,y]of chosen.cells){const sx=(x-ox)*S,sy=(y-oy)*S;rect(sx+3,sy+3,74,74,aim.item==='bomb'?'#eaa25450':'#a4e4e346');ctx.strokeStyle=aim.item==='bomb'?'#e9b67f':'#ceefdc';ctx.lineWidth=2;ctx.strokeRect(sx+5,sy+5,70,70);}text(aim.item==='bomb'?'投掷落点':'确认目标',(chosen.x-ox)*S+40,(chosen.y-oy)*S+14,'#fff0cb',12);
+ if(!chosen)return;if(aim.item==='bomb'){const p=game.state.player;ctx.save();ctx.setLineDash([7,5]);line([[(p.x-ox)*S+40,(p.y-oy)*S+40],[(chosen.x-ox)*S+40,(chosen.y-oy)*S+40]],'#e9ca8c',2);ctx.restore();}for(const [x,y]of chosen.cells){const sx=(x-ox)*S,sy=(y-oy)*S;rect(sx+3,sy+3,74,74,aim.item==='bomb'?'#eaa25450':'#a4e4e346');ctx.strokeStyle=aim.item==='bomb'?'#e9b67f':'#ceefdc';ctx.lineWidth=2;ctx.strokeRect(sx+5,sy+5,70,70);}text(aim.item==='bomb'?'投掷落点':'目标',(chosen.x-ox)*S+40,(chosen.y-oy)*S+14,'#fff0cb',12);
 }
 
 $('#bag-button').addEventListener('click',bag);
 $('#more-button').addEventListener('click',()=>{const panel=$('#more-tools');panel.hidden=!panel.hidden;$('#more-button').setAttribute('aria-expanded',String(!panel.hidden));});
 document.addEventListener('click',e=>{if(!e.target.closest('.mast nav')){$('#more-tools').hidden=true;$('#more-button').setAttribute('aria-expanded','false');}});
 
-$('#confirm-aim').addEventListener('click',()=>commitAim());$('#cancel-aim').addEventListener('click',()=>cancelAim());
+$('#cancel-aim').addEventListener('click',()=>cancelAim());
 $('#wait-touch').addEventListener('click',()=>{if(!aim)act({type:'wait'});});
 function specialStorage(){const s=game.state,spare=game.spareGear();return `<details class="special-storage" ${gearSelection||bagSelection==='torch'?'open':''}><summary>装备与任务物品 · 不占背包</summary><div class="stack-grid">${spare.map(id=>`<button class="stack-tile gear-tile ${gearSelection===id?'selected':''}" data-select-gear="${id}"><span class="gear-icon">${GEAR[id].icon}</span><span class="gear-name">${GEAR[id].name}</span></button>`).join('')}${game.amount('torch')?`<button class="stack-tile gear-tile" data-select-item="torch"><span class="gear-icon">♨</span><span class="gear-name">火把 ×${game.amount('torch')}</span></button>`:''}</div>${s.local.part?`<p class="quest-storage">任务物品 · ${esc(game.level.part)}</p>`:'<p class="micro-note">暂未携带任务物品。备用装备保留各自耐久。</p>'}</details>`;}
 const GEAR=EscapeEngine.EQUIPMENT,SLOT_LABELS={body:'身体',head:'头戴',main:'主手 · 镐',off:'副手'};let gearSlot=null,gearSelection=null;
@@ -2662,7 +2932,7 @@ ITEM_UI.torch.text='装备到副手才提供随身照明。使用会消耗1支�
 for(const [id,d]of Object.entries(GEAR))OFFERS[id==='magic'?'pick':id]=[d.name,d.effect+' 取舍：'+d.trade];
 $('#offhand-button').addEventListener('click',offhandMenu);
 
-function chapterV2Dialog(){const s=game.state,c=s.challenge,a=s.sites.find(a=>a.id===s.chapterSite);if(!a){close();return;}let options=[],details=game.chapterStatus();if(a.id==='cart-control'){if(!c.overhauled)options.push(['chapter:cart:repair-kit','维修包 ×1 · 整修动力机'],['chapter:cart:repair-ore','银矿 ×3 · 整修动力机']);options.push(['chapter:start','启动动力车']);}else if(a.id.startsWith('track-service-'))options=[['chapter:track:'+a.id,'矿镐耐久 −6 · 维修 · 2回合']];else if(a.id==='city-inscription'){options=[['chapter:read',c.read?'重读六印次序':'读取六印次序']];if(c.read)details=c.order.map((id,i)=>(i<c.progress?'✓ ':'')+runeName(id)).join(' → ');}else if(a.id.startsWith('rune-')){options=[['chapter:rune:'+a.id.slice(5),'激活'+runeName(a.id.slice(5))+' · 1回合']];if(c.read)details=c.order.map((id,i)=>(i<c.progress?'✓ ':'')+runeName(id)).join(' → ');}else if(a.id.startsWith('river-anchor-')){const key=a.id.slice(-1);options=[['chapter:anchor:'+key+':rope','绳索 ×1 · 固定锚'],['chapter:anchor:'+key+':ore','银矿 ×3 · 固定锚']];}else if(a.id.startsWith('sluice-')){options=[['chapter:sluice:'+a.id.slice(7),'操作水闸 · 1回合']];const high=s.turn%16>=8;details+=(high?' · 涨水':' · 退水')+'剩余'+((high?16:8)-s.turn%16)+'回合';}open('chapter-device','<div class="dialog-kicker">'+esc(game.chapterPlay().title)+'</div><h2 class="dialog-title">'+esc(a.name)+'</h2><div class="interaction-state">'+esc(details)+'</div><p>'+esc(a.description)+'</p><div class="dialog-actions">'+options.map(([kind,label])=>{const q=game.chapterActionCheck(kind);return '<button data-choice="'+kind+'" '+(q.ok?'':'disabled')+'>'+esc(label)+(q.ok?'':' · '+esc(q.reason))+'</button>';}).join('')+button('返回地图','close')+'</div>');}
+function chapterV2Dialog(){const s=game.state,c=s.challenge,a=s.sites.find(a=>a.id===s.chapterSite);if(!a){close();return;}const options=game.taskDeviceOptions(a),order=c.kind==='sequence'&&c.read?'<p>碑文次序：'+c.order.map((id,i)=>(i<c.progress?'✓ ':'')+({hammer:'锤纹印石',lamp:'灯纹印石',wave:'水纹印石'})[id]).join(' → ')+'</p>':'';open('chapter-device','<div class="dialog-kicker">'+esc(game.chapterPlay().title)+'</div><h2 class="dialog-title">'+esc(a.name)+'</h2><div class="interaction-state">'+esc(game.chapterStatus())+'</div><p>'+esc(a.description)+'</p>'+order+'<p class="notice">'+esc(game.taskInventoryText())+'</p><div class="dialog-actions">'+options.map(([kind,label])=>{const q=game.chapterActionCheck(kind);return '<button data-choice="'+kind+'" '+(q.ok?'':'disabled')+'>'+esc(label)+(q.ok?'':' · '+esc(q.reason))+'</button>';}).join('')+button('返回地图','close')+'</div>');}
 
 function chapterDeviceDialog(){if(game.state.challenge?.version===2){chapterV2Dialog();return;}const s=game.state,c=s.challenge,a=s.sites.find(a=>a.id===s.chapterSite);if(!a){close();return;}let kind,details='';if(a.id==='cart-control'){kind='chapter:start';details=game.chapterStatus();}else if(a.id==='city-inscription'){kind='chapter:read';details=c.read?'碑文：'+c.order.map(id=>({hammer:'锤印',lamp:'灯印',wave:'水印'})[id]).join(' → '):'读碑不会消耗回合，顺序会自动记入手记。';}else if(a.id.startsWith('rune-')){kind='chapter:rune:'+a.id.slice(5);details=c.read?'碑文次序：'+c.order.map((id,i)=>(i<c.progress?'✓ ':'')+({hammer:'锤印',lamp:'灯印',wave:'水印'})[id]).join(' → '):'还未读过启门碑，请先去中央广场。';}else{kind='chapter:sluice:'+a.id.slice(7);const high=s.turn%16>=8;details=(high?'涨水':'退水')+'中 · 还有'+((high?16:8)-s.turn%16)+'回合改变水位。';}const check=game.chapterActionCheck(kind),label=kind==='chapter:read'?'阅读并记下次序':kind==='chapter:start'?'启动动力车':a.id.startsWith('rune-')?'唤醒这枚印记':'操作水闸';open('chapter-device',`<div class="dialog-kicker">${esc(game.chapterPlay().title)}</div><h2 class="dialog-title">${esc(a.name)}</h2><div class="interaction-state">${esc(details)}</div><p class="dialog-copy">${esc(a.description)}</p><p class="notice">${check.ok?(kind==='chapter:read'?'查看不耗回合。':'操作消耗1回合，附近怪物也会行动。'):esc(check.reason)}</p><div class="dialog-actions">${button('回到地图','close')}<button class="primary" data-choice="${kind}" ${check.ok?'':'disabled'}>${label}</button></div>`);}
 function route(){const s=game.state,a=s.sites.find(a=>a.id===s.routeChoice);if(!a){close();return;}const check=game.exitCheck(),next=(s.depth||1)+1,role=({mechanical:'近出口 · 需本层任务',water:'远出口 · 无需任务','random-exit':'随机出口 · 无需任务'})[a.id];open('route',`<div class="dialog-kicker">通往第${next}层 · ${role}</div><h2 class="dialog-title">${esc(a.name)}</h2><p class="notice">${esc(check.reason)}。下行消耗1回合，随身卡片、装备、燃料和银矿继续携带。</p><div class="dialog-actions">${button('继续探索','close')}<button class="primary" data-choice="depart" ${check.ok?'':'disabled'}>前往第${next}层 · 1回合</button></div>`);}
@@ -2673,7 +2943,7 @@ function runeName(id){return {hammer:'锤印',lamp:'灯印',wave:'水印'}[id]||
 function taskModel(){if(game.state.mode==='playing'&&game.state.challenge?.version===2&&!game.state.focusPinned)return game.chapterTaskModel();
  const s=game.state,c=s.challenge,p=s.player,base=game.objective(),distance=a=>Math.abs(a.x-p.x)+Math.abs(a.y-p.y);let title='',progress='',target=null,point=null;
  if(s.mode==='home')return {...base,title:s.expedition?.phase==='prepare'?'营地':'避难所',progress:s.expedition?.phase==='prepare'?'卡包 '+preparedCards().length+'/5 · 银矿 '+game.campaign.ore:game.level.name,x:null,y:null};
- if(s.focusPinned&&!['chapter-challenge','chapter-complete'].includes(s.focus))return {...base,title:base.text,progress:'正在追踪线索 · 点此返回本章目标'};
+ if(s.focusPinned&&!['chapter-challenge','chapter-complete'].includes(s.focus))return {...base,title:base.text,progress:'正在追踪线索',hint:s.notes.find(n=>n.id===s.focus)?.text||''};
  if(!c)return {...base,title:base.text,progress:game.level.name};
  if(c.kind==='escort'){
   progress=(c.started?'运输 '+c.index+'/'+(c.path.length-1):'动力车待启动')+(s.local.part?' · 静音齿轮已安装':'');
@@ -2715,15 +2985,16 @@ function liveDangers(){
  if(s.mode==='playing'&&risk?.due!==null&&risk?.due>s.turn&&!risk.secured&&!risk.collapsed&&risk.due-s.turn<=5&&Math.abs(p.x-risk.entry.x)+Math.abs(p.y-risk.entry.y)<=7)add(70,'支洞物资将被埋 · 剩 '+(risk.due-s.turn)+' 回合','取走装备可稳住物资龛；来不及时先撤离，不必为了支路耽误本章目标。');
  if(d.worldLeft!==null&&d.worldLeft<=60)add(80,'全区塌陷倒计时 · 剩 '+d.worldLeft+' 回合','完成眼下的撤离条件，前往出口；时间推进才会减少倒计时。');
  if(d.campLeft!==null&&d.campLeft<=12&&s.mode==='home')add(88,'营地将塌 · 剩 '+d.campLeft+' 回合','从矿道出口离开，避免修理或休息耽搁撤离。');
+ for(const burst of s.reactions?.pending||[])if(burst.due>s.turn&&burst.cells.some(([x,y])=>game.visible().has(x+','+y)))add(85,'燃气即将闪燃','离开地面亮起的菱形范围；下一次行动后闪燃。');
  return list.sort((a,b)=>b.priority-a.priority);
 }
 function dangerDetails(){const list=liveDangers();open('danger',`${inventoryHeader('眼前的危险','只显示仍在生效的威胁')}${list.map(d=>`<div class="interaction-state">${esc(d.title)}</div><p class="dialog-copy">${esc(d.detail)}</p>`).join('')||'<p class="notice">眼前的威胁已经解除。</p>'}`);}
 function syncPresentation(){
  $('#restart-button').textContent=game.state.expedition?.phase==='prepare'?'新开局':'放弃本次探险';
- syncDiscoveries();
+ game.archiveResolvedClues();syncDiscoveries();
  const s=game.state,p=s.player,task=taskModel(),hazards=liveDangers();$('#ui-health').textContent='♥ '+p.hp+'/'+p.maxHp;$('#ui-health').className=p.hp<=2?'urgent':'';$('#ui-armor').textContent='护甲 '+p.armor;$('#ui-armor').title=$('#armor').title;
  const warnings=[];if(s.mode==='playing')warnings.push(game.lightLabel());if(p.equipped.main&&p.dur<=p.maxDur*.2)warnings.push('镐耐久 '+p.dur+'/'+p.maxDur);if(p.stun)warnings.push('被缠住 · 行动一次挣脱');$('#ui-conditions').textContent=warnings.join(' · ');
- $('#task-title').textContent=task.title;$('#task-progress').textContent=task.progress;$('#task-arrow').textContent=$('#compass').textContent;$('#task-button').title=task.title+'；点击查看本章详情';
+ $('#task-title').textContent=task.title;$('#task-progress').textContent=task.progress;$('#task-arrow').textContent='';$('#task-requirement').textContent=task.requirement||'';$('#task-hint').textContent=task.hint||'';$('#task-button').title=[task.title,task.requirement,task.hint].filter(Boolean).join('；');
  const banner=$('#danger-banner');banner.hidden=!hazards.length;banner.innerHTML=hazards.length?esc(hazards[0].title)+(hazards.length>1?'<small>另有 '+(hazards.length-1)+' 项 · 详情 ›</small>':'<small>详情 ›</small>'):'';
  const latest=s.logs.at(-1);if(feedbackState.game!==game||feedbackState.level!==s.level){feedbackState={game,level:s.level,last:latest,until:0};$('#action-feedback').textContent='';}
  else if(latest!==feedbackState.last){const start=s.logs.indexOf(feedbackState.last),fresh=s.logs.slice(start<0?-1:start+1).filter(l=>l.tone!=='story'),entry=fresh.findLast(l=>l.tone==='danger')||fresh.findLast(l=>l.kind==='hearing')||fresh.at(-1);feedbackState.last=latest;if(entry){$('#action-feedback').textContent=entry.text;$('#action-feedback').className=entry.tone;$('#action-feedback').title=entry.text;feedbackState.until=performance.now()+(entry.tone==='danger'?6000:entry.tone==='warn'?4000:2600);}}
@@ -2738,7 +3009,7 @@ $('#equipment-button').addEventListener('click',equipment);$('#task-button').add
 // Investigation results require acknowledgement; incidental discoveries stay marked until read.
 let discoveryState={game:null,level:-1,known:new Map(),unread:new Set()};
 const noteSignature=n=>n.title+'\n'+n.text+'\n'+n.target;
-function syncDiscoveries(){const s=game.state;if(discoveryState.game!==game||discoveryState.level!==s.level){discoveryState={game,level:s.level,known:new Map(s.notes.map(n=>[n.id,noteSignature(n)])),unread:new Set()};}else{for(const n of s.notes){const signature=noteSignature(n);if(discoveryState.known.get(n.id)!==signature){discoveryState.known.set(n.id,signature);discoveryState.unread.add(n.id);}}}renderDiscoveryNotice();}
+function syncDiscoveries(){const s=game.state;if(discoveryState.game!==game||discoveryState.level!==s.level){discoveryState={game,level:s.level,known:new Map(s.notes.map(n=>[n.id,noteSignature(n)])),unread:new Set()};}else{for(const n of s.notes){if(n.useless){discoveryState.unread.delete(n.id);continue;}const signature=noteSignature(n);if(discoveryState.known.get(n.id)!==signature){discoveryState.known.set(n.id,signature);discoveryState.unread.add(n.id);}}}renderDiscoveryNotice();}
 function renderDiscoveryNotice(){const b=$('#discovery-button'),n=discoveryState.unread.size;b.hidden=!n;b.textContent='新线索 '+n+' · 查看';b.setAttribute('aria-label',n+'条未读线索，点击查看');}
 function readDiscoveries(ids=null){if(ids)for(const id of ids)discoveryState.unread.delete(id);else discoveryState.unread.clear();renderDiscoveryNotice();}
 function captureInvestigation(action){if(action.type!=='interact'&&!(action.type==='choose'&&action.kind==='chapter:read'))return null;const s=game.state;return {level:s.level,mode:s.mode,turn:s.total,hp:s.player.hp,armor:s.player.armor,site:action.type==='interact'?game.nearby():null,notes:new Map(s.notes.map(n=>[n.id,noteSignature(n)]))};}
@@ -2751,11 +3022,11 @@ function presentInvestigation(action,before,result){
  const changed=notes.some(n=>before.notes.get(n.id)!==noteSignature(n)),spent=s.total-before.turn,hurt=before.hp-s.player.hp,armor=before.armor-s.player.armor;
  const summary=inscription?'按这个次序前往三座印殿，唤醒印记。':blockedBox?'先操作旧水闸，再回来搜索箱子。':'路牌指出了工坊与河岸的方向。可以追踪其中一条，或继续本章目标。';
  readDiscoveries(notes.map(n=>n.id));
- open('discovery',`<div class="investigation-source">${inscription?'启门碑':esc(a?.name||'调查')} · ${changed?'已记入手记':'重读已有线索'}</div><h2 class="dialog-title">${blockedBox?'这里暂时打不开':inscription?'记下了三印次序':changed?'看清了路牌上的指引':'路牌上的指引'}</h2><p class="discovery-next">${summary}</p>${notes.map(n=>`<article class="discovery-card"><h3>${esc(n.title)}</h3><p>${esc(n.text)}</p>${n.target&&!inscription?`<button data-focus="${esc(n.id)}">追踪这条线索 →</button>`:''}</article>`).join('')}${hurt>0||armor>0?`<p class="notice urgent">调查期间${hurt>0?'生命减少 '+hurt+'。':''}${armor>0?'护甲减少 '+armor+'。':''}留意附近危险。</p>`:''}<p class="discovery-cost">${spent?'本次调查消耗 '+spent+' 回合。':'本次查看不耗回合。'}阅读此页不会推进时间。</p><div class="dialog-actions">${button('读完了，继续探索','close',true)}</div>`);
+ open('discovery',`<div class="investigation-source">${inscription?'启门碑':esc(a?.name||'调查')} · ${changed?'已记入手记':'重读已有线索'}</div><h2 class="dialog-title">${blockedBox?'这里暂时打不开':inscription?'记下了三印次序':changed?'看清了路牌上的指引':'路牌上的指引'}</h2><p class="discovery-next">${summary}</p>${notes.map(n=>`<article class="discovery-card"><h3>${esc(n.title)}</h3><p>${esc(n.text)}</p>${n.target&&!inscription?`<button data-focus="${esc(n.id)}">追踪这条线索</button>`:''}</article>`).join('')}${hurt>0||armor>0?`<p class="notice urgent">调查期间${hurt>0?'生命减少 '+hurt+'。':''}${armor>0?'护甲减少 '+armor+'。':''}留意附近危险。</p>`:''}<p class="discovery-cost">${spent?'本次调查消耗 '+spent+' 回合。':'本次查看不耗回合。'}阅读此页不会推进时间。</p><div class="dialog-actions">${button('读完了，继续探索','close',true)}</div>`);
 }
 $('#discovery-button').addEventListener('click',()=>journal('clues'));
 
-const desktopCardDock=()=>innerWidth>=900;
+const desktopCardDock=()=>matchMedia('(min-width:900px) and (min-height:600px) and (pointer:fine)').matches;
 let cardDockPosition='side';try{if(localStorage.getItem('mine5-card-dock-position')==='bottom')cardDockPosition='bottom';}catch(_){}
 let cardSelection=null,loadoutSelection=null,loadoutRegion=0,loadoutOre=0,cardNotice='',saveTimer=null,saveWarning='',cardDockOpen=desktopCardDock(),cardDockPinned=desktopCardDock(),cardHover=null,cardHoverTimer=null;
 const CARD_SAVE_KEY='mine5-card-expedition-v2';
@@ -2778,7 +3049,7 @@ function loadout(){open('loadout',`<div class="chest-heading"><h2>卡片箱</h2>
 function departure(){preparedCards();loadoutOre=Math.min(loadoutOre,game.campaign.ore);open('departure',`<div class="chest-heading"><h2>出发</h2><button data-action="close" aria-label="关闭">×</button></div><div class="departure-options"><label>目的地<select id="expedition-region">${['断脉矿区','沉睡的矮人城','无光之河'].map((n,i)=>`<option value="${i}" ${i===loadoutRegion?'selected':''}>${n}</option>`).join('')}</select></label><label>银矿 · 存有 ${game.campaign.ore}<input id="departure-ore" type="number" min="0" max="${game.campaign.ore}" value="${loadoutOre}" inputmode="numeric"></label></div><p>随身卡片 ${loadoutSelection.length}/5</p><div class="dialog-actions"><button data-open-chest="1">整理卡片</button><button data-expedition-start="1" class="primary">进入地牢</button></div>${cardNotice?`<p role="status">${esc(cardNotice)}</p>`:''}`);}
 function campBench(){open('camp-bench',`<div class="chest-heading"><h2>工作台 · 银矿 ${game.campaign.ore}</h2><button data-action="close" aria-label="关闭">×</button></div><div class="stock-repairs">${game.campaign.stock.map(c=>{const q=game.stockRepairQuote(c.uid);return q&&q.gain>0?`<article>${cardFace(c,'disabled')}<button data-stock-repair="${c.uid}" ${game.campaign.ore<q.cost?'disabled':''}>修复 ${q.gain} 点 · ${q.cost} 银矿</button></article>`:'';}).join('')||'<p>没有需要修理的装备</p>'}</div>`);}
 function cardDetails(){const prep=game.state.expedition.phase==='prepare',c=handCards().find(c=>c.uid===(cardSelection||cardHover));if(!c)return '';let actions='';if(c.ability){const q=game.eliteActiveCheck(c.id);actions='<button data-ability-use="'+c.id+'" '+(q.ok?'':'disabled')+'>'+(q.ok?'选择目标':esc(q.reason))+'</button>';}else if(prep)actions=`<button data-pack-card="${c.uid}">存入箱子</button>`;else if(c.type==='kit'){const v=game.kitPreview(c.uid);actions=`<button data-kit-open="${c.uid}" ${v.ok?'':'disabled'}>使用套装${game.state.mode==='playing'?' · 1回合':''}</button>${v.ok?'':`<p>${esc(v.reason)}</p>`}`;}else if(c.id==='torch'){const q=game.equipmentChangeCheck('off','torch'),lit=(c.fuels||[EscapeEngine.LIGHTS.torch.max]).some(n=>n>0);actions=`<button data-light-equip="${c.uid}" ${q.ok&&lit?'':'disabled'}>点亮并手持</button><button data-light-place="torch" data-light-uid="${c.uid}" ${game.placeableLight('torch',c.uid)?'':'disabled'}>放置 · 1回合</button>`;}else if(c.type==='gear'){const q=game.equipmentChangeCheck(GEAR[c.id].slot,c.id);actions=`<button data-wear="${c.id}" ${q.ok?'':'disabled'}>${q.ok?'装备'+(q.advance?' · 1回合':''):esc(q.reason)}</button>${['lamp','elite_lantern'].includes(c.id)?`<button data-light-place="${c.id}" data-light-uid="${c.uid}" ${game.placeableLight(c.id,c.uid)?'':'disabled'}>放置 · 1回合</button>`:''}`;}else if(c.type==='supply')actions=`<button data-card-use="${c.uid}" ${game.state.mode==='home'&&c.id!=='bread'||c.id==='bread'&&game.state.player.hp===game.state.player.maxHp?'disabled':''}>${ITEM_UI[c.id].action}</button>${c.id==='torch'?'<button data-wear="torch">装备到副手</button>':''}`;return `<div class="floating-card" data-card-kind="${c.type}"><button class="card-dismiss" data-card-dismiss="1" aria-label="关闭卡片详情">×</button><span class="card-type">${cardType(c)}</span><div class="card-art">${cardArt(c)}</div><h3>${esc(game.cardName(c))}</h3><p>${esc(cardText(c))}</p><strong class="card-condition">${esc(cardCondition(c))}</strong><div class="card-actions">${actions}${game.state.mode==='playing'&&!c.ability?`<button data-card-drop="${c.uid}">放下</button>`:''}</div></div>`;}
-function bagMarkup(){const prep=game.state.expedition.phase==='prepare',cards=handCards(),count=prep?cards.length:game.carriedCards().length;return `<div class="dock-heading"><h2>卡包 <small>${count}/${prep?5:15}</small></h2>${prep?'<button data-open-chest="1">卡片箱</button>':'<button data-card-organize="1">整理</button>'}<button class="wallet-open" data-wallet-open="1" title="钱袋 · 不占卡位">钱袋 <span>${game.mineralAmount('ore')}</span></button><button data-card-position="1" title="切换卡包位置">${cardDockPosition==='side'?'移到底部':'移到侧边'}</button><button data-card-pin="1" aria-pressed="${cardDockPinned}" title="保持展开">${cardDockPinned?'已固定':'固定'}</button><button data-card-close="1" aria-label="收起卡包">×</button></div><div class="hand-spread"><div class="hand-row" role="group" aria-label="手牌">${cards.map((c,i)=>{const offset=cards.length>1?(i/(cards.length-1)-.5)*2:0;return cardFace(c,`${c.ability?`data-ability-card="${c.id}" aria-disabled="${!game.eliteActiveCheck(c.id).ok}" title="${esc(game.eliteActiveCheck(c.id).reason||EscapeEngine.ELITE_GEAR[c.id].role)}"`:""} data-card-select="${c.uid}" aria-label="${esc(game.cardName(c)+'，'+cardCondition(c))}" aria-pressed="${c.uid===cardSelection}" style="--card-index:${i};--card-angle:0deg;--card-curve:0px;z-index:${i+1}"`,c.uid===cardSelection).replace('</button>','<span class="hand-edge-label" aria-hidden="true">'+esc(game.cardName(c))+'</span></button>');}).join('')||'<p class="empty-cards">空</p>'}</div></div>`;}
+function bagMarkup(){const prep=game.state.expedition.phase==='prepare',cards=handCards(),count=prep?cards.length:game.carriedCards().length;return `<div class="dock-heading"><h2>卡包 <small>${count}/${prep?5:15}</small></h2>${prep?'<button data-open-chest="1">卡片箱</button>':'<button data-card-organize="1">整理</button>'}<button class="wallet-open" data-wallet-open="1" title="钱袋 · 不占卡位">钱袋 <span>${game.mineralAmount('ore')}</span></button><button data-card-position="1" title="切换卡包位置">${cardDockPosition==='side'?'移到底部':'移到侧边'}</button><button data-card-pin="1" aria-pressed="${cardDockPinned}" title="保持展开">${cardDockPinned?'已固定':'固定'}</button><button data-card-close="1" aria-label="收起卡包">×</button></div><div class="hand-spread"><div class="hand-row" role="group" aria-label="手牌">${cards.map((c,i)=>{const offset=cards.length>1?(i/(cards.length-1)-.5)*2:0;return cardFace(c,`${c.ability?`data-ability-card="${c.id}" aria-disabled="${!game.eliteActiveCheck(c.id).ok}" title="${esc(game.eliteActiveCheck(c.id).reason||EscapeEngine.ELITE_GEAR[c.id].role)}"`:""} data-card-select="${c.uid}" aria-label="${esc(game.cardName(c)+'，'+cardCondition(c))}" aria-pressed="${c.uid===cardSelection}" style="--card-index:${i};--card-angle:0deg;--card-curve:0px;z-index:${i+1}"`,c.uid===cardSelection).replace('</button>','<span class="hand-edge-label" aria-hidden="true"><span class="hand-edge-name">'+esc(game.cardName(c))+'</span><span class="hand-edge-condition">'+esc(c.type==='supply'&&c.id!=='torch'?c.qty+'/3':cardCondition(c).replace(/^(耐久|燃料|次数) /,''))+'</span></span></button>');}).join('')||'<p class="empty-cards">空</p>'}</div></div>`;}
 function bag(){if(dialog.open)close();cardDockOpen=!cardDockOpen;if(desktopCardDock())cardDockPinned=cardDockOpen;cardSelection=null;cardHover=null;renderCardDock();}
 function intro(){if(game.state.expedition.phase==='result')ending();else renderCardDock();}
 function fresh(){if(game.state.expedition.phase==='active')game.fail('主动放弃了本次探险。');if(game.state.expedition.phase==='result')game.returnToCamp();queuedAction=null;queuedMove=null;motion={events:[],end:0};cardSelection=null;loadoutSelection=null;cardNotice='';cardDockOpen=false;modal='';dialog.close();saveCampaign();sync();}
@@ -2808,7 +3079,7 @@ function handleCardClick(b){const d=b.dataset;if(d.walletOpen){walletDialog();re
  if(d.cardSelect){cardSelection=d.cardSelect;cardHover=null;renderCardPopover();return true;}
  if(d.cardOrganize){act({type:'card-organize'});return true;}
  if(d.kitOpen){if(animBusy())return true;cardSelection=null;cardHover=null;act({type:'card-unpack',uid:d.kitOpen});renderCardDock();return true;}
- if(d.cardUse){if(animBusy())return true;const c=game.carriedCards().find(c=>c.uid===d.cardUse);if(!c)return true;cardSelection=null;cardHover=null;if(!cardDockPinned)cardDockOpen=false;renderCardDock();if(c.id==='bread'||c.id==='elite_tide')act({type:'use',item:c.id,cardUid:c.uid});else{beginUse(c.id);if(aim)aim.cardUid=c.uid;}return true;}
+ if(d.cardUse){if(animBusy())return true;const c=game.carriedCards().find(c=>c.uid===d.cardUse);if(!c)return true;cardSelection=null;cardHover=null;if(!cardDockPinned)cardDockOpen=false;renderCardDock();beginUse(c.id,c.uid);return true;}
  if(d.cardDrop){cardSelection=null;cardHover=null;act({type:'card-drop',uid:d.cardDrop});return true;}
  if(d.cardTake){act({type:'card-take',uid:d.cardTake});ground();return true;}if(d.cardLoot){act({type:'card-loot',uid:d.cardLoot});loot();return true;}return false;
 }
@@ -2832,16 +3103,19 @@ function cardArt(c){if(EscapeEngine.COMMON_ITEMS[c.id])return itemIcon(c.id);if(
  shield:'<path d="m50 13 30 13-5 39-25 22-26-23-5-38Z" fill="#8aa6a3" stroke="#d2c28b" stroke-width="5"/><path d="m50 30 9 19-9 19-9-19Z" fill="#c7d4cc"/><path d="m24 30-12-7 6 19m61-12 12-7-6 19" fill="#bed0ce"/>',
  sword:'<path d="m67 13 14 2-3 15-32 38-12-12Z" fill="#c2d6d2"/><path d="m42 61-20 25" stroke="#af8554" stroke-width="9"/><path d="m27 52 24 21" stroke="#cfb97d" stroke-width="7"/>'};const key=shape[c.id]?c.id:GEAR[c.id]?.slot||'kit';return '<svg viewBox="0 0 100 100" aria-hidden="true">'+(shape[key]||shape.kit)+'</svg>';}
 function minerPortrait(){const e=game.state.player.equipped;return `<svg viewBox="0 0 160 240" aria-label="角色" role="img"><ellipse cx="80" cy="215" rx="55" ry="13" fill="#09171c"/><path d="M57 159h20v49H57zM87 159h20v49H87z" fill="#263945"/><path d="M49 205h31v12H49zM85 205h31v12H85z" fill="#9b7853"/><path d="M46 83h68v85H46z" fill="${e.body?'#66847c':'#6d6256'}"/><path d="M52 88h9v75h-9zM99 88h9v75h-9z" fill="#c3a66e"/><path d="M36 96h15v54H36zM110 96h15v54h-15z" fill="#b28c64"/><path d="M58 44h46v45H58z" fill="#bb906b"/><path d="M61 63h7v4h-7zM91 63h7v4h-7z" fill="#25333a"/>${e.head?'<path d="M49 35h64v21H49zM41 52h80v10H41z" fill="#c5a566"/><path d="M72 34h20v15H72z" fill="#f2d999"/>':'<path d="M55 39h51v16H55z" fill="#534135"/>'}${e.main?'<path d="m28 193 8-74" stroke="#af8859" stroke-width="7"/><path d="M15 119q18-19 41-2l-22-4-19 12" fill="#b2c6c7"/>':''}${e.off==='torch'?'<path d="m132 159-5-55" stroke="#b18c58" stroke-width="7"/><path d="M127 110q-18-16-2-37 1 13 10 19 7 14-8 18" fill="#edb36d"/>':e.off?'<path d="m117 106 25 7-3 33-17 14-13-28Z" fill="#8baba8" stroke="#d0bc7f" stroke-width="3"/>':''}</svg>`;}
+function applyCardDesktopLayout(){document.body.classList.toggle('card-layout-side',desktopCardDock()&&cardDockPosition==='side');}
 function positionSideHand(pane,row,controls){
- const top=Math.max(70,$('#task-button').getBoundingClientRect().bottom+10),bottom=Math.max(12,innerHeight-controls.top+10),height=Math.max(210,innerHeight-top-bottom);pane.style.top=top+'px';pane.style.bottom=bottom+'px';pane.style.height=height+'px';if(!row)return;
- const cards=[...row.querySelectorAll('[data-card-select]')],n=cards.length,columns=2,rows=Math.max(1,Math.ceil(n/columns)),width=pane.querySelector('.hand-spread').clientWidth,cardWidth=Math.min(136,(width-16)/2),available=height-pane.querySelector('.dock-heading').offsetHeight-12,cardHeight=Math.max(80,Math.min(174,available-12-(rows-1)*18)),step=rows>1?Math.max(18,Math.min(cardHeight+12,(available-cardHeight-12)/(rows-1))):0;
- row.style.width='100%';row.style.height=available+'px';pane.dataset.handRows=rows;pane.style.setProperty('--dense-card-width',cardWidth+'px');pane.style.setProperty('--dense-card-height',cardHeight+'px');
- cards.forEach((b,i)=>{const r=Math.floor(i/columns),column=i%columns,last=i+columns>=n;b.style.left=(8+column*(cardWidth+8))+'px';b.style.top=(8+r*step)+'px';b.style.setProperty('--card-angle','0deg');b.style.setProperty('--card-curve','0px');b.dataset.handRow=r;b.dataset.handColumn=column;b.dataset.handEnd=String(last);b.dataset.handCompressed=String(!last&&step<cardHeight*.7);});
+ const main=$('.game').getBoundingClientRect(),top=$('#task-button').getBoundingClientRect().bottom+10,bottom=12,height=Math.max(210,innerHeight-top-bottom);pane.style.top=top+'px';pane.style.bottom=bottom+'px';pane.style.left=(main.right-260)+'px';pane.style.height=height+'px';if(!row)return;
+ const cards=[...row.querySelectorAll('[data-card-select]')],n=cards.length,width=pane.querySelector('.hand-spread').clientWidth,available=height-pane.querySelector('.dock-heading').offsetHeight-12,cardWidth=width-12,topPad=6;
+ const cardHeight=n<=3?Math.min(228,(available-topPad-6-Math.max(0,n-1)*10)/Math.max(1,n)):Math.max(56,Math.min(228,available-topPad-6-(n-1)*24)),step=n>1?Math.max(0,Math.min(cardHeight+10,(available-cardHeight-topPad-6)/(n-1))):0;
+ row.style.width='100%';row.style.height=available+'px';pane.dataset.handRows=Math.max(1,n);pane.style.setProperty('--dense-card-width',cardWidth+'px');pane.style.setProperty('--dense-card-height',cardHeight+'px');
+ cards.forEach((b,i)=>{b.style.left='6px';b.style.top=(topPad+i*step)+'px';b.style.setProperty('--card-angle','0deg');b.style.setProperty('--card-curve','0px');b.style.setProperty('--card-stack-index',i+1);b.dataset.handRow=i;b.dataset.handColumn=0;b.dataset.handEnd=String(i===n-1);b.dataset.handCompressed=String(n>3&&(i<n-1||cardHeight<180));});
 }
-function positionCardHand(){if(!cardDockOpen)return;const pane=$('#card-dock'),controls=$('.player-panel').getBoundingClientRect(),row=pane.querySelector('.hand-row');pane.dataset.position=desktopCardDock()&&innerHeight>=600?cardDockPosition:'bottom';if(pane.dataset.position==='side'){positionSideHand(pane,row,controls);return;}pane.style.top='';pane.style.bottom=Math.max(12,innerHeight-controls.top+10)+'px';if(!row)return;const cards=[...row.querySelectorAll('[data-card-select]')],n=cards.length,narrow=innerWidth<=700,short=innerHeight<=560,rows=narrow&&n>8?2:1,columns=Math.max(1,Math.ceil(n/rows)),width=pane.querySelector('.hand-spread').clientWidth,cardWidth=narrow?104:short?130:160,cardHeight=short?122:narrow?152:190,top=short?18:26,pitch=cardHeight+18;row.style.width='100%';row.style.height=(top+cardHeight+(rows-1)*pitch+16)+'px';pane.style.height=(pane.querySelector('.dock-heading').getBoundingClientRect().height+row.offsetHeight+2)+'px';pane.dataset.handRows=rows;pane.style.setProperty('--dense-card-width',cardWidth+'px');pane.style.setProperty('--dense-card-height',cardHeight+'px');cards.forEach((b,i)=>{const r=Math.floor(i/columns),column=i%columns,count=Math.min(columns,n-r*columns),step=count>1?Math.max(0,Math.min(cardWidth+12,(width-cardWidth-24)/(count-1))):0,span=cardWidth+(count-1)*step,offset=count>1?(column/(count-1)-.5)*2:0;b.style.left=((width-span)/2+column*step)+'px';b.style.top=(top+r*pitch)+'px';b.style.setProperty('--card-angle',(narrow?0:offset*2)+'deg');b.style.setProperty('--card-curve',Math.round(offset*offset*6)+'px');b.dataset.handRow=r;b.dataset.handColumn=column;b.dataset.handEnd=String(column===count-1);b.dataset.handCompressed=String(column<count-1&&step<cardWidth*.7);});}
-function renderCardDock(){if(desktopCardDock()&&cardDockPinned)cardDockOpen=true;$('#card-dock').dataset.position=desktopCardDock()&&innerHeight>=600?cardDockPosition:'bottom';const prep=game.state.expedition?.phase==='prepare',cards=prep?preparedCards():game.carriedCards();$('#card-tab span').textContent=cards.length+'/'+(prep?5:15);$('#card-tab').setAttribute('aria-expanded',String(cardDockOpen));$('#bag-button').setAttribute('aria-expanded',String(cardDockOpen));$('#card-dock').hidden=!cardDockOpen;document.body.classList.toggle('card-dock-open',cardDockOpen);if(cardDockOpen){const pane=$('#card-dock');pane.innerHTML=bagMarkup();positionCardHand();}if(!handCards().some(c=>c.uid===cardSelection))cardSelection=null;renderCardPopover();}
-function positionCardPopover(){const pop=$('#card-popover');if(pop.hidden)return;const active=$('#card-dock').querySelector('[data-card-select="'+(cardSelection||cardHover)+'"]'),dock=$('#card-dock').getBoundingClientRect(),r=active?.getBoundingClientRect(),width=Math.min(260,innerWidth-24),maxHeight=Math.min(440,innerHeight-24,$('#card-dock').dataset.position==='side'?440:Math.max(80,dock.top-24));pop.style.width=width+'px';pop.style.maxHeight=maxHeight+'px';pop.style.right='auto';pop.style.left=Math.max(12,Math.min(innerWidth-width-12,(r?r.x+r.width/2:innerWidth/2)-width/2))+'px';const height=Math.min(pop.scrollHeight,maxHeight);pop.style.top=Math.max(12,Math.min(innerHeight-height-12,dock.top-12-height))+'px';if($('#card-dock').dataset.position==='side'){pop.style.left=Math.max(12,dock.left-width-12)+'px';pop.style.top=Math.max(12,Math.min(innerHeight-height-12,r?r.top:dock.top))+'px';}}
-function renderCardPopover(){const pop=$('#card-popover'),html=cardDockOpen&&!aim?cardDetails():'';pop.hidden=!html;pop.innerHTML=html;for(const b of $('#card-dock').querySelectorAll('[data-card-select]')){const selected=b.dataset.cardSelect===cardSelection;b.classList.toggle('chosen',selected);b.classList.toggle('previewing',b.dataset.cardSelect===(cardSelection||cardHover));b.setAttribute('aria-pressed',String(selected));}positionCardPopover();}
+function positionCardHand(){applyCardDesktopLayout();if(!cardDockOpen)return;const pane=$('#card-dock'),controls=$('.player-panel').getBoundingClientRect(),row=pane.querySelector('.hand-row');pane.dataset.position=desktopCardDock()&&innerHeight>=600?cardDockPosition:'bottom';if(pane.dataset.position==='side'){positionSideHand(pane,row,controls);return;}pane.style.top='';pane.style.left='';pane.style.bottom=Math.max(12,innerHeight-controls.top+10)+'px';if(!row)return;const cards=[...row.querySelectorAll('[data-card-select]')],n=cards.length,narrow=innerWidth<=700,short=innerHeight<=560,rows=narrow&&n>8?2:1,columns=Math.max(1,Math.ceil(n/rows)),width=pane.querySelector('.hand-spread').clientWidth,cardWidth=narrow?104:short?130:160,cardHeight=short?122:narrow?152:190,top=short?18:26,pitch=cardHeight+18;row.style.width='100%';row.style.height=(top+cardHeight+(rows-1)*pitch+16)+'px';pane.style.height=(pane.querySelector('.dock-heading').getBoundingClientRect().height+row.offsetHeight+2)+'px';pane.dataset.handRows=rows;pane.style.setProperty('--dense-card-width',cardWidth+'px');pane.style.setProperty('--dense-card-height',cardHeight+'px');cards.forEach((b,i)=>{const r=Math.floor(i/columns),column=i%columns,count=Math.min(columns,n-r*columns),step=count>1?Math.max(0,Math.min(cardWidth+12,(width-cardWidth-24)/(count-1))):0,span=cardWidth+(count-1)*step,offset=count>1?(column/(count-1)-.5)*2:0;b.style.left=((width-span)/2+column*step)+'px';b.style.top=(top+r*pitch)+'px';b.style.setProperty('--card-angle',(narrow?0:offset*2)+'deg');b.style.setProperty('--card-curve',Math.round(offset*offset*6)+'px');b.dataset.handRow=r;b.dataset.handColumn=column;b.dataset.handEnd=String(column===count-1);b.dataset.handCompressed=String(column<count-1&&step<cardWidth*.7);});}
+let cardDockMarkupCache='',cardPopoverMarkupCache='',cardPopoverAnchorCache=null,cardDockLayoutCache='';
+function renderCardDock(){applyCardDesktopLayout();if(desktopCardDock()&&cardDockPinned)cardDockOpen=true;$('#card-dock').dataset.position=desktopCardDock()&&innerHeight>=600?cardDockPosition:'bottom';const prep=game.state.expedition?.phase==='prepare',cards=prep?preparedCards():game.carriedCards();$('#card-tab span').textContent=cards.length+'/'+(prep?5:15);$('#card-tab').setAttribute('aria-expanded',String(cardDockOpen));$('#bag-button').setAttribute('aria-expanded',String(cardDockOpen));const wasHidden=$('#card-dock').hidden;$('#card-dock').hidden=!cardDockOpen;document.body.classList.toggle('card-dock-open',cardDockOpen);if(cardDockOpen){const pane=$('#card-dock'),html=bagMarkup(),changed=html!==cardDockMarkupCache;if(changed){pane.innerHTML=html;cardDockMarkupCache=html;}const layoutKey=[innerWidth,innerHeight,cardDockPosition,!!aim].join('|');if(changed||wasHidden||layoutKey!==cardDockLayoutCache){positionCardHand();cardDockLayoutCache=layoutKey;cardPopoverAnchorCache=null;}}if(!handCards().some(c=>c.uid===cardSelection))cardSelection=null;renderCardPopover();}
+function positionCardPopover(){const pop=$('#card-popover');if(pop.hidden)return;const active=$('#card-dock').querySelector('[data-card-select="'+(cardSelection||cardHover)+'"]'),dock=$('#card-dock').getBoundingClientRect(),r=active?.getBoundingClientRect(),width=Math.min(260,innerWidth-24),maxHeight=Math.min(440,innerHeight-24,$('#card-dock').dataset.position==='side'?440:Math.max(80,dock.top-24));pop.style.width=width+'px';pop.style.maxHeight=maxHeight+'px';pop.style.right='auto';pop.style.left=Math.max(12,Math.min(innerWidth-width-12,(r?r.x+r.width/2:innerWidth/2)-width/2))+'px';const height=Math.min(pop.scrollHeight,maxHeight);pop.style.top=Math.max(12,Math.min(innerHeight-height-12,dock.top-12-height))+'px';if($('#card-dock').dataset.position==='side'){pop.style.left=Math.max(12,dock.left-width-12)+'px';pop.style.top=Math.max(12,Math.min(innerHeight-height-12,dock.top+12))+'px';}}
+function renderCardPopover(){const pop=$('#card-popover'),html=cardDockOpen&&!aim?cardDetails():'',anchor=cardSelection||cardHover,changed=html!==cardPopoverMarkupCache,needsPosition=changed||pop.hidden!==!html||anchor!==cardPopoverAnchorCache;pop.hidden=!html;if(changed){pop.innerHTML=html;cardPopoverMarkupCache=html;}cardPopoverAnchorCache=anchor;for(const b of $('#card-dock').querySelectorAll('[data-card-select]')){const selected=b.dataset.cardSelect===cardSelection;b.classList.toggle('chosen',selected);b.classList.toggle('previewing',b.dataset.cardSelect===(cardSelection||cardHover));b.setAttribute('aria-pressed',String(selected));}if(needsPosition)positionCardPopover();}
 window.addEventListener('resize',()=>{positionCardHand();positionCardPopover();});
 $('#card-tab').addEventListener('click',bag);$('#card-dock').addEventListener('click',panelClick);$('#card-popover').addEventListener('click',panelClick);
 $('#card-dock').addEventListener('pointerover',e=>{clearTimeout(cardHoverTimer);if(aim||e.pointerType==='touch'||matchMedia('(max-width:700px),(max-height:560px),(pointer:coarse)').matches||cardSelection)return;const b=e.target.closest('[data-card-select]');if(b&&cardHover!==b.dataset.cardSelect){cardHover=b.dataset.cardSelect;renderCardPopover();}});
@@ -2859,6 +3133,6 @@ game.enableCards();if(savedCampaign&&!game.restoreCampaign(savedCampaign))saveWa
 $('#save-notice').textContent=saveWarning;$('#save-notice').hidden=!saveWarning;
 $('#bag-button').innerHTML='卡包 <kbd>I</kbd>';$('#restart-button').textContent='放弃本次探险';
 
-resizeCanvas();sync();intro();requestAnimationFrame(draw);
+applyCardDesktopLayout();resizeCanvas();sync();intro();requestAnimationFrame(draw);
 })();
 </script></body></html>

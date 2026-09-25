@@ -155,6 +155,22 @@
         font-size: 11px;
       }
     }
+  
+    html { display: block; }
+    body { width: 100%; height: auto; min-height: 100dvh; }
+    .wrapper { width: 100%; max-width: 900px; padding: 12px; }
+    :root { --tile-size: min(32px, calc((100vw - 32px) / 24.02), calc((100dvh - 206px) / 24.02)); }
+    .grid { user-select: none; }
+    .status, .tip { line-height: 1.45; overflow-wrap: anywhere; }
+    .game-controls { display: flex; justify-content: center; gap: 8px; margin-top: 8px; }
+    .game-controls button { min-height: 44px; padding: 8px 16px; border: 0; border-radius: 6px; background: #8f7a66; color: #fff; font: inherit; cursor: pointer; touch-action: manipulation; }
+    @media (max-height: 480px) and (min-width: 540px) {
+      :root { --tile-size: min(32px, calc((100dvh - 28px) / 24.02), calc((100vw - 300px) / 24.02)); }
+      .wrapper { display: grid; grid-template-columns: auto 240px; justify-content: center; align-items: center; column-gap: 20px; }
+      .grid { grid-column: 1; grid-row: 1 / 5; }
+      .top, .status, .game-controls, .tip { grid-column: 2; }
+      .top { margin-bottom: 0; }
+    }
   </style>
 </head>
 <body>
@@ -172,6 +188,7 @@
   <div id="grid" class="grid"></div>
 
   <div id="status" class="status"></div>
+  <div class="game-controls"><button type="button" id="play-pause">开始 / 暂停</button><button type="button" id="restart">重新开始</button></div>
   <div class="tip">
     按任意键开始 / 空格暂停 | 方向键 / WASD 控制 | 手机滑动控制方向
   </div>
@@ -417,7 +434,7 @@
     gameState = "ready";
     gridEl.classList.remove("shake");
 
-    setBaseStatus("按任意键开始，方向键 / WASD 控制方向");
+    setBaseStatus("滑动 / 按任意键开始，方向键 / WASD 控制");
     updateStats();
     renderScene();
   }
@@ -445,7 +462,7 @@
         clearInterval(tickTimer);
         tickTimer = null;
       }
-      setBaseStatus("已暂停，按空格继续");
+      setBaseStatus("已暂停，点击开始 / 暂停或按空格继续");
     } else if (gameState === "paused") {
       gameState = "running";
       setBaseStatus("小心别撞到墙和自己的身体～");
@@ -556,6 +573,7 @@
   // ====== 键盘 & 触摸控制 ======
   function handleKeydown(e) {
     const key = e.key;
+    if (key.startsWith("Arrow") || key === " ") e.preventDefault();
 
     let startedThisKey = false;
 
@@ -629,6 +647,14 @@
       else applyDirection(0, -1);
     }
   });
+
+  document.getElementById("play-pause").addEventListener("click", () => {
+    if (gameState === "ready" || gameState === "over") {
+      if (gameState === "over") resetGame();
+      startGame();
+    } else togglePause();
+  });
+  document.getElementById("restart").addEventListener("click", resetGame);
 
   // ====== 初始化 ======
   window.addEventListener("keydown", handleKeydown);
