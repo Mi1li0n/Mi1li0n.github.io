@@ -1,0 +1,116 @@
+/* Narrow-screen layout only. Desktop tables and original copy stay intact. */
+@media screen and (max-width: 760px) {
+  html { -webkit-text-size-adjust: 100%; }
+  body.retro-page { margin: 0; padding: 8px; min-width: 0; }
+  .retro-page *, .retro-page *::before, .retro-page *::after { box-sizing: border-box; }
+  .retro-page .wrap, .retro-page .page, .retro-page .host-strip { width: 100%; max-width: 100%; }
+  .retro-page table.m-fluid { width: 100% !important; max-width: 100%; }
+  .retro-page table { max-width: 100%; }
+  .retro-page td, .retro-page th { overflow-wrap: anywhere; }
+  .retro-page img { max-width: 100%; height: auto; }
+  .retro-page marquee { max-width: 100%; }
+  .retro-page input, .retro-page select, .retro-page textarea { max-width: 100%; font-size: 16px; }
+  .retro-page textarea { width: 100% !important; }
+  .retro-page form > table.m-fluid { table-layout: fixed; }
+  .retro-page input[type="submit"], .retro-page button { min-height: 32px; }
+  .retro-page pre, .retro-page .code-example { max-width: 100%; overflow-x: auto; }
+  .retro-page blockquote { margin-right: 0; margin-left: 0; }
+  .retro-page .pages { display: inline-block; min-width: 28px; line-height: 26px; padding: 0 5px; margin: 2px 0; }
+  .retro-page .pager { line-height: 2; white-space: normal; }
+
+  .m-masthead > tbody > tr { display: flex; flex-wrap: wrap; }
+  .m-masthead > tbody > tr > td { display: block; width: 100%; height: auto; padding: 4px 0; text-align: center; }
+  .m-masthead > tbody > tr > td:first-child > div { margin: 0 auto; }
+  .m-masthead table { width: 100%; }
+  .m-masthead form { display: inline; }
+  .m-masthead > tbody > tr > td:last-child > br { display: none; }
+  .m-nav > tbody > tr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .m-nav > tbody > tr > td { width: auto; padding: 0; }
+  .m-nav > tbody > tr > td > a { display: inline-block; padding: 9px 2px; }
+  .m-nav > tbody > tr > td:last-child { display: none; }
+  .m-welcome { table-layout: fixed; }
+  .m-welcome > tbody > tr > td:first-child { display: none; }
+  .m-welcome > tbody > tr > td:last-child { width: 100%; }
+  .m-welcome table { table-layout: fixed; }
+  .m-welcome table tr:first-child { display: block; }
+  .m-welcome table tr:first-child > td { display: block; width: auto; text-align: left; }
+  .m-tools > tbody > tr { display: flex; flex-wrap: wrap; gap: 6px; }
+  .m-tools > tbody > tr > td { width: auto; flex: 1 1 180px; text-align: left; }
+  .m-tools > tbody > tr > td:last-child { text-align: right; }
+
+  /* Keep the alternating forum rows; move metadata under each title. */
+  .m-topic-list, .m-topic-list > tbody { display: block; }
+  .m-topic-list > tbody > tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 7px 8px; border-bottom: 1px solid #b6c5d8; text-align: left; }
+  .m-topic-list > tbody > tr.header-bg { display: none; }
+  .m-topic-list > tbody > tr > td { display: block; width: auto; padding: 2px 0; text-align: left; }
+  .m-topic-list > tbody > tr > td:nth-child(1), .m-topic-list > tbody > tr > td:nth-child(2) { display: none; }
+  .m-topic-list > tbody > tr > td:nth-child(3) { grid-column: 1 / -1; font-size: 15px; line-height: 1.65; }
+  .m-topic-list > tbody > tr > td:nth-child(3) a { display: inline-block; padding: 3px 0; }
+  .m-topic-list > tbody > tr > td:nth-child(4), .m-topic-list > tbody > tr > td:nth-child(5) { font-size: 12px; color: #666; }
+  .m-topic-list > tbody > tr > td:nth-child(5) { text-align: right; padding-left: 8px; }
+  .m-topic-list > tbody > tr > td:nth-child(6) { grid-column: 1 / -1; font-size: 11px; color: #777; }
+  .m-topic-list > tbody > tr > td:nth-child(6)::before { content: "最后发表："; }
+  .m-topic-list > tbody > tr > td:nth-child(6) br { display: none; }
+  .m-topic-list > tbody > tr > td:nth-child(6) a { margin-right: 5px; }
+  .m-topic-list > tbody > tr > td[colspan] { display: block; grid-column: 1 / -1; }
+
+  /* Each floor keeps its own border, author, timestamp, signature and actions. */
+  .m-post, .m-post > tbody, .m-post > tbody > tr { display: block; }
+  .m-post { border: 1px solid #87a3c5; margin-top: 8px !important; }
+  .m-post > tbody > tr > td { display: block; width: 100%; }
+  .m-post .user-info { padding: 8px 10px !important; text-align: left; border-bottom: 1px solid #b6c5d8; }
+  .m-post .user-info > div { display: inline-block; margin-right: 8px; }
+  .m-post .user-info > br, .m-post .user-info > img,
+  .m-post .user-info > div[align="left"], .m-post .user-info > a[href="login.html"] { display: none; }
+  .m-post .post-bg { padding: 12px 10px !important; min-width: 0; }
+  .m-post .post-bg > table:first-child { width: 100%; table-layout: fixed; }
+  .m-post .post-bg > table:first-child td:last-child { width: 48px; vertical-align: top; }
+  .m-post .post-body { font-size: 15px !important; line-height: 1.85 !important; }
+  .m-post .signature { overflow-wrap: anywhere; margin-top: 18px; }
+  .m-post > tbody > tr:last-child { background: #efefef; }
+  .m-post > tbody > tr:last-child > td:first-child { display: none; }
+  .m-post > tbody > tr:last-child > td:last-child { text-align: right; height: auto; }
+  .m-post > tbody > tr:last-child a { display: inline-block; padding: 7px 3px; }
+  .m-post .desktop-sample, .m-post .homepage-sample { max-width: 100%; }
+  .m-post .post-bg div[style*="width:480px"], .m-post .post-bg div[style*="width:360px"] { max-width: 100%; }
+
+  .m-forums > tbody > tr { display: grid; grid-template-columns: 30px minmax(0, 1fr); }
+  .m-forums > tbody > tr > td { width: auto; padding: 7px 5px; }
+  .m-forums > tbody > tr > td:nth-child(3) { grid-column: 2; padding-top: 0; font-size: 12px; }
+  .m-forums > tbody > tr > td[colspan] { grid-column: 1 / -1; }
+  .m-forums > tbody > tr > td:nth-child(2) > b > a { font-size: 16px; line-height: 2; }
+  .m-archive { table-layout: fixed; }
+  .m-archive td:last-child:not([colspan]) { width: 76px; font-size: 11px; }
+  .m-archive a { display: inline-block; padding: 4px 0; }
+  .member-table { table-layout: fixed; }
+  .member-table td:first-child { width: 35%; }
+
+  .m-profile, .m-profile > tbody, .m-profile > tbody > tr { display: block; }
+  .m-profile > tbody > tr > td { display: block; width: 100%; }
+  .m-profile > tbody > tr > td[width="10"] { display: none; }
+  .m-profile .avatar-frame { float: left; margin-right: 14px; }
+  .m-profile .avatar-frame img { width: 72px; height: 72px; }
+  .m-profile .menu-box { text-align: left; overflow: auto; }
+  .m-profile .menu-box > br { display: none; }
+  .m-profile .menu-box > div[align="left"] { padding-left: 0 !important; }
+  .m-profile .tableborder { table-layout: fixed; }
+  .m-profile .tableborder td { padding: 8px; }
+
+  .page-home .main-table { width: 100%; }
+  .page-home .main-table > tbody > tr { display: block; }
+  .page-home .main-table > tbody > tr > td { display: block; width: 100%; }
+  .page-home .sidebar { border-right: 0; border-bottom: 1px solid #006699; }
+  .page-home .sidebar center { display: none; }
+  .page-home .sidebar > br { display: none; }
+  .page-home .sidebar a { display: inline-block; padding: 6px; }
+  .page-home .content { padding: 12px; }
+  .page-home .content a { color: #006699; }
+  .page-home .page > table > tbody > tr > td { display: block; width: 100%; }
+  .page-home .page .memo { margin: 12px 0 !important; }
+  .page-home .name { font-size: 25px; letter-spacing: 2px; }
+  .page-home .nav a { display: inline-block; padding: 6px 0; }
+  .page-login table { table-layout: fixed; width: 100%; }
+  .page-login td[rowspan] { display: none; }
+  .page-login form td:first-child { width: 72px; }
+  .page-login ol { padding-left: 16px; margin-left: 0 !important; }
+}
