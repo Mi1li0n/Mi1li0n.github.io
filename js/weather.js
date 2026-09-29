@@ -1,4 +1,4 @@
-/* Five decorative weather modes for the NexT blog. No network or storage needed. */
+/* Background rendering and preferences. Real weather is supplied by local-weather.js. */
 (() => {
   'use strict';
 
@@ -8,6 +8,20 @@
   let weather = modes.includes(root.dataset.weather)
     ? root.dataset.weather
     : modes[Math.floor(Math.random() * modes.length)];
+  let following = root.dataset.weatherMode === 'auto';
+  let localScene = null;
+  const followButton = document.getElementById('weather-follow');
+
+  function saveChoice() {
+    root.dataset.weatherMode = following ? 'auto' : 'manual';
+    try {
+      localStorage.setItem('blog-weather-preferences-v1', JSON.stringify({ scene: weather, mode: root.dataset.weatherMode }));
+    } catch (_) { /* The background remains usable with storage disabled. */ }
+    if (followButton) {
+      followButton.setAttribute('aria-pressed', String(following));
+      followButton.textContent = following ? '跟随天气：开' : '跟随天气：关';
+    }
+  }
 
   const canvas = document.getElementById('blog-rain');
   const controls = document.querySelector('.weather-controls');
@@ -84,7 +98,7 @@
     const index = modes.indexOf(weather);
     const nextLabel = labels[(index + 1) % modes.length];
     weatherLabel.textContent = labels[index];
-    weatherSwitch.setAttribute('aria-label', `当前天气：${labels[index]}，切换到${nextLabel}`);
+    weatherSwitch.setAttribute('aria-label', `当前背景：${labels[index]}，切换到${nextLabel}并固定背景`);
     weatherSwitch.title = `切换到${nextLabel}`;
     motionButton.setAttribute('aria-label', moving ? '暂停动效' : '继续动效');
     motionButton.setAttribute('aria-pressed', String(!moving));
@@ -96,10 +110,30 @@
   }
 
   function cycle(direction) {
+    following = false;
     weather = modes[(modes.indexOf(weather) + direction + modes.length) % modes.length];
+    saveChoice();
     resize();
     update();
   }
+
+  function followLocalWeather() {
+    if (!following || !localScene) return;
+    weather = localScene;
+    saveChoice();
+    resize();
+    update();
+  }
+
+  document.addEventListener('blog:local-weather', event => {
+    localScene = modes.includes(event.detail?.scene) ? event.detail.scene : null;
+    followLocalWeather();
+  });
+  if (followButton) followButton.addEventListener('click', () => {
+    following = !following;
+    saveChoice();
+    followLocalWeather();
+  });
 
   weatherSwitch.addEventListener('click', () => cycle(1));
   weatherSwitch.addEventListener('keydown', event => {
@@ -129,6 +163,7 @@
     if (event.persisted) update();
   });
 
+  saveChoice();
   resize();
   update();
   controls.hidden = false;

@@ -1,0 +1,57 @@
+/* Homepage directory and topic list; the shared forum skin stays in forum-extra.css. */
+.forum-home .breadcrumb { margin: 0 0 7px; }
+.forum-home .section-shortcuts { float: right; }
+.forum-home .forum-directory { table-layout: fixed; margin-top: 5px; }
+.forum-home .forum-directory td { padding: 5px 8px; vertical-align: middle; }
+.forum-home .forum-directory .header-bg td { padding: 4px 8px; }
+.forum-home .board-info { width: 36%; }
+.forum-home .board-count { width: 21%; }
+.forum-home .board-latest { width: 43%; }
+.forum-home .board-mark { color: #5B89C8; margin-right: 6px; }
+.forum-home .board-description, .forum-home .last-post { display: block; }
+.forum-home .last-post { margin-top: 2px; }
+.forum-home .hot-topics { margin-top: 12px; }
+.forum-home .hot-topics caption { text-align: left; background: #5B89C8; color: #FFF; padding: 5px 8px; font-weight: bold; }
+.forum-home .hot-topics th { background: #DDE6F1; color: #000; font-weight: normal; }
+.forum-home .hot-topics td, .forum-home .hot-topics th { padding: 6px 8px; }
+.forum-home .hot-board { width: 9%; }
+.forum-home .hot-title { width: 45%; }
+.forum-home .hot-author { width: 12%; }
+.forum-home .hot-count { width: 12%; text-align: center; white-space: nowrap; }
+.forum-home .hot-last { width: 22%; }
+.forum-home .hot-label { color: #CC3300; margin-right: 5px; }
+.forum-home .topic-pages { white-space: nowrap; }
+
+@media screen and (min-width: 761px) and (max-width: 979px) {
+  .forum-home .wrap { width: calc(100% - 16px); }
+  .forum-home table.m-fluid { width: 100%; }
+  .forum-home .m-masthead { table-layout: fixed; }
+  .forum-home .m-masthead > tbody > tr > td:first-child { width: 190px; }
+  .forum-home .m-masthead > tbody > tr > td:last-child { width: 180px; }
+  .forum-home .m-masthead table { width: 100%; }
+}
+
+@media screen and (max-width: 760px) {
+  .forum-home .section-shortcuts { float: none; display: block; margin-top: 4px; }
+  .forum-home .forum-directory, .forum-home .forum-directory > tbody { display: block; }
+  .forum-home .forum-directory > tbody > tr { display: grid; grid-template-columns: minmax(0, 1fr) 128px; gap: 1px; }
+  .forum-home .forum-directory td { display: block; width: auto; padding: 6px; }
+  .forum-home .forum-directory .header-bg td, .forum-home .board-latest { grid-column: 1 / -1; }
+  .forum-home .board-count { font-size: 11px; }
+  .forum-home .board-info > b > a { display: inline-block; padding: 2px 0; font-size: 14px; }
+  .forum-home .board-latest { border-top: 1px dotted #CCD5E0; }
+  .forum-home .hot-topics, .forum-home .hot-topics > tbody { display: block; }
+  .forum-home .hot-topics caption { display: block; }
+  .forum-home .hot-topics > tbody > tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 6px; margin-top: 1px; }
+  .forum-home .hot-topics > tbody > tr:first-child { display: none; }
+  .forum-home .hot-topics td { display: block; width: auto; padding: 3px; }
+  .forum-home .hot-title { grid-column: 1 / -1; grid-row: 2; font-size: 14px; }
+  .forum-home .hot-title > a { display: inline-block; padding: 3px 0; }
+  .forum-home .hot-author { grid-column: 2; grid-row: 1; text-align: right; }
+  .forum-home .hot-count { grid-column: 1 / -1; text-align: left; font-size: 11px; color: #666; }
+  .forum-home .hot-count::before { content: "回复 / 查看："; }
+  .forum-home .hot-last { grid-column: 1 / -1; }
+  .forum-home .hot-last::before { content: "最后发表："; }
+  .forum-home .hot-last br { display: none; }
+  .forum-home .hot-last > a { margin-right: 8px; }
+}

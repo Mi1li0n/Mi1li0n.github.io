@@ -124,7 +124,7 @@ input, select, textarea {
             <td width="200" align="right" valign="middle" class="smalltxt">
                 设为首页 | 加入收藏 | 联系我们<br>
                 <br>
-                <form action="#" method="post">
+                <form action="login.html">
                     <input type="text" name="keyword" size="15" value="搜索帖子...">
                     <input type="submit" value="搜索">
                 </form>
@@ -191,7 +191,7 @@ input, select, textarea {
                 <img src="https://via.placeholder.com/16x16/006699/FFFFFF?text=H" align="absmiddle">
                 <a href="forum.html">龙腾世纪BBS</a> &raquo; <a href="forum.html">技术交流区</a> &raquo; <b>硬件维护</b>
             </td>
-            <td align="right"><span class="smalltxt">今日: <font color="red">83</font>　主题: 7821　帖子: 68490</span></td>
+            <td align="right"><span class="smalltxt">今日: <font color="red">376</font>　主题: 7821　帖子: 241968</span></td>
         </tr>
     </table>
     <br>
@@ -322,7 +322,7 @@ input, select, textarea {
 
     <table width="980" border="0" cellspacing="1" cellpadding="4" class="tableborder m-fluid">
         <tr>
-            <td class="header-bg" colspan="2">&raquo; <b>在线会员</b> - 总计 <b>108</b> 人在线 (35 位会员, 73 位访客)
+            <td class="header-bg" colspan="2">&raquo; <b>在线会员</b> - 总计 <b>247</b> 人在线 (86 位会员, 161 位访客)
             </td>
         </tr>
         <tr class="row1">
@@ -354,21 +354,23 @@ input, select, textarea {
 
     <div align="center">
         <form>
-            <select onchange="window.location=this.options[this.selectedIndex].value">
+            <select name="forumjump" onchange="if (this.value) window.location=this.value;">
                 <option value="">-- 跳转版块 --</option>
                 <option value="forum.html">+ 站务管理区</option>
                 <option value="board-notice.html"> |- 公告发布</option>
                 <option value="board-feedback.html"> |- 投诉建议</option>
                 <option value="forum.html">+ 技术交流区</option>
-                <option value="board-hardware.html"> |- 硬件维护</option>
+                <option value="board-hardware.html" selected> |- 硬件维护</option>
                 <option value="board-software.html"> |- 软件下载</option>
                 <option value="board-code.html"> |- 编程开发</option>
-                <option value="forum.html">+ 技术交流区</option>
-                <option value="bbs.html" selected> |- 硬件维护</option>
+                <option value="forum.html">+ 休闲娱乐区</option>
+                <option value="bbs.html"> |- 灌水乐园</option>
+                <option value="board-diary.html"> |  |- 心情日记</option>
+                <option value="board-pictures.html"> |  |- 贴图专区</option>
                 <option value="board-music.html"> |- 影视音乐</option>
                 <option value="board-game.html"> |- 游戏天地</option>
             </select>
-            <a href="forum.html" style="border: 1px solid #999; padding: 2px 6px; background: #EFEFEF;">Go</a>
+            <input type="button" value="Go" onclick="window.location=this.form.elements['forumjump'].value || 'forum.html';" style="border: 1px solid #999; padding: 2px 6px; background: #EFEFEF;">
         </form>
     </div>
 
