@@ -1,4 +1,4 @@
-/* Visitor weather: ipapi location + Open-Meteo. No API keys or server required. */
+/* Visitor weather: IPWHOIS / IP.SB + Open-Meteo, with bundled city search. */
 (() => {
   'use strict';
   const card = document.getElementById('local-weather-card');
@@ -10,6 +10,10 @@
   const oneHour = 60 * 60 * 1000;
   const sixHours = 6 * 60 * 60 * 1000;
   const oneDay = 24 * 60 * 60 * 1000;
+  const ipProviders = [
+    { id: 'ipwhois', name: 'IPWHOIS', href: 'https://ipwhois.io/', url: 'https://ipwho.is/?lang=zh-CN&fields=success,message,city,latitude,longitude' },
+    { id: 'ipsb', name: 'IP.SB', href: 'https://ip.sb/', url: 'https://api.ip.sb/geoip' }
+  ];
   function read(key) {
     try { return JSON.parse(localStorage.getItem(key)); } catch (_) { return null; }
   }
@@ -59,7 +63,7 @@
       const response = await fetch(url, { signal: controller.signal, credentials: 'omit', referrerPolicy: 'no-referrer' });
       if (!response.ok) throw new Error('Service unavailable');
       const value = await response.json();
-      if (!value || value.error) throw new Error('Invalid response');
+      if (!value || value.error || value.success === false) throw new Error('Invalid response');
       return value;
     } finally { clearTimeout(timeout); }
   }
@@ -73,15 +77,31 @@
   let busy = false;
   let lastAttempt = 0;
 
+  async function locate(request) {
+    for (const provider of ipProviders) {
+      if (request !== requestNumber) return null;
+      try {
+        const result = await fetchJSON(provider.url);
+        const value = { city: result.city, latitude: result.latitude, longitude: result.longitude,
+          source: 'ip', provider: provider.id, savedAt: Date.now() };
+        if (validLocation(value)) return value;
+      } catch (_) { /* A failed provider must not block the next one or manual selection. */ }
+    }
+    throw new Error('Location unavailable');
+  }
+
   function publish(scene) {
     document.dispatchEvent(new CustomEvent('blog:local-weather', { detail: { scene } }));
   }
   function showLocation(value) {
     byId('city').textContent = value ? value.city : '尚未确定城市';
     byId('location-label').textContent = value ? '详情与设置' : '选择城市';
-    const manual = value?.source === 'manual';
-    byId('provider').textContent = manual ? 'GeoNames' : 'ipapi';
-    byId('provider').href = manual ? 'https://www.geonames.org/' : 'https://ipapi.co/';
+    const provider = value?.source === 'manual'
+      ? { name: 'GeoNames', href: 'https://www.geonames.org/' }
+      : ipProviders.find(provider => provider.id === value?.provider) || (value
+        ? { name: 'ipapi', href: 'https://ipapi.co/' } : ipProviders[0]);
+    byId('provider').textContent = provider.name;
+    byId('provider').href = provider.href;
   }
   function clearConditions() {
     byId('reading').hidden = true;
@@ -128,12 +148,16 @@
     card.setAttribute('aria-busy', 'true');
     if (!showCached()) { clearConditions(); showLocation(location); }
     byId('status').textContent = useIP || !location ? '正在定位城市…' : '正在更新天气…';
+    let usingSavedLocation = false;
     try {
       let nextLocation = location;
       if (useIP || !nextLocation || (nextLocation.source === 'ip' && !recent(nextLocation.savedAt, sixHours))) {
-        const result = await fetchJSON('https://ipapi.co/json/');
-        nextLocation = { city: result.city, latitude: result.latitude, longitude: result.longitude, source: 'ip', savedAt: Date.now() };
-        if (!validLocation(nextLocation)) throw new Error('Invalid location');
+        try { nextLocation = await locate(request); }
+        catch (error) {
+          // Keep a known city usable when refreshing its IP lookup fails.
+          if (!nextLocation) throw error;
+          usingSavedLocation = true;
+        }
       }
       if (request !== requestNumber) return;
       if (!sameLocation(location, nextLocation)) clearConditions();
@@ -142,6 +166,7 @@
       showLocation(location);
       if (!force && freshCache(cached) && sameLocation(cached.location, location)) {
         render({ ...cached, location });
+        if (usingSavedLocation) byId('status').textContent = '定位暂不可用，沿用上次城市 · ' + byId('status').textContent;
         return;
       }
       const url = new URL('https://api.open-meteo.com/v1/forecast');
@@ -153,6 +178,7 @@
       cached = { location: { ...location }, data: result.current, timezone: result.timezone, fetchedAt: Date.now() };
       write(cacheKey, cached);
       render(cached);
+      if (usingSavedLocation) byId('status').textContent = '定位暂不可用，沿用上次城市 · ' + byId('status').textContent;
     } catch (_) {
       if (request !== requestNumber) return;
       const hasCache = showCached();
@@ -160,7 +186,9 @@
       else {
         clearConditions();
         byId('description').textContent = '天气暂不可用';
-        byId('status').textContent = '暂时无法获取，可稍后刷新或切换城市。';
+        byId('status').textContent = location
+          ? '天气暂时无法获取，请稍后刷新。'
+          : '暂时无法定位，请在“选择城市”中手动搜索。';
       }
     } finally {
       if (request === requestNumber) {
@@ -183,12 +211,47 @@
     byId('results').replaceChildren();
     byId('search-status').textContent = '';
   });
+  function searchText(value) {
+    return value.normalize('NFKD').replace(/[\u0300-\u036f\s'’_-]/g, '').toLowerCase().replace(/市$/, '');
+  }
+  function localCities(query) {
+    const term = searchText(query);
+    if (!term) return [];
+    return (window.BlogWeatherCities || []).map(city => {
+      const names = [city.name, ...city.aliases].map(searchText);
+      const rank = names.includes(term) ? 0 : names.some(name => name.startsWith(term)) ? 1 : names.some(name => name.includes(term)) ? 2 : 3;
+      return { city, rank };
+    }).filter(item => item.rank < 3).sort((a, b) => a.rank - b.rank).slice(0, 5).map(item => item.city);
+  }
+  function showCities(cities) {
+    byId('search-status').textContent = cities.length ? '请选择城市' : '未找到城市，试试拼音或附近城市。';
+    for (const city of cities) {
+      const item = document.createElement('li');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = [...new Set([city.name, city.admin1, city.country].filter(Boolean))].join(' · ');
+      button.addEventListener('click', () => {
+        ++searchNumber;
+        location = { city: city.name, latitude: city.latitude, longitude: city.longitude, source: 'manual', savedAt: Date.now() };
+        write(locationKey, location);
+        byId('location').open = false;
+        byId('results').replaceChildren();
+        byId('search-status').textContent = '';
+        // Starting a new load discards any earlier city's in-flight response.
+        load({ force: true });
+      });
+      item.append(button);
+      byId('results').append(item);
+    }
+  }
   byId('search').addEventListener('submit', async event => {
     event.preventDefault();
     const query = byId('query').value.trim();
     if (query.length < 2) return;
     const search = ++searchNumber;
     byId('results').replaceChildren();
+    const matches = localCities(query);
+    if (matches.length) { showCities(matches); return; }
     byId('search-status').textContent = '正在查找城市…';
     const url = new URL('https://geocoding-api.open-meteo.com/v1/search');
     url.search = new URLSearchParams({ name: query, count: '5', language: 'zh', format: 'json' });
@@ -197,27 +260,9 @@
       if (search !== searchNumber) return;
       const cities = (Array.isArray(result.results) ? result.results : []).slice(0, 5).filter(city =>
         validLocation({ city: city.name, latitude: city.latitude, longitude: city.longitude, source: 'manual' }));
-      byId('search-status').textContent = cities.length ? '请选择城市' : '未找到城市，试试拼音或英文名称。';
-      for (const city of cities) {
-        const item = document.createElement('li');
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.textContent = [...new Set([city.name, city.admin1, city.country].filter(Boolean))].join(' · ');
-        button.addEventListener('click', () => {
-          ++searchNumber;
-          location = { city: city.name, latitude: city.latitude, longitude: city.longitude, source: 'manual', savedAt: Date.now() };
-          write(locationKey, location);
-          byId('location').open = false;
-          byId('results').replaceChildren();
-          byId('search-status').textContent = '';
-          // Incrementing the load generation discards an earlier city's in-flight response.
-          load({ force: true });
-        });
-        item.append(button);
-        byId('results').append(item);
-      }
+      showCities(cities);
     } catch (_) {
-      if (search === searchNumber) byId('search-status').textContent = '暂时无法搜索，请稍后再试。';
+      if (search === searchNumber) byId('search-status').textContent = '未找到内置城市，在线搜索暂不可用。请试试附近城市。';
     }
   });
 
