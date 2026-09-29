@@ -156,7 +156,41 @@
         <a href="https://github.com/Mi1li0n" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Mi1li0n" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
       </span>
   </div>
-<div id="sidebar-cards" hidden>
+<aside id="sidebar-cards" aria-label="天气与每日签" hidden>
+<section id="local-weather-card" class="local-weather-card" aria-labelledby="local-weather-title">
+  <div class="local-weather-heading">
+    <h2 id="local-weather-title">此刻天气</h2>
+    <button id="local-weather-refresh" type="button" title="刷新天气" aria-label="刷新天气">↻</button>
+  </div>
+  <div class="local-weather-current">
+    <div class="local-weather-place">
+      <p id="local-weather-city" class="local-weather-city">正在定位城市</p>
+      <span id="local-weather-description" hidden>获取天气中</span>
+    </div>
+    <div id="local-weather-reading" class="local-weather-reading" hidden>
+      <span id="local-weather-icon" aria-hidden="true">☁</span>
+      <strong id="local-weather-temperature">—</strong>
+    </div>
+  </div>
+  <p id="local-weather-status" class="local-weather-status" role="status">正在获取当地天气…</p>
+  <details id="local-weather-location" class="local-weather-location">
+    <summary id="local-weather-location-label">详情与设置</summary>
+    <p id="local-weather-detail" class="local-weather-detail"></p>
+    <button id="weather-follow" class="local-weather-follow" type="button" aria-pressed="false">跟随天气：关</button>
+    <form id="local-weather-search">
+      <label for="local-weather-query">切换城市</label>
+      <div class="local-weather-search-row">
+        <input id="local-weather-query" type="search" placeholder="如 北京 / Beijing" minlength="2" maxlength="80" required autocomplete="off">
+        <button type="submit">搜索</button>
+      </div>
+    </form>
+    <p id="local-weather-search-status" role="status"></p>
+    <ul id="local-weather-results"></ul>
+    <button id="local-weather-ip" type="button">使用 IP 定位</button>
+    <p class="local-weather-note">IP 定位可能有偏差，可手动选择城市。</p>
+    <p class="local-weather-source">天气 <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a> · 位置 <a id="local-weather-provider" href="https://ipapi.co/" target="_blank" rel="noopener noreferrer">ipapi</a></p>
+  </details>
+</section>
 <section id="daily-sign-card" class="daily-sign-card" aria-labelledby="daily-sign-title" tabindex="-1">
   <div class="daily-sign-heading">
     <h2 id="daily-sign-title">每日一签</h2>
@@ -175,7 +209,11 @@
   </div>
   <p id="daily-sign-note" class="daily-sign-note" role="status" hidden></p>
   <details id="daily-food" class="daily-food">
-    <summary>吃点什么<span id="daily-food-slot" class="daily-food-slot"></span></summary>
+    <summary>
+      <span class="daily-food-label">吃点什么</span>
+      <span id="daily-food-slot" class="daily-food-slot"></span>
+      <span id="daily-food-preview" class="daily-food-preview" hidden></span>
+    </summary>
     <div id="daily-food-result" aria-live="polite" hidden>
       <p class="daily-food-name"><span id="daily-food-emoji" aria-hidden="true"></span> <strong id="daily-food-name"></strong></p>
       <p id="daily-food-description"></p>
@@ -183,37 +221,7 @@
     <button id="daily-food-draw" type="button">选一个</button>
   </details>
 </section>
-<section id="local-weather-card" class="local-weather-card" aria-labelledby="local-weather-title">
-  <div class="local-weather-heading">
-    <h2 id="local-weather-title">此刻天气</h2>
-    <button id="local-weather-refresh" type="button" title="刷新天气" aria-label="刷新天气">↻</button>
-  </div>
-  <p id="local-weather-city" class="local-weather-city">正在定位城市</p>
-  <div class="local-weather-current">
-    <span id="local-weather-icon" aria-hidden="true">☁</span>
-    <strong id="local-weather-temperature">—</strong>
-    <span id="local-weather-description">获取天气中</span>
-  </div>
-  <p id="local-weather-detail" class="local-weather-detail"></p>
-  <p id="local-weather-status" class="local-weather-status" role="status">正在获取当地天气…</p>
-  <button id="weather-follow" class="local-weather-follow" type="button" aria-pressed="false">跟随天气：关</button>
-  <details id="local-weather-location" class="local-weather-location">
-    <summary>切换城市</summary>
-    <form id="local-weather-search">
-      <label for="local-weather-query">城市名称</label>
-      <div class="local-weather-search-row">
-        <input id="local-weather-query" type="search" placeholder="如 北京 / Beijing" minlength="2" maxlength="80" required autocomplete="off">
-        <button type="submit">搜索</button>
-      </div>
-    </form>
-    <p id="local-weather-search-status" role="status"></p>
-    <ul id="local-weather-results"></ul>
-    <button id="local-weather-ip" type="button">使用 IP 定位</button>
-    <p class="local-weather-note">IP 定位可能有偏差，可手动选择城市。</p>
-  </details>
-  <p class="local-weather-source">天气 <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a> · 位置 <a id="local-weather-provider" href="https://ipapi.co/" target="_blank" rel="noopener noreferrer">ipapi</a></p>
-</section>
-</div>
+</aside>
 
         </div>
       </div>

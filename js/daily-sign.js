@@ -71,6 +71,9 @@
     byId('daily-sign-note').hidden = storageWorks;
     byId('daily-sign-note').textContent = storageWorks ? '' : '无法保存，下次打开会重置。';
     byId('daily-food-slot').textContent = slots[slot];
+    byId('daily-food-preview').hidden = !food;
+    byId('daily-food-preview').textContent = food ? food.name : '';
+    byId('daily-food-preview').title = food ? food.name : '';
     byId('daily-food-result').hidden = !food;
     foodDraw.textContent = food ? '换一道' : '选一个';
     if (food) {

@@ -1236,7 +1236,7 @@ pre code {
     vertical-align: middle;
   }
   .links-of-author a::before {
-    background: #ff52ff;
+    background: #cfffe5;
     display: inline-block;
     margin-right: 3px;
     transform: translateY(-2px);
@@ -2922,9 +2922,15 @@ html[data-weather='night'] .post-body blockquote {
 .daily-sign-card [hidden] {
   display: none !important;
 }
-.daily-sign-card {
+#sidebar-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
   margin-top: 14px;
-  padding: 18px;
+}
+.daily-sign-card {
+  padding: 14px;
   box-sizing: border-box;
   border: 1px solid var(--weather-border);
   border-radius: 12px;
@@ -2958,47 +2964,54 @@ html[data-weather='night'] .post-body blockquote {
   font-variant-numeric: tabular-nums;
 }
 .daily-sign-main {
-  padding: 22px 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 10px 0;
   text-align: center;
+}
+.daily-sign-card[data-drawn='true'] .daily-sign-main {
+  display: block;
 }
 .daily-sign-ritual {
   display: flex;
   justify-content: center;
-  padding: 14px 0 16px;
+  flex: 0 0 38px;
 }
 .daily-sign-tube {
   position: relative;
-  width: 34px;
-  height: 39px;
-  margin-top: 16px;
+  width: 26px;
+  height: 30px;
+  margin-top: 14px;
   border: 1px solid var(--weather-link);
-  border-radius: 3px 3px 8px 8px;
+  border-radius: 3px 3px 6px 6px;
 }
 .daily-sign-tube span {
   display: block;
-  font: 17px/37px 'Songti SC', SimSun, serif;
+  font: 15px/28px 'Songti SC', SimSun, serif;
   color: var(--weather-link);
 }
 .daily-sign-tube i {
   position: absolute;
-  width: 4px;
-  height: 22px;
+  width: 3px;
+  height: 17px;
   border: 1px solid var(--weather-link);
   border-radius: 2px 2px 0 0;
   background: var(--weather-panel);
-  bottom: 38px;
+  bottom: 29px;
   transform-origin: bottom;
 }
 .daily-sign-tube i:nth-child(1) {
-  left: 6px;
+  left: 4px;
   transform: rotate(-12deg);
 }
 .daily-sign-tube i:nth-child(2) {
-  left: 14px;
-  height: 29px;
+  left: 11px;
+  height: 22px;
 }
 .daily-sign-tube i:nth-child(3) {
-  left: 23px;
+  left: 18px;
   transform: rotate(12deg);
 }
 .daily-sign-card button {
@@ -3046,8 +3059,8 @@ html[data-weather='night'] .post-body blockquote {
   letter-spacing: 0.2em;
 }
 .daily-sign-result h3 {
-  font: 400 19px/1.6 'Songti SC', SimSun, serif;
-  margin: 5px 0 12px;
+  font: 400 18px/1.6 'Songti SC', SimSun, serif;
+  margin: 3px 0 6px;
 }
 .daily-sign-result p {
   line-height: 1.9;
@@ -3055,12 +3068,13 @@ html[data-weather='night'] .post-body blockquote {
 }
 .daily-food {
   border-top: 1px solid var(--weather-selected);
-  padding-top: 9px;
+  padding-top: 6px;
 }
 .daily-food summary {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 7px;
+  column-gap: 7px;
   min-height: 32px;
   list-style: none;
   cursor: pointer;
@@ -3082,6 +3096,18 @@ html[data-weather='night'] .post-body blockquote {
   margin-left: auto;
   font-size: 10px;
   color: var(--weather-muted);
+}
+.daily-food-preview {
+  grid-column: 2/-1;
+  padding-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--weather-muted);
+}
+.daily-food[open] .daily-food-preview {
+  display: none;
 }
 #daily-food-result {
   margin: 12px 0 4px;
@@ -3121,14 +3147,11 @@ html[data-weather='night'] .post-body blockquote {
 }
 @media (max-width: 991px) {
   .daily-sign-card {
-    padding: 16px 20px;
+    padding: 12px 16px;
   }
   .daily-sign-card button,
   .daily-food summary {
     min-height: 40px;
-  }
-  .daily-sign-main {
-    padding-top: 18px;
   }
   .daily-sign-result {
     max-width: 260px;
@@ -3229,21 +3252,21 @@ body .menu .menu-item a {
   font-size: 14px;
 }
 body .sidebar-inner {
-  padding: 26px 20px;
+  padding: 18px 16px;
 }
 body .site-author-image {
-  width: 78px;
-  height: 78px;
+  width: 64px;
+  height: 64px;
   padding: 0;
   border: 0;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 body .site-author-name {
   font-size: 15px;
   font-weight: 500;
 }
 body .site-state {
-  margin-top: 18px;
+  margin-top: 12px;
 }
 body .site-state-item-count {
   font-size: 17px;
@@ -3253,7 +3276,7 @@ body .site-state-item-name {
   font-size: 11px;
 }
 body .links-of-author {
-  margin-top: 19px;
+  margin-top: 12px;
 }
 body .links-of-author-item {
   font-size: 12px;
@@ -3482,8 +3505,7 @@ html[data-weather=night] .weather-thumb [data-icon=night] {
 }
 .local-weather-card {
   box-sizing: border-box;
-  margin-top: 14px;
-  padding: 18px 18px 13px;
+  padding: 12px 14px;
   border: 1px solid var(--weather-border);
   border-radius: 12px;
   color: var(--weather-ink);
@@ -3495,8 +3517,8 @@ html[data-weather=night] .weather-thumb [data-icon=night] {
   font-size: 12px;
   line-height: 1.7;
 }
-.local-weather-card[hidden] {
-  display: none;
+.local-weather-card [hidden] {
+  display: none !important;
 }
 .local-weather-card p {
   margin: 0;
@@ -3541,58 +3563,69 @@ html[data-weather=night] .weather-thumb [data-icon=night] {
   outline-offset: 2px;
 }
 .local-weather-card #local-weather-refresh {
-  min-width: 32px;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0;
   border: 0;
   background: transparent;
-  font-size: 20px;
+  font-size: 18px;
 }
 .local-weather-card .local-weather-city {
-  margin: 5px 0 7px;
-  font-size: 14px;
+  font-size: 13px;
   overflow-wrap: anywhere;
 }
 .local-weather-current {
   display: flex;
   align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
   gap: 8px;
 }
+.local-weather-place {
+  flex: 1;
+  min-width: 0;
+}
+.local-weather-reading {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 5px;
+}
 #local-weather-icon {
-  font-size: 25px;
+  font-size: 18px;
   line-height: 1;
 }
 #local-weather-temperature {
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 400;
   line-height: 1.4;
   font-variant-numeric: tabular-nums;
 }
 #local-weather-description {
-  font-size: 12px;
+  font-size: 11px;
+  color: var(--weather-muted);
 }
 .local-weather-card .local-weather-detail {
   margin-top: 5px;
   color: var(--weather-muted);
 }
 .local-weather-card .local-weather-status {
-  margin-top: 7px;
+  margin-top: 4px;
   color: var(--weather-muted);
-  font-size: 11px;
-  min-height: 19px;
+  font-size: 10px;
+  overflow-wrap: anywhere;
 }
 .local-weather-follow {
   width: 100%;
-  margin-top: 13px;
+  margin-top: 8px;
 }
 .local-weather-follow[aria-pressed='true'] {
   box-shadow: inset 0 0 0 1px var(--weather-link);
 }
 .local-weather-location {
-  margin-top: 10px;
+  margin-top: 4px;
 }
 .local-weather-location summary {
+  min-height: 24px;
+  line-height: 24px;
   cursor: pointer;
   color: var(--weather-link);
 }
@@ -3649,6 +3682,34 @@ html[data-weather=night] .weather-thumb [data-icon=night] {
   color: inherit;
   border: 0;
 }
+@media (min-width: 1280px) {
+  body .main {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr) 220px;
+    gap: 24px;
+    max-width: 1320px;
+  }
+  body .column {
+    width: 200px;
+    min-width: 0;
+  }
+  body .column > .header {
+    width: 100%;
+  }
+  body .main-inner {
+    width: auto;
+    min-width: 0;
+  }
+  body .main > #sidebar-cards {
+    align-self: start;
+    margin-top: 0;
+  }
+  body .footer-inner {
+    max-width: 1320px;
+    padding-left: 224px;
+    padding-right: 244px;
+  }
+}
 @media (max-width: 991px) {
   body .main {
     width: calc(100% - 40px);
@@ -3676,7 +3737,11 @@ html[data-weather=night] .weather-thumb [data-icon=night] {
     background: var(--weather-panel);
   }
   .local-weather-card {
-    padding: 15px 20px;
+    padding: 12px 16px;
+  }
+  .local-weather-card #local-weather-refresh {
+    min-width: 40px;
+    min-height: 40px;
   }
   .local-weather-card button,
   .local-weather-location summary {

@@ -78,11 +78,14 @@
   }
   function showLocation(value) {
     byId('city').textContent = value ? value.city : '尚未确定城市';
+    byId('location-label').textContent = value ? '详情与设置' : '选择城市';
     const manual = value?.source === 'manual';
     byId('provider').textContent = manual ? 'GeoNames' : 'ipapi';
     byId('provider').href = manual ? 'https://www.geonames.org/' : 'https://ipapi.co/';
   }
   function clearConditions() {
+    byId('reading').hidden = true;
+    byId('description').hidden = true;
     byId('temperature').textContent = '—';
     byId('description').textContent = '等待天气';
     byId('icon').textContent = '☁';
@@ -93,6 +96,8 @@
     const data = snapshot.data;
     const weather = conditions(data.weather_code, data.is_day);
     showLocation(snapshot.location);
+    byId('reading').hidden = false;
+    byId('description').hidden = false;
     byId('temperature').textContent = `${Math.round(data.temperature_2m)}°`;
     byId('description').textContent = weather.text;
     byId('icon').textContent = weather.icon;
