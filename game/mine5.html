@@ -3300,7 +3300,8 @@ const $=s=>document.querySelector(s),canvas=$('#world'),ctx=canvas.getContext('2
 let game=new EscapeEngine(),modal='',fxUntil=0,lastMove=0,motion={events:[],end:0},queuedMove=null,queuedAction=null,zoom=1,mapZoom='full',holdBlocked=false,hoverCell=null,overlayCache=null,bagSelection=null,bagHand=null,elapsedMs=0,lastClockAt=performance.now(),displayedSecond=-1;
 let pointerTravel=null,pointerIntent=null,pointerGesture=null,pointerLongTimer=null,pointerSuppressClick=false;
 const ITEMS=EscapeEngine.ITEMS,PICKS=EscapeEngine.PICKS,HOME=EscapeEngine.HOME,HANDS=EscapeEngine.HANDS,MONSTERS=EscapeEngine.MONSTERS,GEN=EscapeEngine.GEN;
-let CW=960,CH=720,soundCueId=null,soundCueStart=0;
+let CW=960,CH=720,canvasScale=1,soundCueId=null,soundCueStart=0;
+const mobileCanvas=matchMedia('(max-width:700px),(pointer:coarse)');
 let aim=null;const QUICK_ITEMS=['bread','bomb','rune','rope'];
 const S=80,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,SIZE=GEN.SIZE;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -3310,7 +3311,8 @@ function line(points,c,w=2){ctx.strokeStyle=c;ctx.lineWidth=w;ctx.beginPath();po
 function text(str,x,y,color='#d7e2e4',size=14){if(zoom<1)return;ctx.fillStyle=color;ctx.font=`${size}px "Microsoft YaHei",sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(str,x,y)}
 function glow(x,y,r,color){const g=ctx.createRadialGradient(x,y,1,x,y,r);g.addColorStop(0,color);g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2)}
 function diamond(x,y,r,color){poly([[x,y-r],[x+r*.55,y],[x,y+r],[x-r*.55,y]],color)}
-function resizeCanvas(){const box=canvas.parentElement.getBoundingClientRect();if(!box.width||!box.height)return;const tilePixels=matchMedia('(max-width:700px),(pointer:coarse)').matches?38:44;CH=Math.max(80,Math.round(box.height*S/tilePixels));CW=Math.round(CH*box.width/box.height);if(canvas.width!==CW||canvas.height!==CH){canvas.width=CW;canvas.height=CH}}
+function resizeCanvas(){const box=canvas.parentElement.getBoundingClientRect();if(!box.width||!box.height)return;const tilePixels=mobileCanvas.matches?38:44;CH=Math.max(80,Math.round(box.height*S/tilePixels));CW=Math.round(CH*box.width/box.height);canvasScale=mobileCanvas.matches?Math.min(1,box.width*1.5/CW):1;const width=Math.round(CW*canvasScale),height=Math.round(CH*canvasScale);if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;paintDirty=true;}}
+function worldTransform(scale=1){ctx.setTransform(canvasScale*scale,0,0,canvasScale*scale,0,0);}
 new ResizeObserver(resizeCanvas).observe(canvas.parentElement);
 function homeView(){const bounds=game.homeBounds(),wide=bounds.minX<0,gridX=wide?40:120,gridY=120,width=(bounds.maxX-bounds.minX+1)*160+gridX*2,height=720,scale=Math.min(CW/width,CH/height);return {...bounds,gridX,gridY,width,height,scale,x:(CW-width*scale)/2,y:(CH-height*scale)/2}}
 function dangerSnapshot(){const s=game.state,keys=new Set();if(s.mode!=='playing')return keys;const v=game.visible();
@@ -3690,23 +3692,27 @@ function sceneDetail(x,y,kind){
 let smoothLightMask=null;
 function drawRememberedTerrain(t,x,y){const kind=t.memoryKind||t.kind,stone=['wall','rock','ore','hard','rubble'].includes(kind);rect(x,y,S,S,stone?'#30404a':['water','ice'].includes(kind)?'#142a37':'#172832');if(stone){line([[x+8,y+18],[x+30,y+9],[x+66,y+17],[x+72,y+53],[x+51,y+70],[x+12,y+61],[x+8,y+18]],'#536169',2);}else if(kind==='bridge'){rect(x+15,y,50,S,'#43545a');}else{line([[x+6,y+S-1],[x+S-6,y+S-1]],'#354950',1);}}
 function drawLightMask(ox,oy){
- const frame=game.lightingFrame(),resolution=6,left=Math.floor(ox)-1,top=Math.floor(oy)-1,cols=Math.ceil(CW/(S*zoom))+3,rows=Math.ceil(CH/(S*zoom))+3,layout=[left,top,cols,rows].join(':');
- if(!smoothLightMask||smoothLightMask.frame!==frame||smoothLightMask.layout!==layout){const surface=smoothLightMask?.surface||document.createElement('canvas');if(surface.width!==cols*resolution)surface.width=cols*resolution;if(surface.height!==rows*resolution)surface.height=rows*resolution;const context=surface.getContext('2d'),pixels=context.createImageData(surface.width,surface.height);
-  for(let y=0;y<surface.height;y++)for(let x=0;x<surface.width;x++){const i=(y*surface.width+x)*4;pixels.data[i]=5;pixels.data[i+1]=10;pixels.data[i+2]=16;pixels.data[i+3]=Math.round(game.lightOpacity(left+(x+.5)/resolution-.5,top+(y+.5)/resolution-.5,frame)*255);}context.putImageData(pixels,0,0);smoothLightMask={frame,layout,surface};
+ const frame=game.lightingFrame(),resolution=mobileCanvas.matches?4:6,viewLeft=Math.floor(ox),viewTop=Math.floor(oy),across=Math.ceil(CW/(S*zoom)),down=Math.ceil(CH/(S*zoom));
+ // Keep a margin in world coordinates so a walking camera can reuse the same mask.
+ if(!smoothLightMask||smoothLightMask.frame!==frame||smoothLightMask.resolution!==resolution||viewLeft<smoothLightMask.left+1||viewTop<smoothLightMask.top+1||viewLeft+across+1>smoothLightMask.left+smoothLightMask.cols||viewTop+down+1>smoothLightMask.top+smoothLightMask.rows){
+  const left=viewLeft-2,top=viewTop-2,cols=across+5,rows=down+5,surface=smoothLightMask?.surface||document.createElement('canvas');if(surface.width!==cols*resolution)surface.width=cols*resolution;if(surface.height!==rows*resolution)surface.height=rows*resolution;const context=surface.getContext('2d'),pixels=context.createImageData(surface.width,surface.height);
+  // Uniform darkness and the interior of remembered terrain need no sub-cell sampling.
+  const flat=new Array(cols*rows).fill(-1);for(let y=0;y<rows;y++)for(let x=0;x<cols;x++){const tx=left+x,ty=top+y;if(frame.levels.has(tx+','+ty))continue;if(!game.tile(tx,ty)?.seen){flat[y*cols+x]=1;continue;}let edge=false;for(let dy=-1;dy<=1&&!edge;dy++)for(let dx=-1;dx<=1;dx++)if((dx||dy)&&!game.tile(tx+dx,ty+dy)?.seen&&!frame.levels.has((tx+dx)+','+(ty+dy))){edge=true;break;}if(!edge)flat[y*cols+x]=.84;}
+  for(let y=0;y<surface.height;y++)for(let x=0;x<surface.width;x++){const i=(y*surface.width+x)*4,alpha=flat[Math.floor(y/resolution)*cols+Math.floor(x/resolution)];pixels.data[i]=5;pixels.data[i+1]=10;pixels.data[i+2]=16;pixels.data[i+3]=Math.round((alpha<0?game.lightOpacity(left+(x+.5)/resolution-.5,top+(y+.5)/resolution-.5,frame):alpha)*255);}context.putImageData(pixels,0,0);smoothLightMask={frame,resolution,left,top,cols,rows,surface};
  }
- ctx.save();ctx.imageSmoothingEnabled=true;ctx.drawImage(smoothLightMask.surface,(left-ox)*S,(top-oy)*S,cols*S,rows*S);ctx.restore();
+ const {surface,left,top,cols,rows}=smoothLightMask;ctx.save();ctx.imageSmoothingEnabled=true;ctx.drawImage(surface,(left-ox)*S,(top-oy)*S,cols*S,rows*S);ctx.restore();
 }
 
 let lastPaintAt=0,paintDirty=true;
-function draw(time){updateClock(time);const frameGap=dialog.open?80:motion.end>time||pointerTravel?0:32;if(document.hidden||!paintDirty&&time-lastPaintAt<frameGap){requestAnimationFrame(draw);return;}lastPaintAt=time;paintDirty=false;
+function draw(time){updateClock(time);const frameGap=dialog.open?250:motion.end>time||pointerTravel?0:mobileCanvas.matches?80:32;if(document.hidden||!paintDirty&&time-lastPaintAt<frameGap){requestAnimationFrame(draw);return;}lastPaintAt=time;paintDirty=false;
  if(time>=motion.end&&motion.events.length){motion.events=[];const next=queuedAction||queuedMove;queuedAction=null;queuedMove=null;sync();if(next&&!dialog.open&&['playing','home'].includes(game.state.mode))act(next)}
   advancePointerTravel(time);
-  const s=game.state;if(motion.world&&(motion.world!==game||motion.map!==s.map||motion.mode!==s.mode)){motion={events:[],end:0};fxUntil=0;}else if(time>=motion.end)motion.events=[];const p=s.player,pv=pose('player',p,time);if(s.mode==='home'){zoom=1;ctx.setTransform(1,0,0,1,0,0);rect(0,0,CW,CH,'#0d1922');const h=homeView();ctx.save();ctx.translate(h.x,h.y);ctx.scale(h.scale,h.scale);drawHome(time);ctx.restore();requestAnimationFrame(draw);return}
- const span=CH/(S*zoom),ox=pv.x-(CW/(2*zoom)-40)/S,oy=pv.y-(CH/(2*zoom)-40)/S,v=game.visible();
- ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,CW,CH);rect(0,0,CW,CH,'#080f16');ctx.setTransform(zoom,0,0,zoom,0,0);
+  const s=game.state;if(motion.world&&(motion.world!==game||motion.map!==s.map||motion.mode!==s.mode)){motion={events:[],end:0};fxUntil=0;}else if(time>=motion.end)motion.events=[];const p=s.player,pv=pose('player',p,time);if(s.mode==='home'){zoom=1;worldTransform();rect(0,0,CW,CH,'#0d1922');const h=homeView();ctx.save();ctx.translate(h.x,h.y);ctx.scale(h.scale,h.scale);drawHome(time);ctx.restore();requestAnimationFrame(draw);return}
+ const span=CH/(S*zoom),ox=pv.x-(CW/(2*zoom)-40)/S,oy=pv.y-(CH/(2*zoom)-40)/S,lightFrame=game.lightingFrame(),v=lightFrame.objects;
+ worldTransform();ctx.clearRect(0,0,CW,CH);rect(0,0,CW,CH,'#080f16');worldTransform(zoom);
  const across=Math.ceil(CW/(S*zoom)),down=Math.ceil(CH/(S*zoom)),x0=Math.floor(ox),y0=Math.floor(oy);
  for(let ry=0;ry<=down;ry++)for(let rx=0;rx<=across;rx++){
-  const wx=x0+rx,wy=y0+ry,t=game.tile(wx,wy),x=(wx-ox)*S,y=(wy-oy)*S,seen=v.has(wx+','+wy),light=game.lightLevel(wx,wy);
+  const wx=x0+rx,wy=y0+ry,t=game.tile(wx,wy),x=(wx-ox)*S,y=(wy-oy)*S,seen=v.has(wx+','+wy),light=lightFrame.levels.get(wx+','+wy)||0;
   if(!t||(!light&&!t.seen)){rect(x,y,S,S,'#050a10');continue}if(!light){drawRememberedTerrain(t,x,y);continue;}
   if(['rock','ore','hard'].includes(t.kind))rock(x,y,t,wx,wy);
   else if(t.kind==='wall'||t.kind==='rubble'){
@@ -3782,7 +3788,7 @@ function draw(time){updateClock(time);const frameGap=dialog.open?80:motion.end>t
  }
  drawLightMask(ox,oy);combatEffects(ox,oy,time);
  for(const q of s.missions||[])for(const wave of q.ambushes||[])if(wave.points&&!wave.spawned)for(const p of wave.points){const x=(p.x-ox)*S,y=(p.y-oy)*S;rect(x+6,y+6,68,68,'#cc895536');text('伏兵 '+Math.max(0,wave.due-s.turn),x+40,y+40,'#f3c179',14);}
- ctx.setTransform(1,0,0,1,0,0);
+ worldTransform();
  if(zoom<1){ctx.fillStyle='#0b141cd0';ctx.fillRect(6,6,182,26);ctx.fillStyle='#d9cdb0';ctx.font='15px "Microsoft YaHei",sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText('地图已缩小 · Z 放大',16,19)}
  requestAnimationFrame(draw);
 }
@@ -4265,7 +4271,7 @@ $('#discovery-button').addEventListener('click',()=>journal('clues'));
 
 const desktopCardDock=()=>matchMedia('(min-width:900px) and (min-height:600px) and (pointer:fine)').matches;
 let cardDockPosition='side';try{if(localStorage.getItem('mine6-card-dock-position')==='bottom')cardDockPosition='bottom';}catch(_){}
-let cardSelection=null,loadoutSelection=null,cardNotice='',saveTimer=null,saveWarning='',saveRecoveryNotice='',saveBlocked=false,cardDockOpen=desktopCardDock(),cardDockPinned=desktopCardDock(),cardHover=null,cardHoverTimer=null;
+let cardSelection=null,loadoutSelection=null,cardNotice='',saveTimer=null,saveIdle=null,saveWarning='',saveRecoveryNotice='',saveBlocked=false,cardDockOpen=desktopCardDock(),cardDockPinned=desktopCardDock(),cardHover=null,cardHoverTimer=null;
 const CARD_SAVE_KEY='mine6-card-expedition-v2';
 function abilityCards(){if(game.state.expedition.phase==='prepare')return [];const p=game.state.player;return ['main','body','head','off'].map(slot=>p.equipped[slot]).filter(id=>id&&id!=='elite_tide'&&!['spear','axe','hammer','crossbow'].includes(id)&&EscapeEngine.ELITE_GEAR[id]&&EscapeEngine.ELITE_GEAR[id].active!==false).map(id=>({uid:'ability:'+id,id,type:'gear',ability:true,data:p.inventoryGear[id]}));}
 function handCards(){return game.state.expedition.phase==='prepare'?preparedCards():[...abilityCards(),...game.carriedCards()];}
@@ -4276,8 +4282,9 @@ function cardCondition(c){const text=baseCardCondition(c),mod=EscapeEngine.GEAR_
 function cardText(c){return game.qualityDescription(c)||ITEM_UI[c.id]?.text||'';}
 function gearComparisonMarkup(c){const q=game.equipmentComparison(c);if(!q)return '';if(!q.current)return '<span class="gear-compare"><small>当前'+esc(({main:'主手',off:'副手',head:'头戴',body:'身体'})[q.slot])+'空置</small></span>';return '<span class="gear-compare"><small>对比身上 · '+esc(q.current.name)+'</small><span class="compare-values">'+q.rows.map(r=>'<span class="'+(r.better===null?'same':r.better?'up':'down')+'">'+esc(r.label)+' '+r.from+'→'+r.to+'</span>').join('')+'</span>'+(q.current.id!==c.id?'<small>不同款式，技能与代价见说明</small>':'')+'</span>';}
 function cardFace(c,attrs='',selected=false){return `<button class="exp-card ${selected?'chosen':''}" data-card-kind="${c.type}" data-quality="${game.cardQuality(c)}" ${attrs}><span class="card-type">${EscapeEngine.QUALITIES[game.cardQuality(c)].name} · ${cardType(c)}</span><span class="card-art">${cardArt(c)}</span><strong>${esc(cardDisplayName(c))}</strong><span class="card-caption">${esc(cardText(c))}</span><span class="card-condition">${esc(cardCondition(c))}</span>${/data-card-(loot|take)|data-loot=|data-take-gear/.test(attrs)?gearComparisonMarkup(c):''}</button>`;}
-function saveCampaign(){clearTimeout(saveTimer);if(saveBlocked)return;try{localStorage.setItem(CARD_SAVE_KEY,JSON.stringify(EscapeEngine.encodeSave(game.exportCampaign())));saveWarning=saveRecoveryNotice;}catch(e){saveWarning='浏览器无法保存进度，请保持此页打开。';}const el=$('#save-notice');if(el){el.textContent=saveWarning;el.hidden=!saveWarning;}}
-function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveCampaign,180);}
+function saveCampaign(){clearTimeout(saveTimer);if(saveIdle!==null&&window.cancelIdleCallback)window.cancelIdleCallback(saveIdle);saveIdle=null;if(saveBlocked)return;try{localStorage.setItem(CARD_SAVE_KEY,JSON.stringify(EscapeEngine.encodeSave(game.exportCampaign())));saveWarning=saveRecoveryNotice;}catch(e){saveWarning='浏览器无法保存进度，请保持此页打开。';}const el=$('#save-notice');if(el){el.textContent=saveWarning;el.hidden=!saveWarning;}}
+function scheduleSave(){clearTimeout(saveTimer);if(saveIdle!==null&&window.cancelIdleCallback)window.cancelIdleCallback(saveIdle);saveIdle=null;saveTimer=setTimeout(flushScheduledSave,260);}
+function flushScheduledSave(){if(animBusy()||pointerTravel){saveTimer=setTimeout(flushScheduledSave,100);return;}if(window.requestIdleCallback)saveIdle=window.requestIdleCallback(()=>{saveIdle=null;if(animBusy()||pointerTravel){scheduleSave();return;}saveCampaign();},{timeout:800});else saveCampaign();}
 window.addEventListener('pagehide',saveCampaign);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveCampaign();});
 function preparedCards(){const p=game.campaign;p.preparedIds=(p.preparedIds||[]).filter(uid=>p.stock.some(c=>c.uid===uid)&&!game.campWornCards().some(c=>c.uid===uid)).slice(0,5);loadoutSelection=p.preparedIds;return loadoutSelection.map(uid=>p.stock.find(c=>c.uid===uid));}
 let chestFilter='all',chestQuery='',chestPage=0,returnToDeparture=false;
