@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>打砖块 · 小游戏</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f7f7f2;color:#243546;font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}button{font:inherit;cursor:pointer;border:0}button:focus-visible,canvas:focus-visible{outline:3px solid #4c92bb;outline-offset:4px}main{width:min(100% - 32px,650px);margin:24px auto 32px}.intro{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.eyebrow{margin:0 0 5px;font-size:11px;letter-spacing:2px;color:#57776f}h1{font-size:30px;margin:0;letter-spacing:2px}.tag{font-size:12px;padding:8px 12px;border-radius:30px;background:#e1eee9;color:#466d65;white-space:nowrap}.subtitle{font-size:14px;line-height:1.7;color:#63717b;margin:10px 0 16px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}.stat{background:#fff;border:1px solid #e4e8e2;border-radius:15px;padding:11px 10px;text-align:center}.stat span{display:block;font-size:11px;color:#76848d;margin-bottom:4px}.stat strong{font-size:20px;font-variant-numeric:tabular-nums}.board-wrap{width:min(100%,400px);margin:auto;position:relative;background:#243546;border-radius:20px;overflow:hidden;box-shadow:0 12px 28px #24354615}canvas{display:block;width:100%;height:auto;aspect-ratio:400/520;touch-action:none}.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}.overlay[hidden]{display:none}.message{color:#fff;text-align:center;padding:20px 24px;background:#182735ed;border:1px solid #ffffff20;border-radius:18px;max-width:86%;box-shadow:0 6px 30px #0002}.message strong{font-size:24px;display:block;margin-bottom:8px}.message p{font-size:13px;line-height:1.7;margin:0;color:#c7d6dc}.controls{display:flex;gap:8px;justify-content:center;margin:16px auto 10px;max-width:400px}.controls button{min-height:44px;border-radius:13px;padding:11px 12px;flex:1;font-weight:650;background:#e5ebed;color:#243546}.controls .primary{background:#a9dacb}.controls button:disabled{opacity:.4;cursor:default}.status{text-align:center;font-size:12px;min-height:20px;color:#57776f;margin:0 0 14px}.guide{background:#fff;border:1px solid #e4e8e2;border-radius:17px;padding:14px 16px;font-size:12px;color:#62717b;line-height:1.8}.guide p{margin:0}.guide b{color:#243546}.legend{display:flex;gap:7px 15px;flex-wrap:wrap;margin-top:8px}.legend span{white-space:nowrap}.symbol{font-weight:800;color:#326d64;font-size:15px}.footer{text-align:center;color:#8c979e;font-size:11px;margin:16px 0 0}@media(max-width:390px){main{width:calc(100% - 24px);margin-top:16px}h1{font-size:27px}.stat{padding:9px 5px}.stat strong{font-size:18px}.controls button{padding:10px 8px;font-size:13px}.guide{padding:12px}}@media(max-height:500px) and (min-width:600px){main{width:min(100% - 32px,880px);display:grid;grid-template-columns:minmax(250px,1fr) 270px;column-gap:24px;margin:14px auto}.intro,.subtitle,.stats,.controls,.status,.guide,.footer{grid-column:1}.board-wrap{grid-column:2;grid-row:1/8;width:270px}.intro{margin-bottom:0}.subtitle{margin:8px 0}.stats{margin-bottom:8px}.controls{margin:8px 0;width:100%}.guide{padding:10px 12px}.footer{margin-top:8px}}
+:root{color-scheme:dark}body{background:radial-gradient(ellipse at 15% 0%,#15383f 0,transparent 45%),#0b1726;color:#edf9f6}main{width:min(100% - 32px,620px);margin-top:24px}.intro{margin-bottom:12px}.eyebrow{color:#52e4ce;letter-spacing:2.5px;font-weight:800}h1{font-size:32px;letter-spacing:-1px}.tag{background:#53e5cb14;border:1px solid #53e5cb40;color:#89f7e1;font-weight:650}.subtitle{color:#9aafba;font-size:13px;margin:8px 0 16px}.stats{gap:0;border-top:1px solid #ffffff12;border-bottom:1px solid #ffffff12;padding:12px 0;margin-bottom:18px}.stat{background:none;border:0;border-radius:0;padding:0 10px;text-align:left}.stat+.stat{border-left:1px solid #ffffff14}.stat span{color:#8ca5b5;letter-spacing:1px}.stat strong{font-size:25px;color:#edf9f6;line-height:1.2}.stat:first-child strong{color:#61f4d7}.board-wrap{border-radius:22px;background:#0b1726;border:1px solid #71f9e33d;box-shadow:0 20px 60px #0006,0 0 34px #46d9cb0a}.message{background:#102738ed;border:1px solid #73e7d660;border-radius:20px;box-shadow:0 10px 40px #0006;padding:25px}.message strong{color:#63f1d4;font-size:26px;letter-spacing:-.5px}.message p{color:#c6d9e0}.controls{margin-top:14px}.controls button{background:#203244;color:#d8ebee;border:1px solid #ffffff14;border-radius:12px;font-size:13px;transition:background .15s,transform .15s}.controls .primary{background:#5bf0d2;color:#08262c;border-color:#5bf0d2;box-shadow:0 4px 18px #5bf0d224}.controls button:not(:disabled):hover{background:#2c455a}.controls .primary:not(:disabled):hover{background:#9affea}.controls button:not(:disabled):active{transform:translateY(2px)}.status{color:#7cebd9;font-size:12px}.guide{background:none;border:0;border-top:1px solid #ffffff14;border-radius:0;padding:14px 0;color:#8faab8}.guide b{color:#d8e8ec}.symbol{color:#60e8d2}.legend span:nth-child(2) .symbol{color:#69d9ff}.legend span:nth-child(3) .symbol{color:#ff8597}.footer{color:#657f90}.board-wrap:has(#overlay:not([hidden])){border-color:#61f4d76b}button:focus-visible,canvas:focus-visible{outline-color:#71f9e3}@media(max-width:390px){h1{font-size:28px}.tag{font-size:10px;padding:7px 9px}.stats{padding:11px 0}.stat{padding:0 8px}.stat strong{font-size:22px}.guide{padding:12px 0}}@media(max-height:500px) and (min-width:600px){main{width:min(100% - 32px,880px);margin:14px auto;column-gap:22px}.board-wrap{width:250px}.stats{padding:10px 0;margin:8px 0}.stat{padding:0 8px}.stat strong{font-size:22px}.guide{padding:10px 0}.controls{max-width:none;margin:6px 0}}@media(prefers-reduced-motion:reduce){button{transition:none!important;transform:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <header class="intro"><div><p class="eyebrow">ARCADE / 03</p><h1>打砖块</h1></div><span class="tag">接住每一次反弹</span></header>
+  <p class="subtitle">移动挡板，清空彩色砖墙。接住道具，让下一波更轻松。</p>
+  <section class="stats" aria-label="游戏数据">
+    <div class="stat"><span>得分</span><strong id="score">0</strong></div>
+    <div class="stat"><span>生命</span><strong id="lives">3</strong></div>
+    <div class="stat"><span>波次</span><strong id="wave">1</strong></div>
+    <div class="stat"><span>最佳</span><strong id="best">0</strong></div>
+  </section>
+  <div class="board-wrap">
+    <canvas id="board" width="400" height="520" tabindex="0" aria-label="打砖块游戏区域，用左右方向键或 A、D 移动挡板，空格发球或暂停"></canvas>
+    <div class="overlay" id="overlay"><div class="message"><strong id="overlay-title">准备发球</strong><p id="overlay-detail">先移动挡板找到位置<br>点击「发球」开始</p></div></div>
+  </div>
+  <div class="controls"><button id="launch" class="primary" type="button">发球</button><button id="pause" type="button" disabled>暂停</button><button id="restart" type="button">重新开始</button></div>
+  <p class="status" id="status" aria-live="polite">第 1 波 · 准备发球</p>
+  <section class="guide" aria-label="玩法说明"><p><b>操作</b>：← → / A D 移动；空格发球、暂停。触屏或鼠标在球场内拖动挡板。失去 3 条生命后结束。</p><div class="legend"><span><b class="symbol">↔</b> 挡板加宽 10 秒</span><span><b class="symbol">◷</b> 慢速球 10 秒</span><span><b class="symbol">♥</b> +1 生命（最多 5）</span></div></section>
+  <p class="footer">离开页面会自动暂停 · 返回后点击继续</p>
+</main>
+<script id="game-core">
+(() => {
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  class BreakoutGame {
+    constructor({ rng = Math.random } = {}) { this.rng = rng; this.width = 400; this.height = 520; this.restart(); }
+    restart() { this.score = 0; this.lives = 3; this.wave = 1; this.paddle = { x: 200, y: 482, w: 80, h: 12 }; this.prepareWave(); }
+    prepareWave() {
+      this.baseSpeed = Math.min(235 + (this.wave - 1) * 18, 370);
+      const rows = Math.min(3 + this.wave, 7);
+      this.bricks = [];
+      for (let row = 0; row < rows; row++) for (let col = 0; col < 7; col++) this.bricks.push({ x: 18 + col * 53, y: 48 + row * 26, w: 46, h: 18, row, alive: true });
+      this.resetBall();
+    }
+    resetBall() {
+      this.status = 'ready'; this.drops = []; this.wideTime = 0; this.slowTime = 0; this.paddle.w = 80;
+      this.movePaddle(this.paddle.x); this.ball = { x: this.paddle.x, y: this.paddle.y - 9, r: 6, vx: 0, vy: 0 };
+    }
+    movePaddle(x) { this.paddle.x = clamp(x, this.paddle.w / 2 + 4, this.width - this.paddle.w / 2 - 4); if (this.status === 'ready' && this.ball) this.ball.x = this.paddle.x; }
+    launch() { if (this.status !== 'ready') return; this.status = 'playing'; this.ball.vx = this.baseSpeed * 0.35; this.ball.vy = -this.baseSpeed * Math.sqrt(1 - 0.35 ** 2); }
+    pause() { if (this.status === 'playing') this.status = 'paused'; }
+    resume() { if (this.status === 'paused') this.status = 'playing'; }
+    setSpeed(speed) { const length = Math.hypot(this.ball.vx, this.ball.vy); if (length) { this.ball.vx *= speed / length; this.ball.vy *= speed / length; } }
+    collect(type) {
+      if (type === 'wide') { this.wideTime = 10; this.paddle.w = 120; this.movePaddle(this.paddle.x); }
+      if (type === 'slow') { this.slowTime = 10; this.setSpeed(this.baseSpeed * 0.65); }
+      if (type === 'life') this.lives = Math.min(5, this.lives + 1);
+    }
+    step(seconds) {
+      if (this.status !== 'playing' || !Number.isFinite(seconds) || seconds <= 0) return;
+      const dt = Math.min(seconds, 0.05), steps = Math.max(1, Math.ceil(dt / (1 / 240))), sub = dt / steps;
+      for (let i = 0; i < steps && this.status === 'playing'; i++) this.tick(sub);
+    }
+    tick(dt) {
+      if (this.wideTime > 0) { this.wideTime = Math.max(0, this.wideTime - dt); if (!this.wideTime) { this.paddle.w = 80; this.movePaddle(this.paddle.x); } }
+      if (this.slowTime > 0) { this.slowTime = Math.max(0, this.slowTime - dt); if (!this.slowTime) this.setSpeed(this.baseSpeed); }
+      const b = this.ball, p = this.paddle, prevX = b.x, prevY = b.y;
+      b.x += b.vx * dt; b.y += b.vy * dt;
+      if (b.x < b.r) { b.x = b.r; b.vx = Math.abs(b.vx); }
+      if (b.x > this.width - b.r) { b.x = this.width - b.r; b.vx = -Math.abs(b.vx); }
+      if (b.y < b.r) { b.y = b.r; b.vy = Math.abs(b.vy); }
+      if (b.vy > 0 && prevY + b.r <= p.y && b.y + b.r >= p.y && b.x + b.r >= p.x - p.w / 2 && b.x - b.r <= p.x + p.w / 2) {
+        b.y = p.y - b.r - 0.01;
+        const angle = clamp((b.x - p.x) / (p.w / 2), -1, 1) * 1.05;
+        const speed = this.baseSpeed * (this.slowTime > 0 ? 0.65 : 1);
+        b.vx = Math.sin(angle) * speed; b.vy = -Math.cos(angle) * speed;
+      }
+      for (const brick of this.bricks) {
+        if (!brick.alive) continue;
+        const nearestX = clamp(b.x, brick.x, brick.x + brick.w), nearestY = clamp(b.y, brick.y, brick.y + brick.h);
+        if ((b.x - nearestX) ** 2 + (b.y - nearestY) ** 2 > b.r ** 2) continue;
+        brick.alive = false; this.score += 10;
+        if (prevY - b.r >= brick.y + brick.h) { b.y = brick.y + brick.h + b.r + 0.01; b.vy = Math.abs(b.vy); }
+        else if (prevY + b.r <= brick.y) { b.y = brick.y - b.r - 0.01; b.vy = -Math.abs(b.vy); }
+        else if (prevX - b.r >= brick.x + brick.w) { b.x = brick.x + brick.w + b.r + 0.01; b.vx = Math.abs(b.vx); }
+        else if (prevX + b.r <= brick.x) { b.x = brick.x - b.r - 0.01; b.vx = -Math.abs(b.vx); }
+        else {
+          const distances = [Math.abs(b.y - (brick.y - b.r)), Math.abs(b.y - (brick.y + brick.h + b.r)), Math.abs(b.x - (brick.x - b.r)), Math.abs(b.x - (brick.x + brick.w + b.r))];
+          const side = distances.indexOf(Math.min(...distances));
+          if (side === 0) { b.y = brick.y - b.r - 0.01; b.vy = -Math.abs(b.vy); }
+          if (side === 1) { b.y = brick.y + brick.h + b.r + 0.01; b.vy = Math.abs(b.vy); }
+          if (side === 2) { b.x = brick.x - b.r - 0.01; b.vx = -Math.abs(b.vx); }
+          if (side === 3) { b.x = brick.x + brick.w + b.r + 0.01; b.vx = Math.abs(b.vx); }
+        }
+        if (this.rng() < 0.25) this.drops.push({ x: brick.x + brick.w / 2, y: brick.y + brick.h / 2, type: ['wide', 'slow', 'life'][Math.min(2, Math.floor(this.rng() * 3))] });
+        break;
+      }
+      this.drops = this.drops.filter(drop => {
+        drop.y += 110 * dt;
+        if (drop.y + 9 >= p.y && drop.y - 9 <= p.y + p.h && drop.x + 9 >= p.x - p.w / 2 && drop.x - 9 <= p.x + p.w / 2) { this.collect(drop.type); return false; }
+        return drop.y < this.height + 12;
+      });
+      if (!this.bricks.some(brick => brick.alive)) { this.wave++; this.prepareWave(); return; }
+      if (b.y - b.r > this.height) { this.lives--; if (this.lives <= 0) this.status = 'over'; else this.resetBall(); }
+    }
+  }
+  globalThis.BreakoutGame = BreakoutGame;
+})();
+</script>
+<script>
+(() => {
+  'use strict';
+  const game = new BreakoutGame(), canvas = document.getElementById('board'), ctx = canvas.getContext('2d');
+  const $ = id => document.getElementById(id), keys = new Set(), palette = ['#61f4d7','#64d6ff','#ffcd68','#ff7c94','#aa9bff','#45dfbf','#c4ed6d'];
+  let best = 0, lastTime = 0, pointerId = null, shownStatus = '', savedScore = 0;
+  const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
+  let particles = [], rings = [], trail = [], banner = null, paddleFlash = 0, sceneTime = 0;
+  const dropColors = {wide:'#61f4d7',slow:'#64d6ff',life:'#ff7c94'};
+  function clearFeedback() { particles=[];rings=[];trail=[];banner=null;paddleFlash=0; }
+  motionQuery.addEventListener('change',clearFeedback);
+  function burst(x,y,color,count=9) {
+    if(motionQuery.matches)return;
+    rings.push({x,y,color,age:0});rings=rings.slice(-10);
+    for(let i=0;i<count;i++){const angle=Math.PI*2*i/count;particles.push({x,y,vx:Math.cos(angle)*(55+i%3*25),vy:Math.sin(angle)*(55+i%3*25)-30,color,age:0,size:2+i%3});}
+    particles=particles.slice(-90);
+  }
+  function notify(text,color) { banner={text,color,age:0}; }
+  function advanceFeedback(dt) {
+    sceneTime+=dt;paddleFlash=Math.max(0,paddleFlash-dt);
+    for(const p of particles){p.age+=dt;p.x+=p.vx*dt;p.vy+=150*dt;p.y+=p.vy*dt;}particles=particles.filter(p=>p.age<.55);
+    for(const r of rings)r.age+=dt;rings=rings.filter(r=>r.age<.45);
+    for(const p of trail)p.age+=dt;trail=trail.filter(p=>p.age<.17);
+    if(banner){banner.age+=dt;if(banner.age>1.6)banner=null;}
+  }
+  function stepWithFeedback(dt) {
+    const wasPlaying=game.status==='playing';
+    if(!wasPlaying){game.step(dt);return;}
+    const alive=game.bricks.filter(b=>b.alive), drops=game.drops.slice(), oldWave=game.wave, oldLives=game.lives, oldVy=game.ball.vy, oldY=game.ball.y;
+    game.step(dt);
+    if(game.wave>oldWave){burst(200,190,'#61f4d7',22);notify('第 '+oldWave+' 波 · 全部击破','#61f4d7');trail=[];}
+    else for(const brick of alive)if(!brick.alive)burst(brick.x+brick.w/2,brick.y+brick.h/2,palette[brick.row%palette.length]);
+    if(oldVy>0&&game.ball.vy<0&&oldY>game.paddle.y-45){paddleFlash=.2;burst(game.ball.x,game.paddle.y,'#61f4d7',6);}
+    for(const drop of drops)if(!game.drops.includes(drop)&&drop.y<game.paddle.y+24&&game.wave===oldWave&&game.lives>=oldLives){burst(drop.x,game.paddle.y,dropColors[drop.type],12);notify({wide:'挡板加宽 · 10 秒',slow:'慢速球 · 10 秒',life:'生命 +1'}[drop.type],dropColors[drop.type]);}
+    if(game.lives<oldLives){trail=[];notify(game.status==='over'?'挑战结束':'没接住 · 还有 '+game.lives+' 次机会','#ff7c94');burst(game.ball.x,500,'#ff7c94',12);}
+    if(!motionQuery.matches&&game.status==='playing'&&dt>0){trail.push({x:game.ball.x,y:game.ball.y,age:0});trail=trail.slice(-16);}
+  }
+  try { const stored = Number(localStorage.getItem('mini-breakout-best')); if (Number.isFinite(stored) && stored > 0) best = stored; } catch (_) {}
+  function sizeCanvas() { const dpr = Math.min(window.devicePixelRatio || 1, 3); canvas.width = Math.round(400 * dpr); canvas.height = Math.round(520 * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); draw(); }
+  function pill(x,y,w,h,r,color) { ctx.fillStyle = color; ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.fill(); }
+  function draw() {
+    ctx.clearRect(0,0,400,520);const sky=ctx.createLinearGradient(0,0,0,520);sky.addColorStop(0,'#102b3d');sky.addColorStop(1,'#091825');ctx.fillStyle=sky;ctx.fillRect(0,0,400,520);
+    const halo=ctx.createRadialGradient(200,90,0,200,90,250);halo.addColorStop(0,'#59e6ce10');halo.addColorStop(1,'#59e6ce00');ctx.fillStyle=halo;ctx.fillRect(0,0,400,520);
+    ctx.fillStyle='#91dbe514';for(let i=0;i<26;i++){ctx.beginPath();ctx.arc((i*73+15)%400,(i*89+25)%520,i%4===0?1.3:.8,0,Math.PI*2);ctx.fill();}
+    ctx.strokeStyle='#7ff4df1a';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(10,454);ctx.lineTo(390,454);ctx.stroke();
+    for(const brick of game.bricks)if(brick.alive){const color=palette[brick.row%palette.length];pill(brick.x,brick.y+3,brick.w,brick.h,5,'#00000035');ctx.shadowColor=color;ctx.shadowBlur=7;pill(brick.x,brick.y,brick.w,brick.h,5,color);ctx.shadowBlur=0;pill(brick.x+3,brick.y+2,brick.w-6,3,2,'#ffffff55');pill(brick.x+3,brick.y+brick.h-4,brick.w-6,2,1,'#00000019');}
+    for(const r of rings){ctx.globalAlpha=1-r.age/.45;ctx.strokeStyle=r.color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(r.x,r.y,4+r.age*60,0,Math.PI*2);ctx.stroke();}ctx.globalAlpha=1;
+    for(const p of particles){ctx.globalAlpha=1-p.age/.55;pill(p.x,p.y,p.size,p.size,1,p.color);}ctx.globalAlpha=1;
+    for(const drop of game.drops){const color=dropColors[drop.type],pulse=motionQuery.matches?0:Math.sin(sceneTime*6)*2;ctx.shadowColor=color;ctx.shadowBlur=14+pulse;pill(drop.x-12,drop.y-12,24,24,8,color);ctx.shadowBlur=0;pill(drop.x-9,drop.y-9,18,3,2,'#ffffff60');ctx.fillStyle='#0d2638';ctx.font='bold 18px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText({wide:'↔',slow:'◷',life:'♥'}[drop.type],drop.x,drop.y+1);}
+    ctx.shadowColor='#61f4d7';ctx.shadowBlur=paddleFlash>0?24:9;pill(game.paddle.x-game.paddle.w/2,game.paddle.y,game.paddle.w,game.paddle.h,6,paddleFlash>0?'#fff':game.wideTime>0?'#61f4d7':'#a5eefe');ctx.shadowBlur=0;pill(game.paddle.x-game.paddle.w/2+7,game.paddle.y+2,game.paddle.w-14,2,1,'#ffffff90');
+    for(const p of trail){ctx.globalAlpha=(1-p.age/.17)*.38;ctx.fillStyle=game.slowTime>0?'#64d6ff':'#61f4d7';ctx.beginPath();ctx.arc(p.x,p.y,game.ball.r*(1-p.age/.25),0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
+    ctx.shadowColor=game.slowTime>0?'#64d6ff':'#fff';ctx.shadowBlur=14;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(game.ball.x,game.ball.y,game.ball.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+    ctx.textBaseline='alphabetic';ctx.font='700 10px system-ui';ctx.fillStyle='#8cb8c8';ctx.textAlign='left';ctx.fillText('BREAKOUT',18,26);ctx.textAlign='right';ctx.fillStyle='#61f4d7';ctx.fillText('WAVE '+String(game.wave).padStart(2,'0'),382,26);
+    const effects=[];if(game.wideTime>0)effects.push({text:'↔ '+Math.ceil(game.wideTime)+'s',color:'#61f4d7'});if(game.slowTime>0)effects.push({text:'◷ '+Math.ceil(game.slowTime)+'s',color:'#64d6ff'});effects.forEach((effect,i)=>{pill(16+i*75,425,68,20,7,'#0c2638');ctx.font='bold 11px system-ui';ctx.fillStyle=effect.color;ctx.textAlign='center';ctx.fillText(effect.text,50+i*75,439);});
+    if(banner){ctx.globalAlpha=Math.min(1,(1.6-banner.age)*3);pill(52,360,296,36,12,'#112f42f0');ctx.fillStyle=banner.color;ctx.font='bold 14px system-ui';ctx.textAlign='center';ctx.fillText(banner.text,200,383);ctx.globalAlpha=1;}
+  }
+  function updateUI() {
+    $('score').textContent=game.score;$('lives').textContent=game.lives;$('wave').textContent=game.wave;
+    if(game.score>best){best=game.score;if(best!==savedScore){try{localStorage.setItem('mini-breakout-best',String(best));}catch(_){}savedScore=best;}}
+    $('best').textContent=best;$('launch').disabled=game.status!=='ready';$('pause').disabled=!['playing','paused'].includes(game.status);$('pause').textContent=game.status==='paused'?'继续':'暂停';
+    $('overlay').hidden=game.status==='playing';
+    const messages={ready:[game.wave===1&&game.score===0?'准备发球':game.wave>1&&game.bricks.every(b=>b.alive)?'砖墙击破！':'准备下一球',game.wave>1&&game.bricks.every(b=>b.alive)?'第 '+game.wave+' 波已就位 · 点击「发球」继续':'先移动挡板找到位置，点击「发球」开始'],paused:['已暂停','点击「继续」回到游戏'],over:['挑战结束','获得 '+game.score+' 分 · 点击「重新开始」再挑战']};
+    if(messages[game.status]){$('overlay-title').textContent=messages[game.status][0];$('overlay-detail').textContent=messages[game.status][1];}
+    const effects=[];if(game.wideTime>0)effects.push('加宽 '+Math.ceil(game.wideTime)+'s');if(game.slowTime>0)effects.push('慢速 '+Math.ceil(game.slowTime)+'s');
+    const text='第 '+game.wave+' 波 · '+({ready:'准备发球',playing:'进行中',paused:'已暂停',over:'本局结束'}[game.status])+(effects.length?' · '+effects.join(' / '):'');
+    if(text!==shownStatus){$('status').textContent=text;shownStatus=text;}
+  }
+  function act(action) { keys.clear(); action(); if(game.status==='paused'||(game.status==='ready'&&game.score===0))clearFeedback(); if(game.status==='playing')canvas.focus({preventScroll:true}); lastTime=0; updateUI(); draw(); }
+  $('launch').addEventListener('click',()=>act(()=>game.launch()));
+  $('pause').addEventListener('click',()=>act(()=>game.status==='paused'?game.resume():game.pause()));
+  $('restart').addEventListener('click',()=>act(()=>game.restart()));
+  function formTarget(target) { return target instanceof Element && !!target.closest('button,input,select,textarea,[contenteditable="true"]'); }
+  window.addEventListener('keydown',event=>{if(formTarget(event.target))return;const key=event.key.toLowerCase();if(['arrowleft','arrowright','a','d',' '].includes(key)){event.preventDefault();if(key===' '){if(!event.repeat)act(()=>{if(game.status==='ready')game.launch();else if(game.status==='paused')game.resume();else game.pause();});}else keys.add(key);}});
+  window.addEventListener('keyup',event=>keys.delete(event.key.toLowerCase()));
+  function point(event) { const rect=canvas.getBoundingClientRect(); game.movePaddle((event.clientX-rect.left)*400/rect.width); draw(); }
+  canvas.addEventListener('pointerdown',event=>{if(event.button!==0)return;pointerId=event.pointerId;canvas.setPointerCapture(pointerId);canvas.focus({preventScroll:true});point(event);event.preventDefault();});
+  canvas.addEventListener('pointermove',event=>{if(event.pointerId===pointerId)point(event);});
+  const release=event=>{if(event.pointerId===pointerId)pointerId=null;};canvas.addEventListener('pointerup',release);canvas.addEventListener('pointercancel',release);canvas.addEventListener('lostpointercapture',release);
+  function pauseAway(){keys.clear();pointerId=null;game.pause();clearFeedback();lastTime=0;updateUI();draw();}
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseAway();});window.addEventListener('blur',pauseAway);window.addEventListener('resize',sizeCanvas);
+  function frame(time){const dt=lastTime?Math.min((time-lastTime)/1000,0.05):0;lastTime=time;if(!document.hidden){if(game.status==='playing'||game.status==='ready'){const direction=(keys.has('arrowright')||keys.has('d')?1:0)-(keys.has('arrowleft')||keys.has('a')?1:0);if(direction)game.movePaddle(game.paddle.x+direction*390*dt);}if(game.status!=='paused')advanceFeedback(dt);stepWithFeedback(dt);draw();updateUI();}requestAnimationFrame(frame);}
+  sizeCanvas();updateUI();requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

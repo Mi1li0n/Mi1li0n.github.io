@@ -595,7 +595,7 @@ function layoutChapter(seed,n,mods,depth=1,context={}){
  const variant=rl.int(3),mapStyle=arena?'arena':primary.kind==='mine'?'rich-mine':['rail-mine','ring-city','braided-river'][n],count=Math.max(6+rl.int(3),missions.length===3?7:6);
  const slots=[];for(let i=0;i<count;i++){let best=null;for(let j=0;j<64;j++){const p={x:11+rl.int(SIZE-22),y:11+rl.int(SIZE-22)},gap=slots.length?Math.min(...slots.map(a=>Math.hypot(a.x-p.x,a.y-p.y))):1;if(!best||gap>best.gap)best={...p,gap};}slots.push(best);}
  // The objective is 1–2 chambers away; the entrance, second approach and escape form a loop.
- const rest=slots.slice(1).sort((a,b)=>Math.hypot(a.x-slots[0].x,a.y-slots[0].y)-Math.hypot(b.x-slots[0].x,b.y-slots[0].y));slots.splice(1,slots.length-1,...(primary.expeditionV2?[rest.at(-1),rest[0],...rest.slice(1,-1)]:[rest[1],rest[0],...rest.slice(2)]));
+ const rest=slots.slice(1).sort((a,b)=>Math.hypot(a.x-slots[0].x,a.y-slots[0].y)-Math.hypot(b.x-slots[0].x,b.y-slots[0].y));slots.splice(1,slots.length-1,...(context.firstExpedition&&depth===1&&primary.commission==='forge'?[rest[0],...rest.slice(1)]:primary.expeditionV2?[rest.at(-1),rest[0],...rest.slice(1,-1)]:[rest[1],rest[0],...rest.slice(2)]));
  if(arena){const anchors=primary.expeditionV2?[[24,6],[24,44],[24,24],[43,45],[9,42],[42,22],[9,22],[43,8]]:[[24,7],[24,25],[24,14],[24,40],[9,25],[39,25],[10,39],[39,39]];slots.splice(0,slots.length,...anchors.slice(0,count).map(([x,y])=>({x:x+rl.int(3)-1,y:y+rl.int(3)-1})));}
  const sceneNames={kill:'围岩巢穴',mine:'露头采掘面',rescue:'塌架避难洞',recover:'遗失勘探站',repair:['废轨装卸场','印石回廊','淹水泵房'][n]},roles=['camp',primary.kind,'approach','crossing','side','workshop','side','garden'];
  const bases=slots.map((p,i)=>({id:'cave-'+i,name:i===0?meta.camp:i===1?(VENTURES[primary.venture]?.place||sceneNames[primary.kind]):i===2?'前哨岔道':i===3?'下行中转厅':i===5?meta.workshop:missions.find(m=>m.region===i)?.title||['晶簇侧洞','菌光浅庭','断柱石窟'][rl.int(3)],role:roles[i],x:p.x,y:p.y,rx:i===1&&(arena||['kill','repair'].includes(primary.kind))?10:arena?4:6+rl.int(3),ry:i===1?8:arena?4:5+rl.int(3),optional:i>=4&&i!==5}));
@@ -1197,12 +1197,12 @@ class EscapeEngine{
  // --- 伤害与爆炸 -------------------------------------------------------------
  hurt(n,bypass=false){const s=this.state,p=s.player;let armor=0;if(!bypass){armor=Math.min(p.armor,n);p.armor-=armor;n-=armor}if(p.equipped?.body&&p.inventoryGear?.[p.equipped.body])p.inventoryGear[p.equipped.body].armor=p.armor;if(n>0&&this.relicDeferDamage?.(n))n=0;p.hp=Math.max(0,p.hp-n);this.visual('player','hurt',p,p,{damage:n,armor});s.effect={kind:'hurt',x:p.x,y:p.y};if(!p.hp)this.fail('矿洞吞没了最后的脚步声。')}
  fail(reason){const s=this.state;s.mode='dead';s.reason=reason;s.panel=null;this.log(reason,'danger')}
- explode(b){const s=this.state;this.emitNoise(b.x,b.y,18,'blast');this.attackVisual('blast',b,this.effectCells(b,1));this.visual('blast','blast',b,b);
-  for(let y=b.y-1;y<=b.y+1;y++)for(let x=b.x-1;x<=b.x+1;x++){const t=this.tile(x,y);if(t&&!t.gate&&['rock','ore','hard','rubble'].includes(t.kind)){t.worked=t.kind==='rubble'?'cleared':'dug';t.kind='floor';t.cracks=0}}
+ explode(b){const s=this.state;let opened=0;this.emitNoise(b.x,b.y,18,'blast');this.attackVisual('blast',b,this.effectCells(b,1));this.visual('blast','blast',b,b);
+  for(let y=b.y-1;y<=b.y+1;y++)for(let x=b.x-1;x<=b.x+1;x++){const t=this.tile(x,y);if(t&&!t.gate&&['rock','ore','hard','rubble'].includes(t.kind)){opened++;t.worked=t.kind==='rubble'?'cleared':'dug';t.kind='floor';t.cracks=0}}
   const victims=s.monsters.filter(m=>this.bodyGap(m,b)<=1);for(const m of victims)this.eliteDamage(m,6,true);
   if(s.companion&&Math.max(Math.abs(s.companion.x-b.x),Math.abs(s.companion.y-b.y))<=1)this.log('同伴躲过爆炸，却不敢再停留；请带他远离炸药。','warn');
   if(!s.player.gear.anchor&&Math.max(Math.abs(s.player.x-b.x),Math.abs(s.player.y-b.y))<=1)this.hurt(6);
-  if(s.mode!=='dead')this.log('炸药打通岩壁。矿石留在地面。','good');}
+  if(s.mode!=='dead')this.log(opened?'炸药打通'+opened+'格岩壁，矿石留在地面。':'炸药在空地上爆开。','good');}
  // --- 物品转移 ---------------------------------------------------------------
  collectItems(items,auto=false,dropped={}){const taken=[];
   const ids=Object.keys(ITEMS).sort((a,b)=>Number(this.amount(b)>0)-Number(this.amount(a)>0));
@@ -3510,8 +3510,8 @@ Object.assign(P,{
  missionProgress(q){if(q?.depthBoss)return q.complete?'守关者已击败 · 下行井架已启用':'击败'+bosses[q.bossType].name;if(q?.progressionObjective){if(q.complete)return q.primary?'井口已通 · 可继续深入':'已取得额外收获';if(q.kind==='kill')return '守井敌人 '+q.progress+'/'+q.required;if(q.kind==='mine')return '清开井口矿脉 '+q.progress+'/'+q.required;if(q.kind==='repair')return '井架装置 '+(q.stage||0)+'/'+q.devices.length;if(q.venture==='drill')return q.started?'钻探 '+(q.drillProgress||0)+'/'+(q.drillGoal||4)+' · 留在5格内':'可选 · 启动钻台';}return current.missionProgress.call(this,q);},
  missionNextStep(q){if(q?.depthBoss)return q.complete?'到遗留核心挑选奖励，或直接深入下一层。':bosses[q.bossType].text;if(q?.progressionObjective)return q.complete?(q.primary?'前往下行井架继续深入，或带着收获撤离。':'可继续搜寻或离开。'):V[q.venture].story+' '+V[q.venture].use;return current.missionNextStep.call(this,q);},
  missionModel(q=this.state.missions?.[0]){if(q?.depthBoss){const a=this.state.sites.find(a=>a.id===(q.complete?'water':'boss-remains'));return {overall:'第'+this.state.depth+'层 · 守关者',title:q.title,text:q.complete?'守关者已击败，可深入或撤离':q.title,progress:this.missionProgress(q),requirement:this.missionNextStep(q),hint:'基础升降机始终可以撤离。首杀记录永久保留，装备与材料仍需带出。',targetId:a?.id,name:a?.name,x:a?.discovered?a.x:null,y:a?.discovered?a.y:null};}const out=current.missionModel.call(this,q);if(q?.progressionObjective){out.requirement=this.missionNextStep(q);out.hint=q.primary?'井口恢复后即可深入；基础升降机随时可撤离。':'可选收获，不影响深入。';out.progress=this.missionProgress(q)+' · '+this.depthProfile().name;}return out;},
- missionActionCheck(){const a=this.nearby(),q=this.missionById(a?.missionId);if(!q?.progressionObjective)return current.missionActionCheck.call(this);let reason=this.state.mode!=='playing'?'先进入矿区':q.complete?'这里已经处理完毕':'';if(!reason&&q.kind==='repair'){if(a.missionRole!=='device')reason='靠近井架装置';else if(a.done)reason='已经启用';else if(q.devices[q.stage||0]!==a.id)reason='先操作标记的上一处装置';}else if(!reason&&['kill','mine'].includes(q.kind))reason=q.kind==='kill'?'清理标记的守井敌人':'开采标记的井口矿脉';else if(!reason&&q.venture==='drill'&&q.started)reason='钻探正在进行，留在5格内';return {ok:!reason,reason,a,q};},
- taskDeviceOptions(a){const q=this.missionById(a?.missionId);if(a?.depthLift)return a.done?[]:[['progress:lift','启用永久捷径 · 1回合']];if(a?.bossReward){const arena=this.state.depthArena;if(arena?.alive)return [];return (a.cards||[]).map((c,i)=>['progress:boss-reward:'+i,'取走'+this.cardName(c)]);}if(a?.bossLamp)return [['progress:lamp','调整灯座 · 打断吸灯 / 恢复照明 · 1回合']];if(a?.bossRetry)return [['progress:rematch','挑战守关者 · 无首杀奖励']];if(a?.surprise)return a.done?[]:[['progress:surprise',a.surprise==='camp'?'搜查旧营地':a.surprise==='armory'?'开启封存军械柜':'开启异常矿囊']];if(q?.progressionObjective){if(q.complete||['kill','mine'].includes(q.kind))return [];if(a.missionRole==='clue')return [['mission:interact','记录线索']];if(q.kind==='repair')return [['mission:interact',q.venture==='pump'?'转动排水阀':'接通井架供电']];if(q.venture==='drill')return q.started?[]:[['progress:drill','启动钻探 · 1回合']];}return current.taskDeviceOptions.call(this,a);},
+ missionActionCheck(){const a=this.nearby(),q=this.missionById(a?.missionId);if(!q?.progressionObjective||a?.missionRole==='clue')return current.missionActionCheck.call(this);let reason=this.state.mode!=='playing'?'先进入矿区':q.complete?'这里已经处理完毕':'';if(!reason&&q.kind==='repair'){if(a.missionRole!=='device')reason='靠近井架装置';else if(a.done)reason='已经启用';else if(q.devices[q.stage||0]!==a.id)reason='先操作标记的上一处装置';}else if(!reason&&['kill','mine'].includes(q.kind))reason=q.kind==='kill'?'清理标记的守井敌人':'开采标记的井口矿脉';else if(!reason&&q.venture==='drill'&&q.started)reason='钻探正在进行，留在5格内';return {ok:!reason,reason,a,q};},
+ taskDeviceOptions(a){const q=this.missionById(a?.missionId);if(a?.depthLift)return a.done?[]:[['progress:lift','启用永久捷径 · 1回合']];if(a?.bossReward){const arena=this.state.depthArena;if(arena?.alive)return [];return (a.cards||[]).map((c,i)=>['progress:boss-reward:'+i,'取走'+this.cardName(c)]);}if(a?.bossLamp)return [['progress:lamp','调整灯座 · 打断吸灯 / 恢复照明 · 1回合']];if(a?.bossRetry)return [['progress:rematch','挑战守关者 · 无首杀奖励']];if(a?.surprise)return a.done?[]:[['progress:surprise',a.surprise==='camp'?'搜查旧营地':a.surprise==='armory'?'开启封存军械柜':'开启异常矿囊']];if(q?.progressionObjective){if(q.complete)return [];if(a.missionRole==='clue')return [['mission:interact','记录线索']];if(['kill','mine'].includes(q.kind))return [];if(q.kind==='repair')return [['mission:interact',q.venture==='pump'?'转动排水阀':'接通井架供电']];if(q.venture==='drill')return q.started?[]:[['progress:drill','启动钻探 · 1回合']];}return current.taskDeviceOptions.call(this,a);},
  progressionCheck(kind){const s=this.state,a=this.nearby();if(s.mode!=='playing'||!a)return false;if(kind==='progress:lift')return !!a.depthLift&&!a.done;if(kind==='progress:lamp')return !!a.bossLamp;if(kind==='progress:rematch')return !!a.bossRetry&&!s.depthArena.alive;if(kind==='progress:drill'){const q=this.missionById(a.missionId);return q?.venture==='drill'&&!q.started&&!q.complete;}if(kind==='progress:surprise')return !!a.surprise&&!a.done;if(kind.startsWith('progress:boss-reward:'))return !!a.bossReward&&!s.depthArena?.alive&&!!a.cards?.[Number(kind.split(':').at(-1))];return false;},
  actionTiming(a){return a?.type==='choose'&&a.kind?.startsWith('progress:')?{advance:this.progressionCheck(a.kind),attack:false}:current.actionTiming.call(this,a);},
  choose(kind){if(!kind?.startsWith('progress:'))return current.choose.call(this,kind);if(!this.progressionCheck(kind))return false;const s=this.state,a=this.nearby();if(kind==='progress:lift'){const z=this.progression();if(!z.lifts.includes(a.depthLift))z.lifts.push(a.depthLift);a.done=true;a.hint='已启用的永久捷径';this.log('已启用第'+a.depthLift+'层捷径，下次可以从营地直达。','good');}
@@ -4032,11 +4032,11 @@ E.BODY_DESCRIPTIONS.guardian=E.UNIT_TACTICS.elite_deepguard;
 const E=root.EscapeEngine,P=E.prototype,G=E.EQUIPMENT,D=[[1,0],[-1,0],[0,1],[0,-1]],distance=(a,b)=>Math.abs(a.x-b.x)+Math.abs(a.y-b.y),copy=v=>JSON.parse(JSON.stringify(v));
 const old={};for(const n of ['enableCards','restoreCampaign','startExpedition','progressionContext','load','updateMissions','settleExpedition','homeFacilities','act','campTrade','repairStock','campModify','craftCheck','researchQuote','selectEntry','missionActionCheck','taskDeviceOptions','chapterActionCheck','actionTiming','choose','missionModel','missionProgress','missionNextStep','challengeTurn','awardDiscovery','releaseMineral','applyRuneEffect','prepareDiscoveries'])old[n]=P[n];
 E.EXPEDITION_COMMISSIONS={
- forge:{name:'工坊',title:'救回巡矿工匠',venture:'engineer',reward:'解锁基础维修、制作与改装',goal:'取回维修间的工具，接出工匠，一起撤离。'},
- medicine:{name:'药台',title:'接应失联医师',venture:'doctor',reward:'解锁治疗用品制作与急救药剂',goal:'取得救护包，为医师解围，一起撤离。'},
- survey:{name:'勘探台',title:'重建勘探记录',venture:'survey',reward:'出发前获得矿层情报，入矿标记额外物资点',goal:'校准两处测点，取回勘探仪后撤离。'},
+ forge:{name:'工坊',title:'救回巡矿工匠',venture:'engineer',reward:'解锁基础维修、制作与改装',goal:'找到工匠，沿矿道护送回入口，再一起撤离。'},
+ medicine:{name:'药台',title:'接应失联医师',venture:'doctor',reward:'解锁治疗用品制作与急救药剂',goal:'找到失联医师，沿矿道护送回入口，再一起撤离。'},
+ survey:{name:'勘探台',title:'重建勘探记录',venture:'survey',reward:'出发前获得矿层情报，入矿标记额外物资点',goal:'找到遗留勘探站，取回勘探仪后撤离。'},
  trade:{name:'商队贸易',title:'接回商队货车',venture:'trade',reward:'解锁轮换商品、出售与高价订单',goal:'查看运输路线，清理轨道，护送货车到接应站后撤离。'},
- deep:{name:'深井设备',title:'回收深井传动组',venture:'deep',reward:'解锁使用已启用的深层捷运站出发',goal:'拆回两组传动组件，回收控制盒后撤离。'}
+ deep:{name:'深井设备',title:'回收深井传动组',venture:'deep',reward:'解锁使用已启用的深层捷运站出发',goal:'找到深井检修室，拆下传动组后撤离。'}
 };
 const C=E.EXPEDITION_COMMISSIONS;
 Object.assign(P,{
@@ -4046,10 +4046,10 @@ Object.assign(P,{
  commissionState(){const p=this.expeditionProgress();if(!p)return {id:'free',name:'自由探索',title:'自由探索'};const id=!p.unlocked.forge?'forge':p.selected&&C[p.selected]&&!p.unlocked[p.selected]?p.selected:'free';return id==='free'?{id,name:'自由探索',title:'自由探索',reward:'矿物、装备与更深处的发现',goal:'自行选择路线；并非每层都需要处理井口事故。'}:{id,...C[id]};},
  selectCommission(id){if(this.state.expedition?.phase!=='prepare'||id!=='free'&&!C[id]||!this.campFacilityOpen('forge')&&id!=='forge'||id!=='free'&&this.campFacilityOpen(id))return false;this.expeditionProgress().selected=id;if(id!=='free')this.progression().entry=1;return true;},
  enableCards(profile){const out=old.enableCards.call(this,profile);this.expeditionProgress(!!profile);return out;},
- restoreCampaign(save){const out=old.restoreCampaign.call(this,save);if(out)this.expeditionProgress(true);return out;},
+ restoreCampaign(save){const out=old.restoreCampaign.call(this,save);if(out){this.expeditionProgress(true);this.simplifyExpeditionObjectives();}return out;},
  startExpedition(ids,...args){const p=this.campaign;if(!p||this.state.expedition?.phase!=='prepare')return old.startExpedition.call(this,ids,...args);const commission=this.commissionState().id,previous=p.runCommission;if(commission!=='free'||!this.campFacilityOpen('deep'))this.progression().entry=1;p.runCommission={id:commission,depth:this.progression().entry};const out=old.startExpedition.call(this,ids,...args);if(!out)p.runCommission=previous;return out;},
- progressionContext(){const context=old.progressionContext.call(this),run=this.campaign?.runCommission;return {...context,expeditionVersion:2,commission:run&&(this.state.depth||1)===run.depth?run.id:'free'};},
- load(...args){delete this.state.expeditionObjectivesVersion;const out=old.load.apply(this,args);if(out&&this.state.expedition?.phase==='active'&&!this.state.depthArena)this.prepareExpeditionObjectives();return out;},
+ progressionContext(){const context=old.progressionContext.call(this),run=this.campaign?.runCommission;return {...context,expeditionVersion:2,firstExpedition:this.campaign?.runs===1,commission:run&&(this.state.depth||1)===run.depth?run.id:'free'};},
+ load(...args){delete this.state.expeditionObjectivesVersion;delete this.state.expeditionFlowVersion;const out=old.load.apply(this,args);if(out&&this.state.expedition?.phase==='active'&&!this.state.depthArena)this.prepareExpeditionObjectives();return out;},
  homeFacilities(){return old.homeFacilities.call(this).map(a=>{if(this.state.expedition?.phase!=='prepare')return a;const id=({craft:'forge',bench:'forge',trade:'trade'})[a.id];if(id&&!this.campFacilityOpen(id))return {...a,locked:id,mapName:(a.id==='bench'?'工作台':C[id].name)+'·待解锁',hint:C[id].goal};if(a.id==='market-shop'&&!this.campFacilityOpen('trade'))return {...a,mapName:'补给摊',name:'简易补给摊',hint:'基础补给始终可购买'};return a;});},
  campPageLock(page){const id=['camp-craft','camp-bench','camp-mods','camp-blueprints','camp-tech'].includes(page)?'forge':['camp-trade','camp-orders'].includes(page)?'trade':null;return id&&!this.campFacilityOpen(id)?id:null;},
  campTrade(kind,id){if(this.state.expedition?.phase==='prepare'){
@@ -4065,7 +4065,7 @@ Object.assign(P,{
  researchQuote(...args){const out=old.researchQuote.apply(this,args);return out&&!this.campFacilityOpen('forge')?{...out,reason:'工坊待解锁：救回巡矿工匠'}:out;},
  selectEntry(depth){return depth>1&&(!this.campFacilityOpen('deep')||this.commissionState().id!=='free')?false:old.selectEntry.call(this,depth);},
  act(action){if(action?.type==='interact'&&this.state.expedition?.phase==='prepare'&&this.homeNearby()?.locked){this.state.panel='camp-projects';return true;}return old.act.call(this,action);},
- updateMissions(){const out=old.updateMissions.call(this),s=this.state;for(const q of s.missions||[]){if(!q.expeditionV2)continue;if(q.complete&&q.field){q.field.returnReady=true;const lift=s.sites.find(a=>a.id===q.field.hoistId);if(lift){lift.discovered=true;lift.hint='返回入口 · 1回合';}}if(q.complete&&q.commission&&s.expedition?.phase==='active')(s.expedition.commissionsReady??={})[q.commission]=true;}return out;},
+ updateMissions(){const out=old.updateMissions.call(this),s=this.state;for(const q of s.missions||[])if(q.expeditionV2&&q.complete&&q.commission&&s.expedition?.phase==='active')(s.expedition.commissionsReady??={})[q.commission]=true;return out;},
  settleExpedition(won){const ready={...(this.state.expedition?.commissionsReady||{})},out=old.settleExpedition.call(this,won);if(!out)return out;const result=this.state.expedition.result;result.facilityUnlocks=[];if(won){const p=this.expeditionProgress(),j=this.journey();for(const id of Object.keys(ready)){if(!C[id]||p.unlocked[id])continue;p.unlocked[id]=true;j.projects[id]={...(j.projects[id]||{}),complete:true};for(const recipe of E.CAMP_PROJECTS[id].recipes||[])if(!this.campaign.recipes.includes(recipe))this.campaign.recipes.push(recipe);result.facilityUnlocks.push(id);this.log(C[id].name+'已开放：'+C[id].reward,'good');}if(result.facilityUnlocks.includes('trade'))delete this.campaign.market;if(p.unlocked[p.selected])p.selected='free';}return out;},
  fieldDistances(start){const queue=[{x:start.x,y:start.y}],steps=new Map([[start.x+','+start.y,0]]);for(let i=0;i<queue.length;i++){const p=queue[i];for(const [dx,dy]of D){const x=p.x+dx,y=p.y+dy,k=x+','+y;if(steps.has(k)||!this.passable(x,y))continue;steps.set(k,steps.get(p.x+','+p.y)+1);queue.push({x,y});}}return {queue,steps};},
  addFieldSite(q,id,name,role,anchor,range=[4,12],opposite=null){const s=this.state,{queue,steps}=this.fieldDistances(anchor),home=this.fieldDistances(s.layout.start).steps;
@@ -4075,67 +4075,75 @@ Object.assign(P,{
   const site={id:q.id+'-'+id,x:p.x,y:p.y,region:this.tile(p.x,p.y).region,kind:'tablet',chapterDevice:true,missionId:q.id,missionRole:'field',fieldRole:role,name,glyph:role==='return'?'⇧':'⚙',description:'',hint:'调查'+name,done:false,discovered:false};s.sites.push(site);this.tile(p.x,p.y).challengeSafe=true;return site;
  },
  prepareExpeditionObjectives(){const s=this.state;if(s.expeditionObjectivesVersion===2||!s.missions?.[0]?.expeditionV2)return;s.expeditionObjectivesVersion=2;
-  for(const q of s.missions){if(!q.expeditionV2)continue;const target=s.sites.find(a=>a.id===q.targetId);if(!target)continue;q.field={nodes:[],returnReady:q.complete};
+  for(const q of s.missions){if(!q.expeditionV2)continue;const target=s.sites.find(a=>a.id===q.targetId);if(!target)continue;q.field={nodes:[]};
    if(q.venture==='passage'){target.name='旧矿道指示牌';target.description='下行通路保持畅通。沿途遗留物资和危险支路自由取舍。';continue;}
    const add=(suffix,name,role,range,opposite)=>this.addFieldSite(q,suffix,name,role,target,range,opposite);
    const node=(suffix,name,description,range=[5,16],opposite=null)=>{const a=add(suffix,name,'node',range,opposite);if(a){a.description=description;q.field.nodes.push(a.id);}return a;};
-   if(q.venture==='engineer')node('tools','工匠的起重工具','取出千斤顶与精密工具，才能撑开困住工匠的塌架。工具独立保管，不占卡位。');
-   if(q.venture==='doctor')node('aid','散落的救护包','取回包扎器材，才能接应受伤的医师。医师会带着药箱一起撤离。');
-   if(['survey','deep'].includes(q.venture)){const first=node('node-a',q.venture==='survey'?'第一测点':'传动齿轮组',q.venture==='survey'?'校准测点；敲击会发出声音，留意附近敌人。':'拆下第一组传动件，控制盒仍需要另一组组件。',[5,18]);node('node-b',q.venture==='survey'?'第二测点':'卷扬轴承组',q.venture==='survey'?'完成两处校准后，取回勘探仪；两测点不能互相替代。':'拆下第二组传动件，然后回收控制盒。',[5,24],first);}
+
+
+
    if(q.venture==='nest'){const a=add('gate','巢道封闭闸','seal',[5,14]);if(a)a.description='可以清理守井敌人，也可以引开它们后关上巢道闸。操作时周围2格不能有活动敌人。';}
    if(q.venture==='fungus'){for(let i=0;i<2;i++){const a=node('vent-'+i,'菌雾通风口 '+(i+1),'封闭通风口可清除附近菌雾。关闭两处，或击倒标记的寄生群，都能取走原料。',[4,18],i?s.sites.find(a=>a.id===q.field.nodes[0]):null);if(a){a.fieldRole='vent';for(let y=a.y-2;y<=a.y+2;y++)for(let x=a.x-2;x<=a.x+2;x++){const t=this.tile(x,y);if(t&&this.passable(x,y)&&distance({x,y},a)>0&&!t.fixedLamp)t.fog='spores';}}}}
    if(q.venture==='core'){const a=add('reserve','机房备用灯座','reserve',[4,12]);if(a)a.description='拆核心会熄灭机房固定灯。可以先把1支火把放在脚下留下备用照明，也可以直接拆走、自己摸黑返回。';}
    if(q.venture==='armory'){const a=add('alarm','军械库警报接线盒','alarm',[6,14]);if(a)a.description='切断警报可让守库精英停顿2回合，获得绕到侧面的机会；也可以直接挑战守卫。';}
-   if(q.kind==='mine'){q.excavationCells=s.map.tiles.map((t,i)=>({t,x:i%s.map.w,y:Math.floor(i/s.map.w)})).filter(c=>c.t.missionId===q.id&&c.t.kind==='ore').sort((a,b)=>distance(a,target)-distance(b,target)).slice(0,q.required).map(({x,y})=>({x,y}));q.required=q.excavationCells.length;for(const p of q.excavationCells){const t=this.tile(p.x,p.y);t.shaftPlug=q.id;t.challengeSafe=true;}const a=add('support','采掘面支撑架','brace',[4,12]);if(a)a.description='可先加固，减小采掘噪声；直接开采更快，但会发出额外震动。挖开标记矿脉后开放下行与回程。';}
+   if(q.kind==='mine'){q.excavationCells=s.map.tiles.map((t,i)=>({t,x:i%s.map.w,y:Math.floor(i/s.map.w)})).filter(c=>c.t.missionId===q.id&&c.t.kind==='ore').sort((a,b)=>distance(a,target)-distance(b,target)).slice(0,q.required).map(({x,y})=>({x,y}));q.required=q.excavationCells.length;for(const p of q.excavationCells){const t=this.tile(p.x,p.y);t.shaftPlug=q.id;t.challengeSafe=true;}const a=add('support','采掘面支撑架','brace',[4,12]);if(a)a.description='可先加固，减小采掘噪声；直接开采更快，但会发出额外震动。挖开标记矿脉后开放下行。';}
    if(q.venture==='drill'){q.drillGoal=6;q.drillYield=3;target.description='启动后留在5格内：3回合可提前收取1份样品；坚持6回合获得3份材料。2回合后出现增援。可随时离开躲避危险，钻探会暂停。';}
    if(q.variant==='cart'){q.field.braked=false;for(const index of [Math.floor(q.path.length/3),Math.floor(q.path.length*2/3)]){const p=q.path[index];if(p&&s.sites.every(a=>distance(a,p)>1)&&!this.actorOn(p.x,p.y)){Object.assign(this.tile(p.x,p.y),{kind:'rubble',cracks:0,challengeSafe:true,collapseAt:null});(q.field.trackDebris??=[]).push({...p});}}const brake=add('brake','货车制动柄','brake',[4,12]);if(brake){q.field.brakeId=brake.id;Object.assign(brake,{x:q.cart.x,y:q.cart.y});brake.description='靠近货车可手动刹车或松闸，每次1回合。先查看并清理前方轨道，也能等敌人走开再启动。';}}
    if(['pump','power'].includes(q.venture)){this.prepareFieldUtilities(q);target.description=q.venture==='pump'?'两处泵阀分段排水，水退后可利用新出现的通路。':'两处配电器依次恢复照明，操作时会发出声音。利用灯光查看下一段道路。';}
-   const hoist=add('return','停用的检修升降机','return',[5,18]);if(hoist){q.field.hoistId=hoist.id;hoist.description='完成这里的任务后开放返回入口的检修通道；它只返回本层入口，收获仍需成功撤离。';}
+
    if(!q.clueId){const path=this.chapterPath(s.layout.start,target),p=path[Math.min(10,Math.max(3,Math.floor(path.length/3)))];if(p&&s.sites.every(a=>distance(a,p)>1)){const a={id:q.id+'-approach',...p,region:this.tile(p.x,p.y).region,kind:'tablet',chapterDevice:true,missionId:q.id,missionRole:'clue',name:'通往'+q.areaName+'的痕迹',description:'前方通向'+q.areaName+'。岔道能绕行，岩壁也可能开出近路；注意照明和噪声。',hint:'查看前方线索',glyph:'迹',done:false,discovered:false};s.sites.push(a);q.clueId=a.id;q.clueRead=false;}}
   }
   for(const [i,a]of s.sites.filter(a=>a.id.startsWith('scene-cache-')).entries()){if(a.surprise)continue;const kinds=[['旧工具柜',{repairKit:1,scrap:2}],['遗留医护箱',{bandage:1,fiber:2}],['探险者行囊',{bread:1,torch:1}]],entry=kinds[i%3];a.name=entry[0];a.description='沿途发现，按需取用；不占正式任务名额。';a.container=entry[1];}
-  this.refreshExpeditionText();s.lightCache=null;s.visionCache=null;this.updateMissions();this.reveal();
+  this.simplifyExpeditionObjectives();this.refreshExpeditionText();s.lightCache=null;s.visionCache=null;this.updateMissions();this.reveal();
+ },
+ // Remove obsolete checklist sites from existing floors without rerolling their map or progress.
+ simplifyExpeditionObjectives(){const s=this.state;if(!s.missions?.some(q=>q.expeditionV2))return;const removed=new Map();for(const q of s.missions){if(!q.expeditionV2||!q.field)continue;const checklist=['engineer','doctor','survey','deep'].includes(q.venture);for(const a of s.sites)if(a.missionId===q.id&&(a.fieldRole==='return'||checklist&&a.fieldRole==='node'||q.variant==='cart'&&a.missionRole==='parts'))removed.set(a.id,q);q.field.nodes=(q.field.nodes||[]).filter(id=>!removed.has(id));delete q.field.hoistId;delete q.field.returnReady;
+  if(q.variant==='cart'){q.partsTaken=true;q.targetId=q.devices[0];q.partsId=q.devices[0];const a=s.sites.find(a=>a.id===q.targetId);if(a){a.name='商队货车';a.description='货车可以直接启动。沿途清开碎石、避开伏兵，保持在车身3格内护送到接应站。';a.hint='启动货车';}for(const a of [q.cart,q.path?.[0]])if(a){a.name='商队货车';a.description='沿轨道护送到接应站。';}}
+ }
+ s.sites=s.sites.filter(a=>!removed.has(a.id));for(const n of s.notes||[])if(removed.has(n.target)){const q=removed.get(n.target);n.target=q.kind==='rescue'&&q.started?q.rallyId:q.targetId;}
+ if(removed.has(this.pointedSiteId))delete this.pointedSiteId;s.expeditionFlowVersion=3;this.refreshExpeditionText();s.lightCache=null;s.visionCache=null;
  },
  prepareDiscoveries(...args){const out=old.prepareDiscoveries.apply(this,args);this.refreshExpeditionText();return out;},
  refreshExpeditionText(){const s=this.state;for(const q of s.missions||[]){if(!q.field)continue;const target=s.sites.find(a=>a.id===q.targetId);if(!target)continue;const texts={
    passage:'下行矿道保持畅通。沿途物资和危险支路自由取舍，可以直接继续深入。',
-   engineer:'工匠被困在塌架后。先取回起重工具，清开碎石，再接应他。带他到检修升降机可返回入口；一起成功撤离后开放工坊。',
-   doctor:'医师在这里等待接应。先取回救护包，再带他经检修升降机返回入口；一起成功撤离后开放药台。',
-   survey:'分别校准两处测点，随后回收这里的勘探仪。成功撤离后开放勘探台。',
-   deep:'拆回两组分开的传动件，随后取走这里的控制盒。成功撤离后开放深井设备，可从已启用的深层捷运站出发。',
-   pump:(q.devices?.length||2)+'处泵阀分段排水，水退后可走相邻矿道间的新通路。按标记顺序操作，原有绕路始终可走。',
-   power:'依次接通配电箱，照亮通往下一处装置与下行井的道路。电机声会吸引附近敌人。',
+   engineer:'工匠在废弃维修间等待接应。找到他即可同行，沿已经走通的矿道护送回入口；一起成功撤离后开放工坊。',
+   doctor:'医师在救护洞等待接应。找到他即可同行，沿已经走通的矿道护送回入口；一起成功撤离后开放药台。',
+   survey:'找到这台遗留勘探仪即可取走。成功撤离后开放勘探台。',
+   deep:'在这里拆下深井传动组并带走。成功撤离后开放深井设备，可从已启用的深层捷运站出发。',
+   pump:(q.devices?.length||2)+'处泵阀各自控制一段积水，任选顺序操作；每排空一段，就能走相邻矿道间的新通路。',
+   power:'各配电箱分别控制一段矿道照明，找到哪一处就能先接通哪一处。电机声会吸引附近敌人。',
    drill:'启动后留在5格内：3回合可提前收取1份样品；坚持6回合获得3份材料。2回合后出现增援。离开5格会暂停钻探。',
    breach:'挖开标记的井口矿脉即可打开下行。可以先加固支撑架，减少采掘噪声；也可以直接开采，引来附近能听到震动的敌人。',
    nest:'清理标记敌人，或引开它们后关闭巢道闸，均可打开下行。未击倒的敌人仍在矿区活动。',
    fungus:'封闭两处通风口，或击倒标记的寄生群，均可取得原料。通风口关闭会清除附近菌雾。',
    core:'拆走核心会熄灭机房固定灯。可先在备用灯座附近留下自己的火把，也可带着照明直接撤回。',
-   armory:'击倒守库精英后挑选一件装备。可先切断警报，让守卫停顿2回合，争取绕侧的机会。'
+   armory:'击倒守库精英后挑选一件装备。可先切断警报，让守卫停顿2回合，争取绕侧的机会。',
+   trade:'直接启动货车，清理轨道上的碎石并护送到接应站；不需要另找挂钩。成功撤离后开放商队贸易。'
   };if(texts[q.venture])target.description=texts[q.venture];if(q.commission)q.title=C[q.commission].title;const clue=s.sites.find(a=>a.id===q.clueId);if(clue)clue.description='前方通向'+q.areaName+'。'+target.description;
-  for(const note of s.notes.filter(n=>['mission-'+q.id,'mission-complete-'+q.id].includes(n.id))){note.title=(q.commission?'营地委托：':q.primary?'本层目标：':'可选发现：')+q.title;note.text=target.description+(q.complete?' 已完成，成功撤离才能保住收获。':'');}
+  for(const note of s.notes.filter(n=>['mission-'+q.id,'mission-complete-'+q.id,'mission-clue-'+q.id].includes(n.id))){note.title=(q.commission?'营地委托：':q.primary?'本层目标：':'可选发现：')+q.title;note.text=target.description+(q.complete?' 已完成，成功撤离才能保住收获。':'');}
   if(q.primary){const sign=s.sites.find(a=>a.id==='sign');if(sign)sign.description=q.title+'。'+target.description+' 入口升降机始终可以撤离。';const note=s.notes.find(n=>n.id==='chapter-challenge');if(note){note.title='本层目标：'+q.title;note.text=target.description;}}
  }},
  prepareFieldUtilities(q){const s=this.state,devices=q.devices.map(id=>s.sites.find(a=>a.id===id));if(devices.length<2)return;const [first,second]=devices;
   if(distance(first,second)<12){const moved=this.addFieldSite(q,'device-placement','临时选址','node',first,[12,25]);if(moved){Object.assign(second,{x:moved.x,y:moved.y,region:moved.region});s.sites=s.sites.filter(a=>a!==moved);}}
-  if(q.venture==='power'){q.field.powerRoutes=devices.map((a,i)=>this.chapterPath(a,devices[i+1]||s.sites.find(a=>a.id==='mechanical')));for(const [i,a]of devices.entries()){a.name='第'+(i+1)+'号配电箱';a.description='接通后照亮通向'+(devices[i+1]?'第'+(i+2)+'号配电箱':'下行井')+'的道路；电机声会吸引附近敌人。';}const parts=s.sites.find(a=>a.id===q.partsId);parts.name='备用电缆卷';return;}
+  if(q.venture==='power'){q.field.powerRoutes=devices.map((a,i)=>this.chapterPath(a,devices[i+1]||s.sites.find(a=>a.id==='mechanical')));for(const [i,a]of devices.entries()){a.name='第'+(i+1)+'号配电箱';a.description='接通后照亮通向'+(devices[i+1]?'第'+(i+2)+'号配电箱':'下行井')+'的道路；电机声会吸引附近敌人。';}return;}
   const used=new Set(),groups=[];for(const device of devices){const {queue,steps}=this.fieldDistances(device),candidates=[];for(const p of queue){if(steps.get(p.x+','+p.y)>32)continue;for(const [dx,dy]of [[1,0],[0,1]]){const cells=[];for(let n=1;n<=7;n++){const x=p.x+dx*n,y=p.y+dy*n,t=this.tile(x,y);if(!t||t.gate||t.riskPassage||t.tidal)break;if(this.passable(x,y)){if(cells.length){const route=this.chapterPath(p,{x,y});if(route.length>=cells.length+4&&!cells.some(c=>used.has(c.join(','))))candidates.push({cells,benefit:route.length-cells.length,near:steps.get(p.x+','+p.y)});}break;}if(t.rail||t.challengeSafe||s.sites.some(a=>distance(a,{x,y})<1)||!['rock','hard','rubble'].includes(t.kind))break;cells.push([x,y]);}}}
    candidates.sort((a,b)=>a.near-b.near||b.benefit-a.benefit);const chosen=candidates.find(c=>!c.cells.some(p=>used.has(p.join(','))));if(chosen){groups.push(chosen.cells);for(const [x,y]of chosen.cells){used.add(x+','+y);Object.assign(this.tile(x,y),{kind:'water',damp:true,challengeSafe:true,tidal:false});}}else groups.push([]);
   }q.field.drainShortcuts=groups;const previous=q.effectCells||[],merged=groups.map((g,i)=>[...g,...previous.filter((_,n)=>n%devices.length===i)]);q.effectCells=[];const count=Math.max(...merged.map(g=>g.length));for(let i=0;i<count;i++)for(let j=0;j<devices.length;j++){const c=merged[j][i]||merged[j][merged[j].length-1];if(c)q.effectCells.push(c);}for(const [i,a]of devices.entries())a.description='排空第'+(i+1)+'段积水，打通相邻矿道间的通路。';
  },
- applyRuneEffect(id,site){const q=this.missionById(site?.missionId);if(q?.field&&q.venture==='power'){const cells=q.field.powerRoutes[q.stage-1]||[];for(const [i,p]of cells.entries())if(i%4===0){const t=this.tile(p.x,p.y);if(t&&this.passable(p.x,p.y)){t.torch=true;t.fixedLamp={radius:4};}}this.emitNoise(site.x,site.y,14,'mechanism');return;}return old.applyRuneEffect.call(this,id,site);},
- expeditionActionCheck(kind){const s=this.state,parts=String(kind).split(':'),op=parts[1],id=parts.slice(2).join(':'),q=op==='return'||op==='claim'?this.missionById(id):this.missionById(s.sites.find(a=>a.id===id)?.missionId),a=op==='return'?s.sites.find(a=>a.id===q?.field?.hoistId):op==='claim'?s.sites.find(a=>a.id===q?.targetId):s.sites.find(a=>a.id===id);let reason=!['return','claim','node'].includes(op)?'无效的装置操作':op==='node'&&(!a?.fieldRole||a.fieldRole==='return')?'不能这样使用装置':s.mode!=='playing'?'先进入矿区':!q?.field||!a?'没有这处装置':distance(s.player,a)>1?'靠近装置再操作':'';
-  if(!reason&&op==='return'){if(!q.field.returnReady)reason='先完成此处任务';else if(s.companion&&distance(s.companion,s.player)>3)reason='等同行者靠近';else if(q.kind==='rescue'&&q.started&&!q.complete&&!s.companion)reason='先接回同行者';}
-  else if(!reason&&op==='claim'){if(q.venture!=='drill'||!q.started||q.complete||q.drillProgress<3)reason='至少完成3回合钻探';}
+ applyRuneEffect(id,site){const q=this.missionById(site?.missionId);if(q?.field&&q.venture==='power'){const cells=q.field.powerRoutes[q.devices.indexOf(site.id)]||[];for(const [i,p]of cells.entries())if(i%4===0){const t=this.tile(p.x,p.y);if(t&&this.passable(p.x,p.y)){t.torch=true;t.fixedLamp={radius:4};}}this.emitNoise(site.x,site.y,14,'mechanism');return;}return old.applyRuneEffect.call(this,id,site);},
+ expeditionActionCheck(kind){const s=this.state,parts=String(kind).split(':'),op=parts[1],id=parts.slice(2).join(':'),q=op==='return'||op==='claim'?this.missionById(id):this.missionById(s.sites.find(a=>a.id===id)?.missionId),a=op==='return'?s.sites.find(a=>a.id===q?.field?.hoistId):op==='claim'?s.sites.find(a=>a.id===q?.targetId):s.sites.find(a=>a.id===id);let reason=!['claim','node'].includes(op)?'无效的装置操作':op==='node'&&(!a?.fieldRole||a.fieldRole==='return')?'不能这样使用装置':s.mode!=='playing'?'先进入矿区':!q?.field||!a?'没有这处装置':distance(s.player,a)>1?'靠近装置再操作':'';
+
+  if(!reason&&op==='claim'){if(q.venture!=='drill'||!q.started||q.complete||q.drillProgress<3)reason='至少完成3回合钻探';}
   else if(!reason){if(a.done||q.complete)reason='已经处理完毕';else if(a.fieldRole==='reserve'&&!this.placeableLight('torch'))reason='需要有燃料的火把，且脚下没有灯具';else if(['node','vent','seal'].includes(a.fieldRole)&&s.monsters.some(m=>m.hp>0&&m.freeze<=0&&distance(m,a)<=2&&this.ray(m.x,m.y,a.x,a.y)))reason='先引开、冻结或处理身边的敌人';}
   return {ok:!reason,reason,a,q,op};
  },
- missionActionCheck(){const out=old.missionActionCheck.call(this),q=out.q,a=out.a;if(out.ok&&q?.field&&['engineer','doctor','survey','deep'].includes(q.venture)&&['person','relic'].includes(a?.missionRole)&&q.field.nodes.some(id=>!this.state.sites.find(a=>a.id===id)?.done))return {...out,ok:false,reason:['engineer','doctor'].includes(q.venture)?'先取回附近的'+(q.venture==='engineer'?'起重工具':'救护包'):'先完成两处'+(q.venture==='survey'?'测点校准':'组件回收')};return out;},
- taskDeviceOptions(a){if(a?.fieldRole){const q=this.missionById(a.missionId);if(a.fieldRole==='return')return [['field:return:'+q.id,q.field.returnReady?'返回入口 · 1回合':'检修通道尚未开放']];return [['field:node:'+a.id,({node:'处理装置 / 收取任务物',vent:'封闭通风口',seal:'关闭巢道闸',reserve:'留下火把 · 消耗1支',alarm:'切断警报',brace:'加固采掘面',brake:q?.field.braked?'松开制动':'拉下制动'})[a.fieldRole]+' · 1回合']];}const options=old.taskDeviceOptions.call(this,a),q=this.missionById(a?.missionId);if(q?.field&&q.venture==='drill'&&q.started&&!q.complete)options.push(['field:claim:'+q.id,'提前收取1份样品 · 1回合']);return options;},
+ missionActionCheck(){const out=old.missionActionCheck.call(this),q=out.q,a=out.a,s=this.state;if(!q?.expeditionV2)return out;const utility=['pump','power'].includes(q.venture)&&a?.missionRole==='device',rescue=a?.missionRole==='person',recover=['survey','deep','core'].includes(q.venture)&&a?.missionRole==='relic';if(!utility&&!rescue&&!recover)return out;let reason=s.mode!=='playing'?'先进入矿区':q.complete?'这里已经处理完毕':a.done?'已经处理完毕':'';if(!reason&&rescue)reason=!this.passable(a.x,a.y)?'先清开挡路的碎石':q.started?'他已经在跟随':s.companion?'先安置现有同行者':'';return {...out,ok:!reason,reason};},
+ taskDeviceOptions(a){if(a?.fieldRole){const q=this.missionById(a.missionId);if(a.fieldRole==='return')return [];return [['field:node:'+a.id,({node:'处理装置 / 收取任务物',vent:'封闭通风口',seal:'关闭巢道闸',reserve:'留下火把 · 消耗1支',alarm:'切断警报',brace:'加固采掘面',brake:q?.field.braked?'松开制动':'拉下制动'})[a.fieldRole]+' · 1回合']];}const options=old.taskDeviceOptions.call(this,a),q=this.missionById(a?.missionId);if(q?.expeditionV2&&q.variant==='cart'&&a?.missionRole==='device')return q.complete?[]:[['mission:interact','启动货车 · 1回合']];if(q?.field&&q.venture==='drill'&&q.started&&!q.complete)options.push(['field:claim:'+q.id,'提前收取1份样品 · 1回合']);return options;},
  chapterActionCheck(kind){return kind?.startsWith('field:')?this.expeditionActionCheck(kind):old.chapterActionCheck.call(this,kind);},
  actionTiming(a){return a?.type==='choose'&&a.kind?.startsWith('field:')?{advance:this.expeditionActionCheck(a.kind).ok,attack:false}:old.actionTiming.call(this,a);},
- choose(kind){if(!kind?.startsWith('field:')){const q=this.missionById(this.nearby()?.missionId),out=old.choose.call(this,kind);if(out&&q?.field&&q.kind==='rescue'&&q.started){q.field.returnReady=true;const a=this.state.sites.find(a=>a.id===q.field.hoistId);if(a)a.discovered=true;}return out;}const check=this.expeditionActionCheck(kind);if(!check.ok){this.log(check.reason,'warn');return false;}const {a,q,op}=check,s=this.state;
-  if(op==='return'){const home=s.sites.find(a=>a.id==='home');Object.assign(s.player,{x:home.x,y:home.y});if(s.companion)Object.assign(s.companion,{x:home.x,y:home.y});this.shelterCompanion();this.log('检修升降机已返回本层入口。走到地表升降机撤离，才能保住收获。','good');}
-  else if(op==='claim'){q.drillYield=1;q.complete=true;this.log('停机取走1份样品，放弃剩余钻探。','good');}
+ choose(kind){if(!kind?.startsWith('field:')){const a=this.nearby(),q=this.missionById(a?.missionId);if(kind==='mission:interact'&&q?.field&&['pump','power'].includes(q.venture)&&a?.missionRole==='device'){const check=this.missionActionCheck();if(!check.ok){this.log(check.reason,'warn');return false;}const s=this.state,index=q.devices.indexOf(a.id);a.done=true;q.stage=q.devices.filter(id=>s.sites.find(a=>a.id===id)?.done).length;if(q.venture==='power')this.applyRuneEffect('lamp',a);else{for(const [x,y]of (q.effectCells||[]).filter((_,i)=>i%q.devices.length===index))Object.assign(this.tile(x,y),{kind:'floor',worked:'drained',damp:true,iceUntil:null,tidal:false});s.local.drained=true;}q.complete=q.stage>=q.devices.length;this.emitNoise(a.x,a.y,8,'mechanism');this.updateMissions();s.panel=null;s.lightCache=null;s.visionCache=null;this.tick();return true;}return old.choose.call(this,kind);}const check=this.expeditionActionCheck(kind);if(!check.ok){this.log(check.reason,'warn');return false;}const {a,q,op}=check,s=this.state;
+
+  if(op==='claim'){q.drillYield=1;q.complete=true;this.log('停机取走1份样品，放弃剩余钻探。','good');}
   else if(a.fieldRole==='brake'){q.field.braked=!q.field.braked;this.log(q.field.braked?'货车已制动。':'货车已松闸。','good');}
   else if(a.fieldRole==='reserve'){const tile=this.tile(s.player.x,s.player.y),out=this.placeQualityLight('torch');if(tile.light){a.done=true;q.field.reserve=true;s.panel=null;}return out;}
   else{a.done=true;this.emitNoise(a.x,a.y,a.fieldRole==='brace'?3:10,'mechanism');
@@ -4143,8 +4151,8 @@ Object.assign(P,{
    if(a.fieldRole==='vent'){for(let y=a.y-4;y<=a.y+4;y++)for(let x=a.x-4;x<=a.x+4;x++){const t=this.tile(x,y);if(t)t.fog=null;}this.clearFog(a.x,a.y,4,20);if(q.field.nodes.every(id=>s.sites.find(a=>a.id===id)?.done))q.complete=true;}
    if(a.fieldRole==='alarm')for(const m of this.missionKeepers(q)){m.plan=null;m.recoverUntil=s.turn+3;m.state='recover';}
    if(a.fieldRole==='brace')q.field.braced=true;
-   if(a.fieldRole==='node'&&q.venture==='engineer')this.recordFinds({tools:1});
-   if(a.fieldRole==='node'&&q.venture==='doctor')this.recordFinds({medkit:1});
+
+
    this.log(a.name+'已处理。','good');
   }
   this.updateMissions();s.panel=null;s.lightCache=null;s.visionCache=null;this.tick();return true;
@@ -4152,12 +4160,11 @@ Object.assign(P,{
  challengeTurn(){const paused=[];for(const q of this.state.missions||[])if(q.field?.braked&&q.started&&!q.complete){q.started=false;paused.push(q);}try{return old.challengeTurn.call(this);}finally{for(const q of paused)q.started=true;for(const q of this.state.missions||[]){const brake=this.state.sites.find(a=>a.id===q.field?.brakeId);if(brake&&q.cart)Object.assign(brake,{x:q.cart.x,y:q.cart.y});}}},
  awardDiscovery(q){const out=old.awardDiscovery.call(this,q);if(q.expeditionV2&&q.venture==='deep')this.recordFinds({deepPart:1,core:1});return out;},
  releaseMineral(t,id){const q=this.missionById(t?.missionId),fresh=!t?.mineralReleased,out=old.releaseMineral.call(this,t,id);if(fresh&&t?.mineralReleased&&q?.field&&q.kind==='mine')this.emitNoise(this.state.player.x,this.state.player.y,q.field.braced?2:16,'dig');return out;},
- missionProgress(q){if(q?.field&&!q.complete){const done=q.field.nodes.filter(id=>this.state.sites.find(a=>a.id===id)?.done).length,total=q.field.nodes.length;if(total&&done<total)return ({engineer:'起重工具',doctor:'救护包',survey:'测点校准',deep:'组件回收',fungus:'封闭通风口'})[q.venture]+' '+done+'/'+total+(q.venture==='fungus'?' · 或击倒寄生群':'');}return old.missionProgress.call(this,q);},
- missionNextStep(q){if(!q?.field)return old.missionNextStep.call(this,q);if(q.venture==='passage')return '通路已开放，继续深入或探索沿途发现。';if(q.complete)return '本层目标已完成。可用检修升降机返回入口，也可以继续深入。';if(q.venture==='drill')return '留在钻台5格内，3回合可提前收取1份；坚持6回合获得3份。离开会暂停，注意增援。';if(q.kind==='rescue'&&q.started)return '带同行者靠近检修升降机，返回入口；成功撤离后开放'+C[q.commission]?.name+'。';if(q.field.nodes.some(id=>!this.state.sites.find(a=>a.id===id)?.done))return ({engineer:'先到维修间侧室取起重工具，再接应工匠。',doctor:'先取救护包，再接应受伤医师。',survey:'前往两处独立测点校准，再回收勘探仪。',deep:'拆回两组传动件，再取控制盒。',fungus:'可关闭两处通风口，或清理标记的寄生群。'})[q.venture]||old.missionNextStep.call(this,q);return old.missionNextStep.call(this,q);},
- missionModel(q=this.state.missions?.[0]){const out=old.missionModel.call(this,q);if(!q?.field)return out;let target=q.kind==='rescue'&&q.started&&!q.complete?this.state.sites.find(a=>a.id===q.field.hoistId):q.field.nodes.map(id=>this.state.sites.find(a=>a.id===id)).find(a=>!a.done);if(q.complete||q.venture==='fungus')target=null;if(target){out.targetId=target.id;out.name=target.name;out.x=target.discovered?target.x:null;out.y=target.discovered?target.y:null;}out.requirement=this.missionNextStep(q);out.progress=this.missionProgress(q);out.hint=q.commission?'营地委托 · 成功撤离后'+C[q.commission].reward:this.state.sites.find(a=>a.id===q.targetId)?.description||out.hint;return out;}
+ missionProgress(q){if(q?.field&&!q.complete){if(q.kind==='rescue')return q.started?'护送同行者回入口':'找到并接应'+(q.venture==='doctor'?'失联医师':'巡矿工匠');if(q.venture==='survey')return '找到勘探仪并带出矿井';if(q.venture==='deep')return '找到传动组并带出矿井';if(q.variant==='cart'&&!q.started)return '找到货车即可启动';const done=q.field.nodes.filter(id=>this.state.sites.find(a=>a.id===id)?.done).length,total=q.field.nodes.length;if(total&&done<total)return '封闭通风口 '+done+'/'+total+' · 或击倒寄生群';}return old.missionProgress.call(this,q);},
+ missionNextStep(q){if(!q?.field)return old.missionNextStep.call(this,q);if(q.venture==='passage')return '通路已开放，继续深入或探索沿途发现。';if(q.complete)return '目标已完成。沿矿道返回入口撤离，也可以继续深入。';if(q.venture==='drill')return '留在钻台5格内，3回合可提前收取1份；坚持6回合获得3份。离开会暂停，注意增援。';if(q.kind==='rescue')return q.started?'沿已走通的矿道护送同行者回入口，走散时回去接应；一起撤离后开放'+(C[q.commission]?.name||'营地设施')+'。':'找到遇险者即可接应，沿矿道护送回入口；可以冒险在敌人身边接人。';if(['survey','deep','pump','power'].includes(q.venture))return this.state.sites.find(a=>a.id===q.targetId)?.description||old.missionNextStep.call(this,q);if(q.variant==='cart'&&!q.started)return '直接启动货车；沿轨道护送，清开实际挡路的碎石，留意伏兵。';if(q.venture==='fungus'&&q.field.nodes.some(id=>!this.state.sites.find(a=>a.id===id)?.done))return '可关闭两处通风口，或清理标记的寄生群。';return old.missionNextStep.call(this,q);},
+ missionModel(q=this.state.missions?.[0]){const out=old.missionModel.call(this,q);if(!q?.field)return out;let target=q.kind==='rescue'&&q.started&&!q.complete?this.state.sites.find(a=>a.id===q.rallyId):null;const actual=this.state.sites.find(a=>a.id===q.targetId);if(!target&&!q.complete&&actual?.discovered)target=actual;if(['pump','power'].includes(q.venture)&&!q.complete){const remaining=q.devices.map(id=>this.state.sites.find(a=>a.id===id)).filter(a=>a&&!a.done);target=remaining.filter(a=>a.discovered).sort((a,b)=>distance(a,this.state.player)-distance(b,this.state.player))[0]||remaining[0];}if(target){out.targetId=target.id;out.name=target.name;out.x=target.discovered?target.x:null;out.y=target.discovered?target.y:null;out.distance=target.discovered?distance(target,this.state.player):null;}out.requirement=this.missionNextStep(q);out.progress=this.missionProgress(q);out.hint=q.commission?'营地委托 · 成功撤离后'+C[q.commission].reward:actual?.description||out.hint;return out;}
 });
 })(globalThis);
-
 </script>
 <script>
 // Mythic equipment: distinct actions and field rules, using the existing turn and card systems.
@@ -4370,6 +4377,39 @@ E.createTrainingGame=function(config){
 };
 })(globalThis);
 </script>
+<script>(function(root){
+'use strict';
+const E=root.EscapeEngine,P=E.prototype,act=P.act,visual=P.visual;
+// Summarise the same events used for combat animation, once per player action.
+P.visual=function(actor,kind,from,to=from,extra={}){
+ const outcome=actor.startsWith('m:')&&['hurt','die'].includes(kind),unit=outcome?(extra.unit||this.state.monsters.find(m=>'m:'+m.id===actor)):null;
+ const perceived=unit&&!unit.disguised&&this.monsterVisible(unit),out=visual.call(this,actor,kind,from,to,extra);
+ if(outcome)this.state.visualEvents.at(-1).perceived=!!perceived;
+ return out;
+};
+P.actionFeedbackRecord=function(){const r=this._actionFeedback;return r&&r.state===this.state&&r.turn===this.state.total&&r.lastLog===this.state.logs.at(-1)?r:null;};
+P.act=function(action){
+ if(this._feedbackRunning)return act.call(this,action);
+ const state=this.state,last=state.logs.at(-1);this._feedbackRunning=true;let result;
+ try{result=act.call(this,action);}finally{this._feedbackRunning=false;}
+ const s=this.state,start=s.logs.indexOf(last),fresh=s.logs.slice(start<0?0:start+1).filter(l=>l.tone!=='story');
+ const groups=new Map();
+ if(result&&state===s)for(const e of s.visualEvents||[]){
+  if(!e.perceived||!e.actor.startsWith('m:')||!['hurt','die'].includes(e.kind))continue;
+  const key=e.actor+':'+e.unitKey,g=groups.get(key)||{actor:e.actor,unitKey:e.unitKey,type:e.type,damage:0,dead:false};
+  if(e.kind==='hurt')g.damage+=Math.max(0,e.damage||0);else g.dead=true;groups.set(key,g);
+ }
+ const parts=[],dead=[...groups.values()].filter(g=>g.dead),alive=[...groups.values()].filter(g=>!g.dead&&g.damage>0);
+ if(dead.length){const names=new Map();for(const g of dead){const name=E.MONSTERS[g.type]?.name||'敌人';names.set(name,(names.get(name)||0)+1);}parts.push('击倒'+[...names].map(([name,n])=>name+(n>1?' ×'+n:'')).join('、')+(dead.some(g=>g.damage>0)?'（'+dead.reduce((n,g)=>n+g.damage,0)+'伤害）':''));}
+ for(const g of alive){const m=s.monsters.find(m=>'m:'+m.id===g.actor&&(g.unitKey===undefined||m.visualId===g.unitKey));parts.push('命中'+(E.MONSTERS[g.type]?.name||'敌人')+' '+g.damage+'伤害'+(m?'，剩余'+m.hp+'生命':''));}
+ let combat=null;if(parts.length){this.log(parts.join('；')+'。',dead.length?'good':'normal');combat=s.logs.at(-1);combat.kind='combat';}
+ let danger=fresh.findLast(l=>l.tone==='danger');
+ if(!danger&&result&&state===s){const hits=(s.visualEvents||[]).filter(e=>e.actor==='player'&&e.kind==='hurt'),hp=hits.reduce((n,e)=>n+(e.damage||0),0),armor=hits.reduce((n,e)=>n+(Number(e.armor)||0),0);if(hp||armor){danger={text:[hp?'生命 −'+hp:'',armor?'护甲 −'+armor:''].filter(Boolean).join(' · ')+'。',tone:'danger'};}}
+ this._actionFeedback={state:s,turn:s.total,lastLog:s.logs.at(-1),entry:danger||combat||fresh.findLast(l=>l.kind==='hearing')||fresh.at(-1)||null};
+ return result;
+};
+})(globalThis);
+</script>
 <script>(function(){
 'use strict';
 const $=s=>document.querySelector(s),canvas=$('#world'),ctx=canvas.getContext('2d'),dialog=$('#dialog'),content=$('#dialog-content');
@@ -4421,9 +4461,13 @@ function drawResidualHeat(ox,oy,v,time){
  }
 }
 
+function appendCombatNotices(events,start){
+ const groups=new Map();for(const e of events){if(!e.perceived||!e.actor.startsWith('m:')||!['hurt','die'].includes(e.kind))continue;const key=e.actor+':'+e.unitKey,g=groups.get(key)||{...e,damage:0,dead:false};if(e.kind==='hurt')g.damage+=Math.max(0,e.damage||0);else g.dead=true;g.start=Math.min(g.start??Infinity,e.start??start);groups.set(key,g);}
+ for(const e of groups.values())if(e.damage||e.dead)motion.events.push({...e,kind:'combatNotice',label:(e.damage?'−'+e.damage:'')+(e.dead?' · 击倒':''),start:e.start,end:e.start+850});
+}
 function animate(events){
  const world=typeof game==='undefined'?null:game,start=performance.now(),durations={reload:420,recover:360,area:360,walk:135,drift:180,leap:320,dash:240,strike:180,chip:160,hurt:130,bind:180,die:210,windup:120,blast:300,trail:240,throw:300};
- motion={events:[],end:start,world,map:world?.state.map,mode:world?.state.mode};if(events===world?.state.visualEvents)world.state.visualEvents=[];events=combatVisualEvents(events);if(world?.state.effect&&['blast','frost'].includes(world.state.effect.kind))world.state.effect.coveredByArea=events.some(e=>e.kind==='area'&&e.attack===world.state.effect.kind);if(reduced){motion.events=events.filter(e=>['area','reload','recover'].includes(e.kind)).map(e=>({...e,start,end:start+160}));motion.end=start+160;return;}
+ motion={events:[],end:start,world,map:world?.state.map,mode:world?.state.mode};if(events===world?.state.visualEvents)world.state.visualEvents=[];events=combatVisualEvents(events);if(world?.state.effect&&['blast','frost'].includes(world.state.effect.kind))world.state.effect.coveredByArea=events.some(e=>e.kind==='area'&&e.attack===world.state.effect.kind);if(reduced){motion.events=events.filter(e=>['area','reload','recover'].includes(e.kind)).map(e=>({...e,start,end:start+160}));motion.end=start+160;appendCombatNotices(events,start);return;}
  const phases=[...new Set(events.map(e=>e.phase))].sort((x,y)=>x-y);let cursor=start;
  for(const phase of phases){const ends=new Map(),lastMoveEvent=new Map();let phaseEnd=cursor;
   for(const raw of events.filter(e=>e.phase===phase)){
@@ -4432,10 +4476,10 @@ function animate(events){
    const event={...raw,start:Math.max(cursor+offset,ends.get(raw.actor)||cursor),end:0};event.end=event.start+duration;motion.events.push(event);ends.set(raw.actor,event.end);phaseEnd=Math.max(phaseEnd,event.end);
    if(['walk','drift','leap','dash'].includes(raw.kind))lastMoveEvent.set(raw.actor,event);
   }cursor=phaseEnd;
- }motion.end=cursor;
+ }motion.end=cursor;appendCombatNotices([...motion.events],start);
 }
 function pose(actor,fallback,time){
- if(reduced||time>=motion.end||motion.world&&(motion.world!==game||motion.map!==game.state.map||motion.mode!==game.state.mode))return {...fallback,lift:0,lx:0,ly:0,flash:0,alpha:1};const events=motion.events.filter(e=>e.actor===actor&&!['trail','area','reload','recover'].includes(e.kind)&&(fallback.visualId===undefined||e.unitKey===undefined||fallback.visualId===e.unitKey));let point=events.length?{...events[0].from}:{...fallback},lift=0,lx=0,ly=0,flash=0,alpha=1;
+ if(reduced||time>=motion.end||motion.world&&(motion.world!==game||motion.map!==game.state.map||motion.mode!==game.state.mode))return {...fallback,lift:0,lx:0,ly:0,flash:0,alpha:1};const events=motion.events.filter(e=>e.actor===actor&&!['trail','area','reload','recover','combatNotice'].includes(e.kind)&&(fallback.visualId===undefined||e.unitKey===undefined||fallback.visualId===e.unitKey));let point=events.length?{...events[0].from}:{...fallback},lift=0,lx=0,ly=0,flash=0,alpha=1;
  for(const e of events){if(time<e.start)break;const k=Math.max(0,Math.min(1,(time-e.start)/(e.end-e.start))),wave=Math.sin(k*Math.PI);
   if(['walk','drift','leap','dash'].includes(e.kind)){const q=k*k*(3-2*k);point={x:e.from.x+(e.to.x-e.from.x)*q,y:e.from.y+(e.to.y-e.from.y)*q};if(k<1){lift=e.kind==='leap'?wave*43:e.kind==='walk'?wave*4:0}}
   else if(k<1&&['strike','chip'].includes(e.kind)){const dx=e.to.x-e.from.x,dy=e.to.y-e.from.y,len=Math.max(1,Math.abs(dx)+Math.abs(dy));const push=e.weapon==='crossbow'?-6:15;lx=dx/len*wave*push;ly=dy/len*wave*push}
@@ -4618,11 +4662,12 @@ function drawAttackEffect(e,ox,oy,time){
  ctx.restore();
 }
 function combatEffects(ox,oy,time){
- for(const e of motion.events){if(time<e.start||time>e.end)continue;if(e.kind==='area'){drawAttackEffect(e,ox,oy,time);continue;}if(['reload','recover'].includes(e.kind)){drawWeaponRest(e,ox,oy,time);continue;}if(['hurt','bind','die'].includes(e.kind)&&game.lightLevel(e.to.x,e.to.y)<2)continue;if(e.actor!=='player'&&['strike','chip','trail'].includes(e.kind)&&(game.lightLevel(e.from.x,e.from.y)<2||game.lightLevel(e.to.x,e.to.y)<2))continue;const k=(time-e.start)/(e.end-e.start),fade=1-k,x=(e.to.x-ox)*S+40,y=(e.to.y-oy)*S+40;
+ for(const e of motion.events){if(time<e.start||time>e.end)continue;if(e.perceived===false&&['hurt','die'].includes(e.kind))continue;if(e.kind==='area'){drawAttackEffect(e,ox,oy,time);continue;}if(['reload','recover'].includes(e.kind)){drawWeaponRest(e,ox,oy,time);continue;}if(['hurt','bind','die'].includes(e.kind)&&game.lightLevel(e.to.x,e.to.y)<2)continue;if(e.actor!=='player'&&['strike','chip','trail'].includes(e.kind)&&(game.lightLevel(e.from.x,e.from.y)<2||game.lightLevel(e.to.x,e.to.y)<2))continue;const k=(time-e.start)/(e.end-e.start),fade=1-k,x=(e.to.x-ox)*S+40,y=(e.to.y-oy)*S+40;
+  if(e.kind==='combatNotice'){ctx.save();ctx.globalAlpha=Math.min(1,(1-k)*4);ctx.shadowColor='#071217';ctx.shadowBlur=6;text(e.label,x,y-28-k*12,e.dead?'#cce6ac':'#f5d8aa',22);ctx.restore();continue;}
   if(e.kind==='throw'){const sx=(e.from.x-ox)*S+40,sy=(e.from.y-oy)*S+40,tx=sx+(x-sx)*k,ty=sy+(y-sy)*k-Math.sin(k*Math.PI)*70;glow(tx,ty,12,'#efb36777');diamond(tx,ty,9,'#c1ac82');rect(tx+4,ty-10,3,5,'#ffe1a0');}
   if(['strike','chip'].includes(e.kind)&&!e.weapon&&!e.poseOnly){const sx=(e.from.x-ox)*S+40,sy=(e.from.y-oy)*S+40;ctx.save();ctx.globalAlpha=Math.sin(k*Math.PI);line([[sx,sy],[x,y]],e.actor==='player'?'#f4d6a2':'#e89b82',e.kind==='chip'?3:6);for(let j=0;j<5;j++){const angle=j*1.25;rect(x+Math.cos(angle)*(10+k*22),y+Math.sin(angle)*(10+k*22),4,4,'#f4d7aa')}ctx.restore()}
   if(e.kind==='trail'&&!e.poseOnly){ctx.save();ctx.globalAlpha=fade*.5;line([[(e.from.x-ox)*S+40,(e.from.y-oy)*S+48],[x,y+8]],e.type==='ghost'?'#c5b3ec':'#a5dab4',e.type==='ghost'?18:7);ctx.restore()}
-  if(e.kind==='hurt'||e.kind==='bind'){text(e.kind==='bind'?'缠住':e.armor?'护甲 −'+Number(e.armor)+(e.damage&&typeof e.armor==='number'?' / 生命 −'+e.damage:''):e.damage?'生命 −'+e.damage:'格挡',x,y-18-k*28,e.armor?'#bdd5df':'#f3a297',15)}
+  if((e.kind==='hurt'||e.kind==='bind')&&(!e.perceived||e.actor==='player')){text(e.kind==='bind'?'缠住':e.armor?'护甲 −'+Number(e.armor)+(e.damage&&typeof e.armor==='number'?' / 生命 −'+e.damage:''):e.damage?'生命 −'+e.damage:'格挡',x,y-18-k*28,e.armor?'#bdd5df':'#f3a297',15)}
   if(e.kind==='die'){ctx.save();ctx.globalAlpha=fade;const color=MONSTERS[e.type]?.color||'#cba97c';for(let j=0;j<7;j++){const angle=j*Math.PI*2/7;rect(x+Math.cos(angle)*(10+k*33),y+Math.sin(angle)*(10+k*25),5,5,color)}ctx.restore()}
  }
 }
@@ -4829,9 +4874,17 @@ function site(a,x,y,time){if(a.missionId&&!a.done){const main=a.missionId==='mai
  }
  if(a.chapterDevice&&a.missionRole!=='person'){rect(x+18,y+24,44,43,a.done?'#35574e':'#6f6754');line([[x+22,y+23],[x+57,y+23]],'#cbbb8e',4);text(a.glyph,x+40,y+43,a.done?'#a5dbac':'#efddb1',24);text(a.name,x+40,y+75,'#d8c6a4',10);return;}
 
- if(a.kind==='home'){rect(x+17,y+12,46,58,'#14242b');line([[x+18,y+65],[x+18,y+15],[x+62,y+15],[x+62,y+65]],'#9a8967',5);for(let j=0;j<4;j++)rect(x+28,y+28+j*10,25,4,'#bfaa7e');text('↑',x+40,y+9,'#d5c494',21);
+ if(a.id==='extraction'||a.id==='mechanical'){
+  const ready=a.id==='extraction'||game.state.challenge?.complete,ink=ready?'#9ee7d0':'#d5b77d';
+  glow(x+40,y+40,44,ready?'#6edac338':'#d5b77d20');rect(x+13,y+58,54,9,'#537b78');
+  line([[x+17,y+59],[x+17,y+14],[x+63,y+14],[x+63,y+59]],ink,4);
+  line([[x+31,y+15],[x+31,y+26],[x+25,y+26],[x+25,y+57],[x+55,y+57],[x+55,y+26],[x+49,y+26],[x+49,y+15]],'#799e9a',3);
+  rect(x+29,y+30,22,23,'#214d4e');line([[x+40,y+47],[x+40,y+34],[x+34,y+40],[x+40,y+34],[x+46,y+40]],ink,3);
+  text('撤离',x+40,y+75,ink,18);return;
+ }
+ if(a.kind==='home'){rect(x+19,y+31,42,34,'#243833');poly([[x+11,y+33],[x+40,y+11],[x+69,y+33]],'#9a8967');rect(x+31,y+43,18,22,'#101e23');text('避难所',x+40,y+75,'#d5c494',16);
  }else if(a.kind==='exit'){
-  rect(x+17,y+18,46,51,'#0c151c');for(let j=0;j<5;j++)rect(x+23+j*3,y+29+j*7,34-j*6,3,'#667981');line([[x+15,y+16],[x+65,y+16],[x+65,y+70]],'#789298',4);text('↓',x+40,y+14,'#a5d6cc',20);
+  rect(x+17,y+18,46,51,'#0c151c');for(let j=0;j<5;j++)rect(x+23+j*3,y+29+j*7,34-j*6,3,'#667981');line([[x+15,y+16],[x+65,y+16],[x+65,y+70]],'#789298',4);text('↓',x+40,y+14,'#a5d6cc',20);text('下层',x+40,y+75,'#a5d6cc',17);
  }else if(a.kind==='gate'){
   glow(x+40,y+40,60,'#e4dc8d66');rect(x+13,y+12,54,59,'#49615b');rect(x+22,y+22,36,49,'#d4dab0');poly([[x+22,y+22],[x+40,y+13],[x+58,y+22]],'#c4d3ac');line([[x+40,y+24],[x+40,y+71]],'#718e79',3);text('风',x+40,y+44,'#486456',18);
  }else if(a.cacheForm){
@@ -4927,9 +4980,9 @@ function drawLightMask(ox,oy){
 let lastPaintAt=0,paintDirty=true;
 function drawMythicMarkers(ox,oy,v){for(const n of game.mythicMarkers()){if(!v.has(n.x+','+n.y)&&!game.tile(n.x,n.y)?.seen)continue;const x=(n.x-ox)*S,y=(n.y-oy)*S;ctx.save();ctx.strokeStyle=n.color;ctx.globalAlpha=.95;ctx.lineWidth=2;ctx.strokeRect(x+9,y+9,S-18,S-18);if(n.direction){const [dx,dy]=n.direction;line([[x+S/2,y+S/2],[x+S/2+dx*20,y+S/2+dy*20]],n.color,3);text(dx>0?'→':dx<0?'←':dy>0?'↓':'↑',x+S/2,y+S/2+5,n.color,22);}ctx.fillStyle='#101b26df';ctx.fillRect(x+6,y+S-31,S-12,26);text(n.label,x+S/2,y+S-11,n.color,21);ctx.restore();}}
 function draw(time){updateClock(time);const frameGap=dialog.open?250:motion.end>time||pointerTravel?0:mobileCanvas.matches?80:32;if(document.hidden||!paintDirty&&time-lastPaintAt<frameGap){requestAnimationFrame(draw);return;}lastPaintAt=time;paintDirty=false;
- if(time>=motion.end&&motion.events.length){motion.events=[];const next=queuedAction||queuedMove;queuedAction=null;queuedMove=null;sync();if(next&&!dialog.open&&['playing','home'].includes(game.state.mode))act(next)}
+ if(time>=motion.end&&!motion.finished&&motion.events.length){motion.finished=true;motion.events=motion.events.filter(e=>e.kind==='combatNotice'&&time<e.end);const next=queuedAction||queuedMove;queuedAction=null;queuedMove=null;sync();if(next&&!dialog.open&&['playing','home'].includes(game.state.mode))act(next)}
   advancePointerTravel(time);
-  const s=game.state;if(motion.world&&(motion.world!==game||motion.map!==s.map||motion.mode!==s.mode)){motion={events:[],end:0};fxUntil=0;}else if(time>=motion.end)motion.events=[];const p=s.player,pv=pose('player',p,time);if(s.mode==='home'){zoom=1;worldTransform();rect(0,0,CW,CH,'#0d1922');const h=homeView();ctx.save();ctx.translate(h.x,h.y);ctx.scale(h.scale,h.scale);drawHome(time);ctx.restore();requestAnimationFrame(draw);return}
+  const s=game.state;if(motion.world&&(motion.world!==game||motion.map!==s.map||motion.mode!==s.mode)){motion={events:[],end:0};fxUntil=0;}else if(time>=motion.end)motion.events=motion.events.filter(e=>e.kind==='combatNotice'&&time<e.end);const p=s.player,pv=pose('player',p,time);if(s.mode==='home'){zoom=1;worldTransform();rect(0,0,CW,CH,'#0d1922');const h=homeView();ctx.save();ctx.translate(h.x,h.y);ctx.scale(h.scale,h.scale);drawHome(time);ctx.restore();requestAnimationFrame(draw);return}
  const span=CH/(S*zoom),ox=pv.x-(CW/(2*zoom)-40)/S,oy=pv.y-(CH/(2*zoom)-40)/S,lightFrame=game.lightingFrame(),v=lightFrame.objects;
  worldTransform();ctx.clearRect(0,0,CW,CH);rect(0,0,CW,CH,'#080f16');worldTransform(zoom);
  const across=Math.ceil(CW/(S*zoom)),down=Math.ceil(CH/(S*zoom)),x0=Math.floor(ox),y0=Math.floor(oy);
@@ -5006,6 +5059,11 @@ function draw(time){updateClock(time);const frameGap=dialog.open?250:motion.end>
   else {for(let i=0;i<6;i++){const angle=i*Math.PI/3,r=15+(1-k)*35;rect(x+Math.cos(angle)*r,y+Math.sin(angle)*r,6,6,f.kind==='bless'?'#9ce4d3':'#d6b17b')}}ctx.globalAlpha=1;
  }
  drawLightMask(ox,oy);
+ // Known lifts remain legible in explored darkness; unknown exits stay hidden.
+ for(const a of s.sites)if(['extraction','mechanical'].includes(a.id)&&a.discovered&&game.sitePresent(a)&&game.tile(a.x,a.y)?.seen){
+  const x=(a.x-ox)*S+40,y=(a.y-oy)*S,ready=a.id==='extraction'||s.challenge?.complete,ink=ready?'#9ee7d0':'#d5b77d',label=ready?'↑ 撤离':'撤离·锁定',w=ready?78:106;
+  ctx.save();rect(x-w/2,y+65,w,26,'#102c30ef');ctx.strokeStyle=ink;ctx.lineWidth=1.5;ctx.strokeRect(x-w/2,y+65,w,26);text(label,x,y+78,ink,21);ctx.restore();
+ }
  drawResidualHeat(ox,oy,v,time);
  drawBattlefields(ox,oy,v,time);
  for(const m of s.monsters)if(game.monsterPlanVisible(m,v))drawCombatPlan(m,ox,oy,v);
@@ -5102,7 +5160,7 @@ function journal(tab='chapter'){if(trainingSession){trainingPanel();return;}
 function showMap(){if(game.state.expedition?.phase==='prepare')return;const s=game.state,o=presentedObjective(),clue=game.missionClueMarker(),full=mapZoom==='full',SIZE=s.map.w;
  const cell=full?Math.max(1,Math.floor(360/SIZE)):12,span=full?SIZE:Math.min(SIZE,Math.ceil(340/cell));
  const ox=full?0:Math.max(0,Math.min(SIZE-span,s.player.x-Math.floor(span/2))),oy=full?0:Math.max(0,Math.min(SIZE-span,s.player.y-Math.floor(span/2)));
- open('map',`<div class="dialog-kicker">${esc(game.level.name)} · 手绘地图 · ${full?'全图':'局部'}</div><h2 class="dialog-title">只记下亲眼见过的路。</h2><p class="dialog-copy">金色实点是你，绿色是营地。金色空圈标出当前线索；调查后才转向目标，沿途路况要亲自探索。红色为裂缝，蓝色为水，灰绿为薄壁，褐色为碎石；小方框是已发现的地点。</p><canvas class="map-sheet" id="map-sheet" width="${span*cell}" height="${span*cell}" aria-label="已探索地形与当前线索位置"></canvas>${clue?`<p class="notice" data-map-clue="${esc(clue.id)}" data-map-step="${clue.step}">${clue.primary?'主线':'支线（可选）'} · ${{clue:'待调查线索',target:'目标位置',parts:'先取配件',return:'接应同行者返回',escort:'护送矿车'}[clue.step]}：${esc(clue.name)} · ${esc(game.regionName(clue.region))}${!full&&(clue.x<ox||clue.x>=ox+span||clue.y<oy||clue.y>=oy+span)?'（在当前视野外，切换全图查看）':''}</p>`:''}<p class="notice">${esc(o.text)}</p><div class="dialog-actions"><button data-action="mapzoom">切换到${full?'局部':'全图'}</button>${button('收起地图','close',true)}</div>`);
+ open('map',`<div class="dialog-kicker">${esc(game.level.name)} · 手绘地图 · ${full?'全图':'局部'}</div><h2 class="dialog-title">只记下亲眼见过的路。</h2><p class="dialog-copy">金色实点是你，绿色是避难所，青绿色上箭头是撤离点（灰色表示尚未解锁）。金色空圈标出当前线索；调查后才转向目标，沿途路况要亲自探索。红色为裂缝，蓝色为水，灰绿为薄壁，褐色为碎石；小方框是已发现的地点。</p><canvas class="map-sheet" id="map-sheet" width="${span*cell}" height="${span*cell}" aria-label="已探索地形与当前线索位置"></canvas>${clue?`<p class="notice" data-map-clue="${esc(clue.id)}" data-map-step="${clue.step}">${clue.primary?'主线':'支线（可选）'} · ${{clue:'待调查线索',target:'目标位置',parts:'先取配件',return:'接应同行者返回',escort:'护送矿车'}[clue.step]}：${esc(clue.name)} · ${esc(game.regionName(clue.region))}${!full&&(clue.x<ox||clue.x>=ox+span||clue.y<oy||clue.y>=oy+span)?'（在当前视野外，切换全图查看）':''}</p>`:''}<p class="notice">${esc(o.text)}</p><div class="dialog-actions"><button data-action="mapzoom">切换到${full?'局部':'全图'}</button>${button('收起地图','close',true)}</div>`);
  renderSurvey($('#map-sheet').getContext('2d'),{cell,span,ox,oy,labels:true});
 }
 function renderSurvey(c,{cell,span,ox=0,oy=0,labels=false}){const s=game.state,o=presentedObjective(),clue=game.missionClueMarker();c.fillStyle='#09131b';c.fillRect(0,0,span*cell,span*cell);
@@ -5111,6 +5169,7 @@ function renderSurvey(c,{cell,span,ox=0,oy=0,labels=false}){const s=game.state,o
   c.fillStyle=t.collapseAt?'#d58572':t.worked&&['floor','bridge'].includes(t.kind)?'#91b6a0':t.shortcut&&t.kind==='hard'?'#a3ad8b':({floor:'#617781',rock:'#293b47',hard:'#645869',ore:'#82bad0',rubble:'#715047',water:'#285d7b',bridge:'#a5bca7'})[t.kind]||'#273844';
   c.fillRect(sx+(cell>3?1:0),sy+(cell>3?1:0),Math.max(1,cell-(cell>3?1:0)),Math.max(1,cell-(cell>3?1:0)))}
  for(const a of s.sites)if(a.discovered&&game.sitePresent(a)&&game.tile(a.x,a.y).kind!=='rubble'){const [sx,sy]=px(a.x,a.y);c.fillStyle=a.id==='home'?(s.campClosed?'#b36b61':'#a7d3a1'):game.siteExhausted(a)?'#43514e':'#c4a774';c.fillRect(sx+2,sy+2,Math.max(2,cell-3),Math.max(2,cell-3));if(labels&&cell>=9){c.fillStyle=game.siteExhausted(a)?'#687570':'#d8cba6';c.font='10px "Microsoft YaHei",sans-serif';c.textAlign='left';c.fillText(a.name,sx+cell+1,sy+cell-2)}}
+ for(const a of s.sites)if(['extraction','mechanical'].includes(a.id)&&a.discovered&&game.sitePresent(a)&&a.x>=ox&&a.x<ox+span&&a.y>=oy&&a.y<oy+span){const [sx,sy]=px(a.x,a.y),cx=sx+cell/2,cy=sy+cell/2,r=Math.max(4,cell*.6),ready=a.id==='extraction'||s.challenge?.complete;c.fillStyle=ready?'#9ee7d0':'#83908d';c.beginPath();c.moveTo(cx,cy-r);c.lineTo(cx+r,cy);c.lineTo(cx+r*.4,cy);c.lineTo(cx+r*.4,cy+r);c.lineTo(cx-r*.4,cy+r);c.lineTo(cx-r*.4,cy);c.lineTo(cx-r,cy);c.closePath();c.fill();if(labels){c.fillStyle='#0b2028';c.fillRect(cx+6,cy-15,32,14);c.fillStyle=ready?'#9ee7d0':'#a6b0ab';c.font='12px "Microsoft YaHei",sans-serif';c.textAlign='left';c.fillText('撤离',cx+8,cy-4);}}
  if(clue&&clue.x>=ox&&clue.x<ox+span&&clue.y>=oy&&clue.y<oy+span){const [sx,sy]=px(clue.x,clue.y);c.strokeStyle='#e4c68b';c.lineWidth=2;c.beginPath();c.arc(sx+cell/2,sy+cell/2,Math.max(5,cell*.75),0,Math.PI*2);c.stroke();}
  else if(!clue&&o.x!==null&&o.x>=ox&&o.x<ox+span&&o.y>=oy&&o.y<oy+span){const [sx,sy]=px(o.x,o.y);c.strokeStyle='#9ed6e9';c.lineWidth=2;c.strokeRect(sx-1,sy-1,cell+2,cell+2)}
  if(s.companion&&game.tile(s.companion.x,s.companion.y).seen){const [sx,sy]=px(s.companion.x,s.companion.y);c.fillStyle='#b5dabd';c.fillRect(sx+2,sy+2,Math.max(2,cell-3),Math.max(2,cell-3))}
@@ -5146,7 +5205,7 @@ function sync(){paintDirty=true;syncPrimaryNavigation();syncMiniMap();const s=ga
  $('#collapse').textContent=dangerText;$('#collapse').className=d.warning||d.worldLeft!==null?'urgent':'';$('#collapse').title=d.warning?'裂缝会在时间推进'+d.safeTurns+'次后塌落，别在这里做耗时的事。':'';
  const near=game.nearby();$('#location').textContent=home?'':near?near.name+(!near.searched&&near.preview?' · '+near.preview:''):(region?.name||'');
  $('#facing').textContent=home?'':holdBlocked?'已停步 · 松开后继续':'面向 '+({'0,1':'↓','0,-1':'↑','1,0':'→','-1,0':'←'})[p.facing.join(',')];
- const latest=[...(s.alerts||[])].reverse().find(l=>l.tone==='danger')||s.alerts?.at(-1)||s.logs.filter(l=>l.tone!=='story').at(-1);$('#feedback').textContent=latest?.text||'';$('#feedback').className='feedback '+(latest?.tone||'');
+ const feedbackAction=game.actionFeedbackRecord(),latest=feedbackAction?feedbackAction.entry:[...(s.alerts||[])].reverse().find(l=>l.tone==='danger')||s.alerts?.at(-1)||s.logs.filter(l=>l.tone!=='story').at(-1);$('#feedback').textContent=latest?.text||'';$('#feedback').className='feedback '+(latest?.tone||'');
  document.querySelectorAll('[data-step]').forEach(el=>el.className=Number(el.dataset.step)<s.level?'passed':Number(el.dataset.step)===(s.mode==='won'?3:s.level)?'current':'');
  const hasGround=!home&&(Object.values(game.groundItems()).some(n=>n>0)||(game.groundEquipment().length>0||game.groundCards?.().length>0)),camp=home?campAction():null;$('#interact').disabled=!['home','playing'].includes(s.mode)||(camp?camp.blocked:!near&&!hasGround);$('#interact-label').textContent=camp?camp.label:hasGround&&near?'查看脚下物资':near?(near.container&&near.searched?'查看容器物品':near.hint):hasGround?'一并拾取脚下物资':'走近地点再互动';$('#interact').title=camp?camp.hint:near?.container&&!near.searched?'翻找时，附近怪物也会行动。找到后可以慢慢挑选。':'';$('#interact kbd').hidden=!!camp?.blocked;$('#bag-status').textContent=`已用 ${game.slots()}/${game.packSize()} 格`;$('#pickup').disabled=s.mode!=='playing';
  $('#equipment-note').textContent=p.stun?'被粘住了，再行动一次才能挣脱':s.companion?s.companion.name+(s.companion.waiting?'在安全处等候':'同行'):game.commonEffects().hardeningCharges?'硬化 · 剩余'+game.commonEffects().hardeningCharges+'次减伤':s.campClosed?'营地已失守':d.campLeft!==null?'营地快塌了，尽快从矿道出口离开':'';
@@ -5455,8 +5514,8 @@ function syncPresentation(){
  const mainMission=s.mode==='playing'?s.missions?.find(q=>q.primary):null;$('#task-button').dataset.compact=String(!!mainMission);$('#task-button').dataset.difficulty=String(mainMission?.tier??'');$('#task-title').textContent=task.title;$('#task-progress').textContent=task.progress||'';$('#task-arrow').textContent='';$('#task-requirement').textContent=task.requirement||'';$('#task-hint').textContent=s.mode==='playing'?'':task.hint||'';$('#task-button').title=[task.title,task.progress,task.requirement,task.hint].filter(Boolean).join('；');
  const tracked=s.mode==='playing'&&s.focusPinned?game.trackedMission():null;$('#task-side').textContent=s.mode==='playing'&&!s.extraction&&s.focusPinned&&mainMission&&tracked!==mainMission?'主线 · '+game.missionProgress(mainMission):'';
  const banner=$('#danger-banner');banner.hidden=!hazards.length;banner.innerHTML=hazards.length?esc(hazards[0].title)+(hazards.length>1?'<small>另有 '+(hazards.length-1)+' 项 · 详情 ›</small>':'<small>详情 ›</small>'):'';
- const latest=s.logs.at(-1);if(feedbackState.game!==game||feedbackState.level!==s.level||feedbackState.floorSeed!==s.floorSeed){feedbackState={game,level:s.level,floorSeed:s.floorSeed,last:latest,until:0};$('#action-feedback').textContent='';}
- else if(latest!==feedbackState.last){const start=s.logs.indexOf(feedbackState.last),fresh=s.logs.slice(start<0?-1:start+1).filter(l=>l.tone!=='story'),entry=fresh.findLast(l=>l.tone==='danger')||fresh.findLast(l=>l.kind==='hearing')||fresh.at(-1);feedbackState.last=latest;if(entry){$('#action-feedback').textContent=entry.text;$('#action-feedback').className=entry.tone;$('#action-feedback').title=entry.text;feedbackState.until=performance.now()+(entry.tone==='danger'?6000:entry.tone==='warn'?4000:2600);}}
+ const action=game.actionFeedbackRecord(),latest=s.logs.at(-1);if(feedbackState.game!==game||feedbackState.level!==s.level||feedbackState.floorSeed!==s.floorSeed){feedbackState={game,level:s.level,floorSeed:s.floorSeed,last:latest,action,until:0};$('#action-feedback').textContent='';}
+ else if(action!==feedbackState.action||latest!==feedbackState.last){const start=s.logs.indexOf(feedbackState.last),fresh=s.logs.slice(start<0?-1:start+1).filter(l=>l.tone!=='story'),entry=action?action.entry:fresh.findLast(l=>l.tone==='danger')||fresh.findLast(l=>l.kind==='hearing')||fresh.at(-1);feedbackState.last=latest;feedbackState.action=action;$('#action-feedback').textContent=entry?.text||'';$('#action-feedback').className=entry?.tone||'';$('#action-feedback').title=entry?.text||'';feedbackState.until=entry?performance.now()+(entry.tone==='danger'?6000:entry.kind==='combat'?3600:entry.tone==='warn'?4000:2600):0;}
  updateFeedback(performance.now());syncActionRemedy();
 }
 function syncActionRemedy(){

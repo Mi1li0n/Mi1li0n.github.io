@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#17152e">
+<title>消灭星星</title>
+<style>
+:root{color-scheme:dark;--ink:#f7f5ff;--muted:#aaa7c8;--panel:#24213f;--mint:#86f5c9}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--ink);background:radial-gradient(ellipse at 18% 0,#43376d 0,transparent 48%),radial-gradient(ellipse at 100% 90%,#223e51 0,transparent 45%),#17152e;font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;line-height:1.5}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}button:focus-visible{outline:3px solid #fff;outline-offset:3px}button:disabled{cursor:default}
+main{width:min(100% - 28px,520px);margin:24px auto}.intro{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}.eyebrow{margin:0 0 4px;color:var(--mint);font-weight:800;font-size:10px;letter-spacing:.22em}h1{margin:0;line-height:1.2;font-size:28px;letter-spacing:.02em}.tools{display:flex;gap:7px}.action{border:1px solid #ffffff17;border-radius:13px;min-height:42px;padding:9px 14px;font-weight:700;background:#a5f0d5;color:#192c32;box-shadow:0 3px 0 #69b9a0}.action.secondary{background:#ffffff0c;color:#dedbf4;box-shadow:none;font-size:12px}.action:hover{filter:brightness(1.1)}.sound{font-size:12px;min-width:60px}
+.game-card{padding:20px;border:1px solid #ffffff12;border-radius:28px;background:linear-gradient(150deg,#302b4ef2,#211e3bed);box-shadow:0 20px 65px #08081755,inset 0 1px 0 #ffffff08}
+.score-row{display:flex;justify-content:space-between;align-items:center;gap:12px}.stat-label{display:block;font-size:11px;color:var(--muted);letter-spacing:.04em}.score-primary strong{display:block;font-size:44px;line-height:1.12;letter-spacing:-.04em;font-variant-numeric:tabular-nums;transform-origin:left center}.round{font-size:12px;font-weight:800;border-radius:20px;background:#ffffff0a;color:var(--mint);padding:6px 12px;white-space:nowrap}
+.target-row{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:#c2bddb;margin:14px 0 8px}.target-row strong{color:#fff;font-variant-numeric:tabular-nums}#remaining{color:var(--mint)}progress{appearance:none;display:block;border:0;width:100%;height:7px;border-radius:10px;overflow:hidden;background:#ffffff09}progress::-webkit-progress-bar{background:#ffffff09}progress::-webkit-progress-value{background:linear-gradient(90deg,#79d7ef,#a5f0c4);border-radius:10px;transition:width .24s}progress::-moz-progress-bar{background:#a5f0c4;border-radius:10px}
+.play-area{margin-top:17px}.board-wrap{position:relative}.board{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;padding:10px;border:1px solid #ffffff0b;border-radius:19px;background:#100f25;box-shadow:inset 0 3px 15px #0004;width:100%;touch-action:manipulation}
+.star{position:relative;min-width:0;aspect-ratio:1;border:0;border-radius:10px;padding:0;display:grid;place-items:center;line-height:1;font-size:25px;color:#fff;isolation:isolate;text-shadow:0 2px 0 #0002;box-shadow:inset 0 1px 0 #ffffff70,inset 0 -4px 0 #0002,0 3px 4px #0003;transition:filter .12s}
+.star::before{content:"";position:absolute;inset:3px 5px 51%;border-radius:7px 7px 14px 14px;background:linear-gradient(#fff3,#fff0);z-index:-1}
+.star[data-color="0"]{background:linear-gradient(150deg,#70c8ff,#5285f5)}.star[data-color="1"]{background:linear-gradient(150deg,#62e4bf,#20b994)}.star[data-color="2"]{background:linear-gradient(150deg,#ffe783,#efa946)}.star[data-color="3"]{background:linear-gradient(150deg,#ff9eaf,#eb6389)}.star[data-color="4"]{background:linear-gradient(150deg,#c8a3ff,#9472e9)}
+.star.preview{filter:brightness(1.18);outline:2px solid #ffffffc9;outline-offset:-3px}.star.empty{background:#ffffff03;box-shadow:none;pointer-events:none}.star.empty::before{display:none}.star:disabled:not(.empty){filter:saturate(.7)}
+.effects{position:absolute;inset:0;pointer-events:none;z-index:5;overflow:visible}.particle{position:absolute;width:6px;height:6px;border-radius:2px;background:var(--particle-color);box-shadow:0 0 9px currentColor}.floating-score{position:absolute;color:#fff;font-size:28px;font-weight:900;text-shadow:0 2px 4px #14112d,0 0 18px #ffe399;white-space:nowrap;transform:translate(-50%,-50%)}
+.feedback{position:absolute;top:-6px;right:12px;z-index:6;color:#ffdfa6;font-size:12px;font-weight:800;pointer-events:none;text-shadow:0 2px 5px #17152e;min-height:18px}
+.preview-text{min-height:19px;text-align:center;font-size:12px;color:#c7c0df;margin:12px 0 0}.meta{display:flex;justify-content:space-between;gap:14px;border-top:1px solid #ffffff0c;margin-top:14px;padding-top:12px;color:var(--muted);font-size:11px}.meta strong{font-size:14px;color:#e7e2fc;font-variant-numeric:tabular-nums;margin-left:6px}.status{font-size:12px;color:#bbb5d3;line-height:1.6;min-height:20px;margin:12px 0 0}
+.result{margin-top:15px;padding:15px;border:1px solid #9beac940;background:#7ddcb911;border-radius:17px;display:flex;align-items:center;justify-content:space-between;gap:12px}.result[hidden]{display:none}.result h2{margin:0 0 4px;font-size:18px;color:#a5f0d5}.result p{margin:0;font-size:12px;color:#c1bdd5}.result .action{flex-shrink:0}
+.rules{margin:14px 4px 0;color:#b6afcd;font-size:11px;text-align:center;line-height:1.8}.rules strong{color:#ded8ef}.footer{text-align:center;color:#8e88a9;font-size:10px;margin:9px 0 0}
+@media(max-width:420px){main{width:calc(100% - 20px);margin:14px auto}.intro{margin-bottom:13px}h1{font-size:24px}.game-card{padding:14px;border-radius:22px}.board{padding:8px;gap:5px;border-radius:15px}.star{font-size:21px;border-radius:8px}.score-primary strong{font-size:38px}.action{padding:9px 10px}.result{flex-wrap:wrap}.result .action{width:100%}}
+@media(max-height:500px) and (min-width:620px){main{width:min(100% - 24px,850px);margin:8px auto}.intro{margin-bottom:8px;min-height:40px}.eyebrow{display:none}h1{font-size:22px}.game-card{position:relative;min-height:calc(100svh - 72px);padding:12px 16px 12px calc(min(272px,100svh - 112px) + 38px)}.play-area{position:absolute;left:12px;top:12px;width:min(272px,100svh - 112px);margin:0}.board{gap:3px;padding:6px}.star{font-size:clamp(15px,5vh,21px);border-radius:6px}.preview-text{font-size:10px;margin-top:5px}.rules,.footer{display:none}.result{flex-wrap:wrap}.score-primary strong{font-size:32px}.target-row{margin-top:8px}.meta{margin-top:10px;padding-top:8px}.status{margin-top:8px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}.star,progress::-webkit-progress-value{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<header class="intro"><div><p class="eyebrow">POP STARS / 经典消除</p><h1>消灭星星</h1></div><div class="tools"><button id="sound" class="action secondary sound" type="button" aria-pressed="false">声音 关</button><button id="restart" class="action secondary" type="button">重新开始</button></div></header>
+<section class="game-card" aria-label="消灭星星游戏">
+<div class="score-row"><div class="score-primary"><span class="stat-label">本关得分</span><strong id="score">0</strong></div><div id="round" class="round">第 1 关</div></div>
+<div class="target-row"><span>目标 <strong id="target">600</strong></span><span id="remaining">还差 600 分</span></div>
+<progress id="progress" aria-label="本关目标完成进度" value="0" max="600"></progress>
+<div class="play-area"><div class="board-wrap"><div id="board" class="board" role="group" aria-busy="false" aria-label="8 行 8 列星星棋盘，方向键移动，空格或回车消除"></div><div id="effects" class="effects" aria-hidden="true"></div><span id="feedback" class="feedback" aria-hidden="true"></span></div><p id="preview" class="preview-text">点相邻同色星星，一次连得越多分越高</p></div>
+<div class="meta"><span>累计 <strong id="total-score">0</strong></span><span>最高累计 <strong id="best-score">0</strong></span></div>
+<p id="message" class="status" role="status" aria-live="polite" aria-atomic="true">先找大块同色组合，给后面的连消留些空间。</p>
+<div id="result" class="result" hidden><div><h2 id="result-title"></h2><p id="result-detail"></p></div><button id="result-action" class="action" type="button"></button></div>
+</section>
+<p class="rules"><strong>2 颗起消 · 5 × 颗数² 得分</strong><br>方块下落、空列左移；无可消组合时，达标即可过关。</p>
+<p class="footer">悬停预览得分 · 方向键移动 · 回车 / 空格消除</p>
+</main>
+<script id="game-core">
+class PopStarsGame {
+  constructor(options = {}) {
+    this.rows = options.board ? options.board.length : (options.rows || 8);
+    this.cols = options.board ? options.board[0].length : (options.cols || 8);
+    this.rng = options.rng || Math.random;
+    this.baseTarget = options.baseTarget === undefined ? 600 : options.baseTarget;
+    this.level = 1;
+    this.score = 0;
+    this.totalScore = 0;
+    this.target = this.baseTarget;
+    this.status = 'playing';
+    this.board = options.board ? options.board.map(row => row.slice()) : this.generateBoard();
+  }
+  generateBoard() {
+    const board = Array.from({ length: this.rows }, () => Array.from({ length: this.cols }, () => Math.floor(this.rng() * 5)));
+    this.board = board;
+    if (!this.hasMoves() && this.cols > 1) board[this.rows - 1][1] = board[this.rows - 1][0];
+    // A legal, reproducible route bounds the goal for this exact board.
+    const attainable = PopStarsGame.baselineScore(board);
+    const nominal = Math.min(1200, this.baseTarget + (this.level - 1) * 100);
+    this.target = Math.max(10, Math.min(nominal, Math.floor(attainable * .8 / 10) * 10));
+    return board;
+  }
+  static baselineScore(board) {
+    const trial = new PopStarsGame({ board, baseTarget: Number.MAX_SAFE_INTEGER });
+    while (trial.hasMoves()) {
+      let largest = [];
+      const seen = new Set();
+      for (let r = 0; r < trial.rows; r++) for (let c = 0; c < trial.cols; c++) {
+        if (seen.has(r * trial.cols + c)) continue;
+        const group = trial.groupAt(r, c);
+        for (const [gr, gc] of group) seen.add(gr * trial.cols + gc);
+        if (group.length > largest.length) largest = group;
+      }
+      trial.remove(...largest[0]);
+    }
+    return trial.score;
+  }
+  groupAt(row, col) {
+    if (!Number.isInteger(row) || !Number.isInteger(col) || row < 0 || row >= this.rows || col < 0 || col >= this.cols) return [];
+    const color = this.board[row][col];
+    if (color === null) return [];
+    const group = [];
+    const seen = new Set();
+    const queue = [[row, col]];
+    while (queue.length) {
+      const [r, c] = queue.pop();
+      const key = r * this.cols + c;
+      if (r < 0 || r >= this.rows || c < 0 || c >= this.cols || seen.has(key) || this.board[r][c] !== color) continue;
+      seen.add(key);
+      group.push([r, c]);
+      queue.push([r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]);
+    }
+    return group;
+  }
+  hasMoves() {
+    for (let r = 0; r < this.rows; r++) for (let c = 0; c < this.cols; c++) {
+      const color = this.board[r][c];
+      if (color !== null && ((r + 1 < this.rows && this.board[r + 1][c] === color) || (c + 1 < this.cols && this.board[r][c + 1] === color))) return true;
+    }
+    return false;
+  }
+  remove(row, col) {
+    const group = this.status === 'playing' ? this.groupAt(row, col) : [];
+    if (group.length < 2) return { removed: 0, points: 0, status: this.status };
+    const cells = group.map(([r, c]) => ({ row: r, col: c, color: this.board[r][c] }));
+    for (const [r, c] of group) this.board[r][c] = null;
+    const columns = [];
+    for (let c = 0; c < this.cols; c++) {
+      const column = [];
+      for (let r = 0; r < this.rows; r++) if (this.board[r][c] !== null) column.push({ from: [r, c], color: this.board[r][c] });
+      if (column.length) columns.push(column);
+    }
+    const movements = [];
+    this.board = Array.from({ length: this.rows }, () => Array(this.cols).fill(null));
+    columns.forEach((column, c) => column.forEach((cell, index) => {
+      const r = this.rows - column.length + index;
+      this.board[r][c] = cell.color;
+      movements.push({ ...cell, to: [r, c] });
+    }));
+    const points = 5 * group.length * group.length;
+    this.score += points;
+    this.totalScore += points;
+    if (!this.hasMoves()) this.status = this.score >= this.target ? 'won' : 'lost';
+    return { removed: group.length, points, status: this.status, cells, movements };
+  }
+  nextLevel() {
+    if (this.status !== 'won') return false;
+    this.level++;
+    this.score = 0;
+    this.status = 'playing';
+    this.board = this.generateBoard();
+    return true;
+  }
+  restart() {
+    this.level = 1;
+    this.score = 0;
+    this.totalScore = 0;
+    this.target = this.baseTarget;
+    this.status = 'playing';
+    this.board = this.generateBoard();
+  }
+}
+globalThis.PopStarsGame = PopStarsGame;
+</script>
+<script>
+(() => {
+  const game = new PopStarsGame();
+  const $ = id => document.getElementById(id);
+  const board = $('board'), preview = $('preview'), message = $('message');
+  const result = $('result'), resultAction = $('result-action'), effects = $('effects');
+  const symbols = ['★', '◆', '●', '▲', '✿'];
+  const names = ['蓝色星形', '绿色菱形', '黄色圆形', '粉色三角', '紫色花形'];
+  const colors = ['#79c7ff', '#68efbc', '#ffe083', '#ff99b3', '#c8a2ff'];
+  const format = value => value.toLocaleString('zh-CN');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const animations = new Set();
+  let best = 0, activeRow = 0, activeCol = 0, busy = false, transaction = 0, restoreAfterMove = false;
+  let soundOn = false, audioContext;
+  try {
+    const stored = Number(localStorage.getItem('mini-pop-stars-best'));
+    if (Number.isSafeInteger(stored) && stored > 0) best = stored;
+  } catch (_) {}
+  function animate(node, frames, options) {
+    if (reduced.matches || !node.animate) return Promise.resolve();
+    const animation = node.animate(frames, options);
+    animations.add(animation);
+    return animation.finished.catch(() => {}).finally(() => animations.delete(animation));
+  }
+  function cancelEffects() {
+    transaction++;
+    animations.forEach(animation => animation.cancel());
+    animations.clear();
+    effects.replaceChildren();
+    $('feedback').textContent = '';
+    busy = false;
+    restoreAfterMove = false;
+    board.setAttribute('aria-busy', 'false');
+  }
+  reduced.addEventListener('change', () => {
+    if (reduced.matches) animations.forEach(animation => animation.finish());
+  });
+  function chime(count) {
+    if (!soundOn) return;
+    try {
+      const Audio = window.AudioContext || window.webkitAudioContext;
+      if (!Audio) return;
+      audioContext ||= new Audio();
+      if (audioContext.state === 'suspended') audioContext.resume().catch(() => {});
+      const now = audioContext.currentTime;
+      [0, 4, 7].slice(0, count >= 5 ? 3 : 2).forEach((note, i) => {
+        const oscillator = audioContext.createOscillator(), gain = audioContext.createGain();
+        oscillator.frequency.value = 440 * Math.pow(2, (note + Math.min(count, 12)) / 12);
+        oscillator.type = 'sine';
+        gain.gain.setValueAtTime(0, now + i * .045);
+        gain.gain.linearRampToValueAtTime(.035, now + i * .045 + .01);
+        gain.gain.exponentialRampToValueAtTime(.001, now + i * .045 + .2);
+        oscillator.connect(gain); gain.connect(audioContext.destination);
+        oscillator.start(now + i * .045); oscillator.stop(now + i * .045 + .21);
+        oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+      });
+    } catch (_) {}
+  }
+  $('sound').addEventListener('click', () => {
+    soundOn = !soundOn;
+    $('sound').textContent = soundOn ? '声音 开' : '声音 关';
+    $('sound').setAttribute('aria-pressed', String(soundOn));
+    if (soundOn) chime(3);
+  });
+  function clearPreview() {
+    board.querySelectorAll('.preview').forEach(tile => tile.classList.remove('preview'));
+    preview.textContent = busy ? '星星正在归位…' : game.status === 'playing' ? '点相邻同色星星，一次连得越多分越高' : '本关已结束';
+  }
+  const tileAt = (r, c) => board.querySelector('button[data-row="' + r + '"][data-col="' + c + '"]');
+  function showPreview(tile) {
+    if (busy) return;
+    clearPreview();
+    if (!tile || tile.disabled || game.status !== 'playing') return;
+    const group = game.groupAt(Number(tile.dataset.row), Number(tile.dataset.col));
+    if (group.length < 2) { preview.textContent = '这颗暂时落单了，先消除旁边的组合'; return; }
+    for (const [r, c] of group) tileAt(r, c).classList.add('preview');
+    preview.textContent = group.length + ' 颗一起消除 → ' + format(5 * group.length * group.length) + ' 分';
+  }
+  function chooseTabStop(tile) {
+    board.querySelectorAll('button').forEach(button => { button.tabIndex = button === tile ? 0 : -1; });
+    activeRow = Number(tile.dataset.row); activeCol = Number(tile.dataset.col);
+  }
+  function updateHUD() {
+    $('score').textContent = format(game.score); $('total-score').textContent = format(game.totalScore);
+    $('target').textContent = format(game.target);
+    $('remaining').textContent = game.score >= game.target ? '目标达成 ✓' : '还差 ' + format(game.target - game.score) + ' 分';
+    $('round').textContent = '第 ' + game.level + ' 关';
+    $('progress').max = game.target; $('progress').value = Math.min(game.score, game.target);
+    if (game.totalScore > best) {
+      best = game.totalScore;
+      try { localStorage.setItem('mini-pop-stars-best', String(best)); } catch (_) {}
+    }
+    $('best-score').textContent = format(best);
+    result.hidden = busy || game.status === 'playing';
+    if (!result.hidden) {
+      const won = game.status === 'won';
+      $('result-title').textContent = won ? '漂亮，过关！' : '再来一盘，试试大组合';
+      $('result-detail').textContent = won ? '本关收获 ' + format(game.score) + ' 分，继续挑战。' : '没有可消组合了，还差 ' + format(game.target - game.score) + ' 分。';
+      resultAction.textContent = won ? '进入下一关' : '重新挑战';
+    }
+  }
+  function renderBoard() {
+    const fragment = document.createDocumentFragment();
+    for (let r = 0; r < game.rows; r++) for (let c = 0; c < game.cols; c++) {
+      const color = game.board[r][c], tile = document.createElement(color === null ? 'span' : 'button');
+      tile.className = color === null ? 'star empty' : 'star';
+      tile.dataset.row = r; tile.dataset.col = c;
+      if (color === null) tile.setAttribute('aria-hidden', 'true');
+      else {
+        tile.type = 'button'; tile.dataset.color = color; tile.textContent = symbols[color];
+        tile.setAttribute('aria-label', '第 ' + (r + 1) + ' 行第 ' + (c + 1) + ' 列，' + names[color]);
+        tile.tabIndex = -1; tile.disabled = game.status !== 'playing';
+      }
+      fragment.append(tile);
+    }
+    board.replaceChildren(fragment);
+    const nextFocus = tileAt(activeRow, activeCol) || board.querySelector('button:not(:disabled)');
+    if (nextFocus && !nextFocus.disabled) chooseTabStop(nextFocus);
+    updateHUD(); clearPreview();
+  }
+  function restoreFocus() {
+    if (!result.hidden) resultAction.focus({ preventScroll: true });
+    else {
+      const next = tileAt(activeRow, activeCol) || board.querySelector('button:not(:disabled)');
+      if (next && !next.disabled) { next.focus({ preventScroll: true }); showPreview(next); }
+    }
+  }
+  function burst(rect, color, quantity = 4, distance = 40) {
+    if (reduced.matches) return;
+    const base = effects.getBoundingClientRect();
+    for (let i = 0; i < quantity; i++) {
+      const particle = document.createElement('i');
+      particle.className = 'particle';
+      particle.style.setProperty('--particle-color', colors[color]);
+      particle.style.color = colors[color];
+      particle.style.left = rect.left - base.left + rect.width / 2 + 'px';
+      particle.style.top = rect.top - base.top + rect.height / 2 + 'px';
+      effects.append(particle);
+      const angle = i / quantity * Math.PI * 2 + .4;
+      animate(particle, [
+        { transform: 'translate(0,0) rotate(0deg) scale(1)', opacity: 1 },
+        { transform: 'translate(' + Math.cos(angle) * distance + 'px,' + (Math.sin(angle) * distance + 18) + 'px) rotate(160deg) scale(.1)', opacity: 0 }
+      ], { duration: 430, easing: 'cubic-bezier(.16,.6,.45,1)' }).then(() => particle.remove());
+    }
+  }
+  function floatScore(rect, points) {
+    if (reduced.matches) return;
+    const base = effects.getBoundingClientRect(), label = document.createElement('span');
+    label.className = 'floating-score'; label.textContent = '+' + format(points);
+    label.style.left = Math.max(45, Math.min(base.width - 45, rect.left - base.left + rect.width / 2)) + 'px';
+    label.style.top = rect.top - base.top + rect.height / 2 + 'px';
+    effects.append(label);
+    animate(label, [
+      { transform: 'translate(-50%,-30%) scale(.7)', opacity: 0 },
+      { transform: 'translate(-50%,-70%) scale(1.12)', opacity: 1, offset: .25 },
+      { transform: 'translate(-50%,-170%) scale(1)', opacity: 0 }
+    ], { duration: 690, easing: 'ease-out' }).then(() => label.remove());
+  }
+  async function choose(tile, keyboard) {
+    if (!tile || tile.disabled || busy) return;
+    chooseTabStop(tile); clearPreview();
+    const before = new Map(Array.from(board.querySelectorAll('button')).map(node => [node.dataset.row + ',' + node.dataset.col, { node, rect: node.getBoundingClientRect() }]));
+    const origin = tile.getBoundingClientRect(), move = game.remove(activeRow, activeCol);
+    if (!move.removed) {
+      message.textContent = '至少需要 2 颗上下左右相连的同色星星。';
+      animate(tile, [{ transform: 'translateX(0)' }, { transform: 'translateX(-3px)' }, { transform: 'translateX(3px)' }, { transform: 'translateX(0)' }], { duration: 180 });
+      return;
+    }
+    busy = true; restoreAfterMove = keyboard; board.setAttribute('aria-busy', 'true');
+    const token = ++transaction;
+    clearPreview(); chime(move.removed); floatScore(origin, move.points);
+    $('feedback').textContent = move.removed >= 10 ? '大连消！' : move.removed >= 5 ? '漂亮！' : '';
+    const popping = move.cells.map((cell, index) => {
+      const { node, rect } = before.get(cell.row + ',' + cell.col);
+      if (index < 14) burst(rect, cell.color, 3);
+      // Hide popped tiles once their animation ends, until the board is rebuilt.
+      node.style.visibility = 'hidden';
+      return animate(node, [
+        { transform: 'scale(1)', opacity: 1, visibility: 'visible' },
+        { transform: 'scale(1.18)', opacity: 1, visibility: 'visible', offset: .32 },
+        { transform: 'scale(.12)', opacity: 0, visibility: 'visible' }
+      ], { duration: 180, easing: 'ease-in' });
+    });
+    await Promise.all(popping);
+    if (token !== transaction) return;
+    renderBoard();
+    const falling = move.movements.map(cell => {
+      const node = tileAt(...cell.to), old = before.get(cell.from.join(',')).rect, next = node.getBoundingClientRect();
+      const dx = old.left - next.left, dy = old.top - next.top;
+      if (!dx && !dy) return Promise.resolve();
+      return animate(node, [{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'translate(0,0)' }], { duration: 240, easing: 'cubic-bezier(.22,.8,.32,1.12)' });
+    });
+    falling.push(animate($('score'), [{ transform: 'scale(1.1)', color: '#a5f0d5' }, { transform: 'scale(1)', color: '#f7f5ff' }], { duration: 240, easing: 'ease-out' }));
+    await Promise.all(falling);
+    if (token !== transaction) return;
+    busy = false; board.setAttribute('aria-busy', 'false');
+    updateHUD(); clearPreview();
+    if (restoreAfterMove) restoreFocus();
+    restoreAfterMove = false;
+    const ending = game.status === 'won' ? '本关达标，可以进入下一关。' : game.status === 'lost' ? '本关结束，还差 ' + format(game.target - game.score) + ' 分。' : game.score >= game.target ? '已达标，继续消除直到本关结束。' : '还差 ' + format(game.target - game.score) + ' 分。';
+    message.textContent = '消除 ' + move.removed + ' 颗，得到 ' + format(move.points) + ' 分。' + ending;
+    if (game.status === 'won') {
+      const rect = board.getBoundingClientRect();
+      for (let i = 0; i < 5; i++) burst({ left: rect.left + rect.width * (i + .5) / 5, top: rect.top + rect.height * .4, width: 0, height: 0 }, i, 8, 95);
+    }
+  }
+  document.addEventListener('focusin', event => {
+    // Rebuilding the board may need focus restoration; intentionally leaving it does not.
+    if (busy && !board.contains(event.target)) restoreAfterMove = false;
+  });
+  board.addEventListener('pointerover', event => showPreview(event.target.closest('button')));
+  board.addEventListener('pointerleave', () => { if (board.contains(document.activeElement)) showPreview(document.activeElement); else clearPreview(); });
+  board.addEventListener('focusin', event => { if (event.target.matches('button')) { chooseTabStop(event.target); showPreview(event.target); } });
+  board.addEventListener('focusout', event => { if (!board.contains(event.relatedTarget)) clearPreview(); });
+  board.addEventListener('click', event => choose(event.target.closest('button'), event.detail === 0));
+  board.addEventListener('keydown', event => {
+    const direction = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] }[event.key];
+    const tile = event.target.closest('button');
+    if (!tile || !direction) return;
+    event.preventDefault();
+    if (busy) return;
+    let r = Number(tile.dataset.row) + direction[0], c = Number(tile.dataset.col) + direction[1];
+    while (r >= 0 && r < game.rows && c >= 0 && c < game.cols) {
+      const next = tileAt(r, c);
+      if (next && !next.disabled) { next.focus(); break; }
+      r += direction[0]; c += direction[1];
+    }
+  });
+  function restart() {
+    cancelEffects(); game.restart(); activeRow = 0; activeCol = 0; renderBoard();
+    message.textContent = '新的一局，先找大块同色组合。';
+  }
+  $('restart').addEventListener('click', restart);
+  resultAction.addEventListener('click', () => {
+    cancelEffects();
+    if (game.status === 'won') {
+      game.nextLevel(); activeRow = 0; activeCol = 0; renderBoard(); restoreFocus();
+      message.textContent = '进入第 ' + game.level + ' 关，目标 ' + format(game.target) + ' 分。';
+    } else { restart(); restoreFocus(); }
+  });
+  renderBoard();
+})();
+</script>
+</body>
+</html>
