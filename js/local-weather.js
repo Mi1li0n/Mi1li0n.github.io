@@ -6,10 +6,11 @@
   const byId = name => document.getElementById(`local-weather-${name}`);
   const locationKey = 'blog-weather-location-v1';
   const cacheKey = 'blog-weather-cache-v1';
-  const halfHour = 30 * 60 * 1000;
   const oneHour = 60 * 60 * 1000;
   const sixHours = 6 * 60 * 60 * 1000;
-  const oneDay = 24 * 60 * 60 * 1000;
+  const state = window.BlogWeatherState;
+  if (!state) return;
+  const { recent, validLocation, sameLocation, conditions, validWeather, validCache, freshCache, periodAt } = state;
   const ipProviders = [
     { id: 'ipwhois', name: 'IPWHOIS', href: 'https://ipwhois.io/', url: 'https://ipwho.is/?lang=zh-CN&fields=success,message,city,latitude,longitude' },
     { id: 'ipsb', name: 'IP.SB', href: 'https://ip.sb/', url: 'https://api.ip.sb/geoip' }
@@ -19,42 +20,6 @@
   }
   function write(key, value) {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) {}
-  }
-  function recent(time, age) {
-    return Number.isFinite(time) && time <= Date.now() + 60000 && Date.now() - time < age;
-  }
-  function validLocation(value) {
-    return value && typeof value.city === 'string' && value.city.trim().length > 0 && value.city.length <= 120 &&
-      Number.isFinite(value.latitude) && Math.abs(value.latitude) <= 90 &&
-      Number.isFinite(value.longitude) && Math.abs(value.longitude) <= 180 &&
-      (value.source === 'ip' || value.source === 'manual');
-  }
-  function sameLocation(a, b) {
-    return a && b && a.latitude === b.latitude && a.longitude === b.longitude && a.city === b.city;
-  }
-  // WMO codes; snow and fog retain their real labels while using the cloudy artwork.
-  function conditions(code, day) {
-    if (code === 0) return { text: '晴', icon: day ? '☀' : '☾', scene: day ? 'sunny' : 'night' };
-    if (code === 1) return { text: '晴间多云', icon: day ? '🌤' : '☾', scene: day ? 'sunny' : 'night' };
-    if (code === 2 || code === 3) return { text: code === 2 ? '多云' : '阴', icon: '☁', scene: 'cloudy' };
-    if ([45, 48].includes(code)) return { text: '雾', icon: '🌫', scene: 'cloudy' };
-    if ([51, 53, 55].includes(code)) return { text: '毛毛雨', icon: '🌧', scene: 'rain' };
-    if ([56, 57, 66, 67].includes(code)) return { text: '冻雨', icon: '🌧', scene: 'rain' };
-    if ([61, 63, 65].includes(code)) return { text: { 61: '小雨', 63: '中雨', 65: '大雨' }[code], icon: '🌧', scene: 'rain' };
-    if ([80, 81, 82].includes(code)) return { text: '阵雨', icon: '🌦', scene: 'rain' };
-    if ([71, 73, 75, 77, 85, 86].includes(code)) return { text: '雪', icon: '❄', scene: 'cloudy' };
-    if ([95, 96, 99].includes(code)) return { text: code === 95 ? '雷雨' : '雷雨伴冰雹', icon: '⛈', scene: 'storm' };
-    return null;
-  }
-  function validWeather(data) {
-    return data && Number.isFinite(data.temperature_2m) && data.temperature_2m >= -100 && data.temperature_2m <= 70 &&
-      (data.is_day === 0 || data.is_day === 1) && recent(data.time * 1000, oneDay) && conditions(data.weather_code, data.is_day);
-  }
-  function validCache(value) {
-    return value && validLocation(value.location) && validWeather(value.data) && recent(value.fetchedAt, oneDay);
-  }
-  function freshCache(value) {
-    return validCache(value) && recent(value.fetchedAt, halfHour) && recent(value.data.time * 1000, oneHour);
   }
   async function fetchJSON(url) {
     const controller = new AbortController();
@@ -90,8 +55,8 @@
     throw new Error('Location unavailable');
   }
 
-  function publish(scene) {
-    document.dispatchEvent(new CustomEvent('blog:local-weather', { detail: { scene } }));
+  function publish(value) {
+    document.dispatchEvent(new CustomEvent('blog:local-weather', { detail: value || { scene: null, period: null } }));
   }
   function showLocation(value) {
     byId('city').textContent = value ? value.city : '尚未确定城市';
@@ -114,7 +79,7 @@
   }
   function render(snapshot, stale = false) {
     const data = snapshot.data;
-    const weather = conditions(data.weather_code, data.is_day);
+    const weather = conditions(data.weather_code, stale ? data.is_day : periodAt(snapshot) === 'day');
     showLocation(snapshot.location);
     byId('reading').hidden = false;
     byId('description').hidden = false;
@@ -131,7 +96,7 @@
       time = new Intl.DateTimeFormat('zh-CN', { timeZone: snapshot.timezone || 'UTC', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(date);
     } catch (_) { time = date.toISOString().slice(5, 16).replace('T', ' ') + ' UTC'; }
     byId('status').textContent = `${stale ? '缓存' : '当地时间'} ${time}`;
-    if (!stale) publish(weather.scene);
+    publish(stale ? null : state.background(snapshot, location));
   }
   function showCached() {
     if (!cached || !validCache(cached) || !sameLocation(cached.location, location)) return false;
@@ -171,11 +136,11 @@
       }
       const url = new URL('https://api.open-meteo.com/v1/forecast');
       url.search = new URLSearchParams({ latitude: location.latitude, longitude: location.longitude,
-        current: 'temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,is_day', timezone: 'auto', timeformat: 'unixtime', forecast_days: '1' });
+        current: 'temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,is_day', daily: 'sunrise,sunset', timezone: 'auto', timeformat: 'unixtime', forecast_days: '2' });
       const result = await fetchJSON(url);
       if (request !== requestNumber) return;
       if (!validWeather(result.current) || !recent(result.current.time * 1000, oneHour)) throw new Error('Invalid or outdated weather');
-      cached = { location: { ...location }, data: result.current, timezone: result.timezone, fetchedAt: Date.now() };
+      cached = { location: { ...location }, data: result.current, daily: result.daily, timezone: result.timezone, fetchedAt: Date.now() };
       write(cacheKey, cached);
       render(cached);
       if (usingSavedLocation) byId('status').textContent = '定位暂不可用，沿用上次城市 · ' + byId('status').textContent;
@@ -267,11 +232,17 @@
   });
 
   function refreshIfNeeded() {
-    if (document.hidden || busy || Date.now() - lastAttempt < 5 * 60 * 1000) return;
-    if (!freshCache(cached) || !sameLocation(cached.location, location)) load();
+    if (document.hidden) return;
+    // Recompute daylight locally even during the request cooldown or a slow refresh.
+    const local = state.background(cached, location);
+    publish(local);
+    if (local) byId('icon').textContent = conditions(cached.data.weather_code, local.period === 'day').icon;
+    if (busy || Date.now() - lastAttempt < 5 * 60 * 1000) return;
+    if (!local || (location.source === 'ip' && !recent(location.savedAt, sixHours))) load();
   }
   document.addEventListener('visibilitychange', refreshIfNeeded);
   window.addEventListener('pageshow', event => { if (event.persisted) refreshIfNeeded(); });
+  window.addEventListener('online', refreshIfNeeded);
   // Check cheaply once a minute; request only after TTL expiry, including a slow first response.
   setInterval(refreshIfNeeded, 60 * 1000);
   load();
